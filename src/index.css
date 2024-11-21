@@ -1,0 +1,34 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+@font-face {
+  font-family: 'Futura Pro';
+  src: url('/src/fonts/futura/FUTURA45LIGHT.TTF') format('truetype'),
+       url('/src/fonts/futura/FUTURA46LIGHTITALIC.TTF') format('truetype'),
+       url('/src/fonts/futura/FUTURA55REGULAR.TTF') format('truetype'),
+       url('/src/fonts/futura/FUTURA56ITALIC.TTF') format('truetype'),
+       url('/src/fonts/futura/FUTURA65MEDIUM.TTF') format('truetype'),
+       url('/src/fonts/futura/FUTURA66MEDIUMITALIC.TTF') format('truetype'),
+       url('/src/fonts/futura/FUTURA75BOLD.TTF') format('truetype'),
+       url('/src/fonts/futura/FUTURA76BOLDITALIC.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  font-family: 'Futura Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

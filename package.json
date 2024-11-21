@@ -1,0 +1,69 @@
+{
+  "name": "iaeste_ap_admin",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.6.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.113",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "firebase": "^10.14.1",
+    "iaeste_ap_admin": "file:",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-query": "3.39.3",
+    "react-router-dom": "6.26.2",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4",
+    "workbox-cacheable-response": "^7.1.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-class-properties": "^7.25.7",
+    "@babel/plugin-transform-nullish-coalescing-operator": "^7.25.8",
+    "@babel/plugin-transform-numeric-separator": "^7.25.8",
+    "@babel/plugin-transform-optional-chaining": "^7.25.8",
+    "@babel/plugin-transform-private-methods": "^7.25.7",
+    "@babel/plugin-transform-private-property-in-object": "^7.25.8",
+    "@jridgewell/sourcemap-codec": "^1.5.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.0.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-react": "^7.37.1",
+    "glob": "^9.0.0",
+    "postcss": "^8.4.47",
+    "rimraf": "^4.0.0",
+    "svgo": "^3.3.2",
+    "tailwindcss": "^3.4.13"
+  }
+}

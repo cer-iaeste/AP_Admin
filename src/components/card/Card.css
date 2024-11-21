@@ -1,0 +1,192 @@
+.section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.background {
+    padding: 0.5rem 1rem;
+    background-color: rgb(224 242 254);
+}
+
+.container {
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.elements-position {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.form {
+    margin-top: 2.5rem;
+    background-color: rgb(243 244 246);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    border-width: 2px;
+    border-color: #1B75BB;
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.75rem; /* 28px */
+}
+
+@media (min-width: 640px) {
+    .form {
+        font-size: 1.5rem; /* 24px */
+        line-height: 2rem; /* 32px */
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+    }
+}
+
+.spacing-y > * + * {
+    margin-top: 1rem;
+}
+
+.table-margins {
+    margin-top: 2.5rem;
+    padding-bottom: 6rem; /* Added padding for footer */
+}
+
+.card-table {
+    width: 100%;
+    border: 1px solid #1B75BB;
+    table-layout: auto;
+}
+
+.card-table-head {
+    background: #1B75BB;
+    color: white;
+    text-align: center;
+}
+
+.card-table-head th {
+    padding: 0.5rem;
+}
+
+.card-table-row {
+    border-bottom: 1px solid #1B75BB;
+    background: white;
+}
+
+.card-table-row td {
+    padding: 0.25rem;
+    font-weight: 600;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 85px;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    border: 2px solid;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.card-grid-body {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border: solid 1px black;
+    background: #F1F1E6;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.card-grid-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.card-grid-title {
+    margin-left: 0.25rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 2rem; 
+}
+
+.card-grid textarea {
+    width: 100%;
+    border: 2px solid;
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.textarea {
+    width: 100%;
+    border: 2px solid;
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    background: #F1F1E6;
+    font-weight: 600;
+}
+
+.card-grid label {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 600;
+}
+
+.delete-btn {
+    background: white;
+    color: rgb(239 68 68);;
+}
+
+.delete-btn:hover {
+    background: rgb(239 68 68);
+    color: white;
+}
+
+@media (max-width: 720px) {
+    .card-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 720px) and (max-width: 1024px) {
+    .card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.accordion-header {
+    padding: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all;
+    transition-duration: 300ms;
+    background: #1B75BB;
+    color: white;
+}
+
+.accordion-header-items {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}

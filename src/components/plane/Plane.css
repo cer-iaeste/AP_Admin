@@ -1,0 +1,12 @@
+@keyframes planePulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .5;
+    }
+  }
+
+.animatePlane {
+    animation: planePulse 1.1s ease-in-out infinite;
+}
