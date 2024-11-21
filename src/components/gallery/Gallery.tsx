@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"; // Import deleteObject and ref if using Firebase storage
+import { ref, uploadBytes, deleteObject } from "firebase/storage"; // Import deleteObject and ref if using Firebase storage
 import { storage } from "../../firebase"; // Update with your Firebase config path
 import CardFooter from "../card/CardFooter";
 import { updateCountryField } from "../../service/CountryService";
@@ -36,7 +36,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country }) => {
             setImagesToDelete([...imagesToDelete, url])
             setIsChanged(true)
         }
-        const imageRef = ref(storage, url);
+        // const imageRef = ref(storage, url);
         setIsChanged(true)
     };
 

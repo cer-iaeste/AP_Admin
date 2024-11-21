@@ -3,7 +3,7 @@ import CardFooter from "../card/CardFooter";
 import { updateCountryField } from "../../service/CountryService";
 import "../card/Card.css"
 import { CuisineType, OtherType } from "../../types/types";
-import useWindowSize from "../../hooks/useScreenSize";
+// import useWindowSize from "../../hooks/useScreenSize";
 
 interface CuisineProps {
     country: string
@@ -21,7 +21,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine }) => {
     const [isChanged, setIsChanged] = useState(false)
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
 
-    const { width } = useWindowSize()
+    // const { width } = useWindowSize()
 
     const setInitialCuisineData = () => {
         const data: CuisineMapType[] = [

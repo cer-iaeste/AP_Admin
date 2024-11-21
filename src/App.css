@@ -42,6 +42,10 @@
   background: linear-gradient(to right, #1B75BB, #27A9E1, #49C0B5);
 }
 
+.bg-gradient-opacity {
+  background: linear-gradient(to right, rgba(27, 117, 187, 0.8), rgba(39, 169, 225, 0.8), rgba(73, 192, 181, 0.8));
+}
+
 .hover-bg-gradient {
   transition: background 0.01s ease;
 }

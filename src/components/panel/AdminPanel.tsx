@@ -3,7 +3,7 @@ import AdminNavbar from "../navbar/Navbar";
 import Sidebar from "../sidebar/Sidebar";
 import Landing from "../landing/Landing";
 import useWindowSize from "../../hooks/useScreenSize"
-import { Routes, useLocation, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Country from "../country/Country";
 import Card from "../card/Card";
 import { CountryType } from "../../types/types";
