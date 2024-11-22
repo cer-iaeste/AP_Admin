@@ -30,6 +30,7 @@ export async function fetchCountryData(country: string): Promise<CountryType | n
     if (cachedData) {
         const parsedData = JSON.parse(cachedData)
         const result = parsedData.find((data: CountryType) => data.name === country)
+        console.log(result)
         return result
     }
 

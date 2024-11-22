@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase";
+import { auth } from "../firebase";
 
 function AuthWrapper({ children }: { children: JSX.Element }) {
   const [user, loading] = useAuthState(auth);

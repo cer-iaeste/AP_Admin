@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { componentsCards, loadingTimer } from "../../global/Global";
+import { componentsCards, loadingTimer, mapCountryCards } from "../../global/Global";
 import Plane from "../plane/Plane";
 import { CardType, CountryType } from "../../types/types";
 import { fetchCountryData } from "../../service/CountryService";
@@ -15,9 +15,11 @@ const Country: React.FC<CountryProps> = ({ selectedCountry, selectCard }) => {
     const [cards, setCards] = useState<CardType[]>([])
 
     useEffect(() => {
+        console.log(selectedCountry)
         const fetchData = async () => {
             setIsLoading(true)
             const data = await fetchCountryData(selectedCountry)
+            console.log(data)
             setCountry(data)
         }
 
@@ -26,53 +28,8 @@ const Country: React.FC<CountryProps> = ({ selectedCountry, selectCard }) => {
     }, [selectedCountry]);
 
     useEffect(() => {
-        // local helper function
-        const getCardContent = (title: string): any => {
-            switch (title) {
-                case "Emergency Numbers":
-                    return country?.emergencyContacts ?? []
-                case "General Information":
-                    return country?.information ?? []
-                case "Cities With LCs":
-                    return country?.committees ?? []
-                case "Transportation":
-                    return country?.transport ?? []
-                case "Recommended Places":
-                    return country?.cities ?? []
-                case "Summer Reception":
-                    return country?.summerReception ?? []
-                case "Fun Facts":
-                    return country?.facts ?? []
-                case "Other Information":
-                    return country?.otherInformation ?? []
-                case "Gallery":
-                    return country?.gallery ?? []
-                case "Traditional Cuisine":
-                    return {
-                        food: country?.food ?? [],
-                        drinks: country?.drinks ?? []
-                    }
-                default:
-                    return [];
-            }
-        }
-
-        const checkIfSectionIsEmpty = (content: any): boolean => {
-            if (!content.hasOwnProperty("food")) return !content?.length
-            return !content.food.length || !content.drinks.length
-        }
-
-        if (country) {
-            // add links to cards
-            const mappedCards = componentsCards.map((card: CardType) => {
-                const content = getCardContent(card.title)
-                const isSectionEmpty = checkIfSectionIsEmpty(content)
-                return ({ ...card, content, isSectionEmpty })
-            })
-            setCards(mappedCards)
-            loadingTimer(setIsLoading)
-        }
-
+        setCards(mapCountryCards(country))
+        loadingTimer(setIsLoading)
     }, [country])
 
     const handleSelectCard = (card: string, content: any[]) => selectCard(card, content)

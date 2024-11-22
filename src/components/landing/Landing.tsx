@@ -1,4 +1,31 @@
-const Landing = () => {
+import React, { useState, useEffect } from "react";
+import { CountryType } from "../../types/types";
+
+interface LandingProps {
+    selectCountry: (countryName: string) => void
+    countries: CountryType[]
+}
+
+const Landing: React.FC<LandingProps> = ({ selectCountry, countries }) => {
+    const [displayedCountries, setDisplayedCountries] = useState<CountryType[]>([]);
+
+    const handleSelectCountry = (event: any): void => {
+        const countryName = event.currentTarget.dataset.name;
+        selectCountry(countryName)
+    }
+
+    const onFilterCountriesHandler = (e: any): void => {
+        const typedCountry = e.target.value;
+        const filteredCountries = !typedCountry
+            ? countries
+            : countries.filter((country: CountryType) => country.name.toLowerCase().includes(typedCountry.toLowerCase()))
+        setDisplayedCountries(filteredCountries)
+    };
+
+    useEffect(() => {
+        setDisplayedCountries(countries)
+    }, [countries])
+
 
     const cards = [
         {
@@ -19,44 +46,40 @@ const Landing = () => {
     ]
 
     return (
-        <section className="bg-sky-100 h-full text-[#1B75BB] flex flex-col">
-            <div className="my-4 text-center font-bold flex flex-col space-y-4 items-center">
+        <section className="bg-sky-100 h-full text-[#1B75BB] flex flex-col min-h-screen">
+            {/* <div className="my-4 text-center font-bold flex flex-col space-y-4 items-center">
                 <i className="fa fa-cogs text-5xl"></i>
                 <h1 className="text-5xl">IAESTE AP Admin Panel</h1>
-            </div>
-            <div className="max-w-2xl mx-auto text-center my-4 space-y-2">
+            </div> */}
+            <div className="max-w-4xl mx-auto text-center my-4 space-y-2">
                 <h3 className="font-semibold text-3xl pb-2">Welcome, Admin!</h3>
-                <span className="text-lg md:text-2xl">Manage the platform’s content and ensure each country's page is up-to-date. Use this dashboard to add, edit, or delete components for each country’s page and customize the information displayed to users.</span>
-                <div className="pt-2 font-bold items-center text-lg">
-                    <i className="fa fa-circle-info mr-3"></i>Start by selecting a country from the sidebar to access the country menu
-                </div>
+                <span className="text-lg md:text-2xl">Manage the platform’s content and ensure each country's page is up-to-date. Use this dashboard to add, edit or delete components for each country and customize the information displayed to users.</span>
             </div>
-            <div className="text-center sm:text-lg md:text-xl flex flex-col w-full mt-4">
-                <div className="text-center items-center justify-center max-w-2xl mx-auto">
-                    <h3 className="text-3xl font-semibold pb-2">About</h3>
-                    <span>The Admin Panel is a powerful tool designed to help administrators manage the content for each country's page. It provides an intuitive interface for creating, updating, and deleting components associated with the pages of the countries listed on the platform.</span>
+            <div className="font-bold items-center text-lg">
+                    <i className="fa fa-circle-info mr-3"></i>Start by selecting a country
                 </div>
-                <div className="mt-8 space-y-4">
-                    <span className="font-semibold text-3xl">Key features</span>
-                    <ul className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 max-w-5xl mx-auto">
-                        {cards.map((card, index) =>
-                            <li key={index} className="bg-gray-100 shadow-xl space-y-2 rounded-lg p-2 py-6 sm:p-6 text-center text-[#1B75BB] max-w-lg mx-auto">
-                                {/* Top half with the icon */}
-                                <div className="flex flex-col justify-center space-y-2 h-1/2">
-                                    <i className={`fa ${card.icon} text-4xl aria-hidden='true'`} />
-                                    <h1 className="text-2xl font-bold">{card.title}</h1>
-                                </div>
-
-                                {/* Bottom half with the title */}
-                                <div className="flex grow items-center justify-center h-1/2">
-                                    <h3 className="text-base">{card.desc}</h3>
-                                </div>
-                            </li>
-                        )}
-                    </ul>
+            <div className="mt-6 space-y-4">
+                <span className="font-semibold text-3xl">IAESTE CER & CoRe countries</span>
+                <div>
+                    <input
+                        type="text"
+                        className="p-2 max-w-md w-full border border-solid border-black rounded-xl"
+                        placeholder="Search for a country"
+                        onChange={onFilterCountriesHandler}
+                    />
                 </div>
                 
+
+                <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 px-4 max-w-5xl mx-auto">
+                    {displayedCountries.map((country) =>
+                        <li key={country.id} data-name={country.name} onClick={handleSelectCountry} className={`flex flex-col items-center p-3 shadow-xl rounded-md bg-gray-100 hover-bg-gradient cursor-pointer`}>
+                            <img src={country.imageSrc} alt={country.imageAlt} className="rounded-full h-20 w-20 border hover:border-white" />
+                            <span className="text-lg mt-2 font-semibold text-wrap">{country.name}</span>
+                        </li>
+                    )}
+                </ul>
             </div>
+            
         </section>
     )
 }

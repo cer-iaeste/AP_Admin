@@ -1,4 +1,4 @@
-import { CardType } from "../types/types";
+import { CardType, CountryType } from "../types/types";
 
 export const componentsCards: CardType[] = [
     // { title: "Hero Banner", icon: "fa fa-chalkboard" },
@@ -47,3 +47,50 @@ export const GENERAL_INFO_CONSTANTS  = [
     "SIM card providers",
     "Population"
 ]
+
+export const mapCountryCards = (country: CountryType | null): CardType[] => {
+     // local helper function
+    const getCardContent = (title: string): any => {
+        switch (title) {
+            case "Emergency Numbers":
+                return country?.emergencyContacts ?? []
+            case "General Information":
+                return country?.information ?? []
+            case "Cities With LCs":
+                return country?.committees ?? []
+            case "Transportation":
+                return country?.transport ?? []
+            case "Recommended Places":
+                return country?.cities ?? []
+            case "Summer Reception":
+                return country?.summerReception ?? []
+            case "Fun Facts":
+                return country?.facts ?? []
+            case "Other Information":
+                return country?.otherInformation ?? []
+            case "Gallery":
+                return country?.gallery ?? []
+            case "Traditional Cuisine":
+                return {
+                    food: country?.food ?? [],
+                    drinks: country?.drinks ?? []
+                }
+            default:
+                return [];
+        }
+    }
+     // local helper function
+    const checkIfSectionIsEmpty = (content: any): boolean => {
+        if (!content.hasOwnProperty("food")) return !content?.length
+        return !content.food.length || !content.drinks.length
+    }
+
+
+    if (country) return componentsCards.map((card: CardType) => {
+        const content = getCardContent(card.title)
+        const isSectionEmpty = checkIfSectionIsEmpty(content)
+        return ({...card, content, isSectionEmpty})
+    })
+
+    return []
+}

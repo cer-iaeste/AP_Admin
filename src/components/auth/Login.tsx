@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase";
+import { useNavigate } from "react-router-dom";
+import cerLogo from "../../images/cer-logo-white.png";
+import AuthService from "../../service/AuthService";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -9,21 +10,23 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [emailFocused, setEmailFocused] = useState(false);  // To track if email input is focused
     const [passwordFocused, setPasswordFocused] = useState(false);  // To track if password input is focused
-
+    const nav = useNavigate()
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            // Redirect or display success message
-        } catch (err: any) {
-            setError(err.message);
-        }
+        AuthService.login(email, password).then(data => {
+            if (data) {
+                if (data.role === "user" && data.country) nav(`/${data.country}`)
+                else nav("/")
+            } else setError("Invalid login credentials!")
+        })
     };
+
 
     return (
         <div className="flex items-center justify-center h-screen bg-gradient-opacity">
-            <div className="w-full max-w-md p-8 space-y-6 bg-gradient rounded-lg shadow-xl border-2 border-black">
+            <div className="w-full max-w-sm mx-10 p-8 space-y-6 bg-gradient rounded-lg shadow-xl border-2 border-black">
+                <img alt="CER Summer App" className="h-16 w-auto mx-auto" src={cerLogo} />
                 <h2 className="text-4xl font-bold text-center text-white">IAESTE AP Admin Panel</h2>
                 {/* <h2 className="text-2xl font-bold text-center text-gray-700">Login</h2> */}
                 <form className="space-y-4 font-semibold text-xl" onSubmit={handleLogin}>
@@ -72,7 +75,9 @@ const Login = () => {
                                 )}
                             </button>
                     </div>
-                    {error && <p className="text-sm text-red-600">{error}</p>}
+                    {error && <p className="rounded-lg bg-red-200 text-red-600">
+                        <i className="fa-solid fa-triangle-exclamation mr-2"></i>{error}
+                    </p>}
                     <button
                         type="submit"
                         className="w-full px-4 py-2 text-white bg-[#282c34] rounded-lg hover:bg-[#61dafb] border-2 border-black shadow-xl"

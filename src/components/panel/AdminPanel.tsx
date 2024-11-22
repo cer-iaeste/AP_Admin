@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import AdminNavbar from "../navbar/Navbar";
 import Sidebar from "../sidebar/Sidebar";
+import UserSidebar from "../sidebar/UserSidebar";
 import Landing from "../landing/Landing";
 import useWindowSize from "../../hooks/useScreenSize"
 import { Routes, Route, useNavigate } from "react-router-dom";
@@ -10,10 +11,11 @@ import { CountryType } from "../../types/types";
 import { loadingTimer } from "../../global/Global";
 import { fetchDbData } from "../../service/CountryService";
 import "../../App.css"
+import ProtectedRoute from "../../service/ProtectedRoute";
 
 const AdminPanel = () => {
     const { width } = useWindowSize()
-    // const location = useLocation();
+    const [role, setRole] = useState<"admin" | "user">("user")
     const navigate = useNavigate();
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -35,6 +37,7 @@ const AdminPanel = () => {
     const selectCard = (selectedCard: string, data: any[]): void => {
         setContent(data)
         setCard(selectedCard)
+        if (width <= 1024) setIsSidebarOpen(false)
     }
 
     // reset the values of the country and card and navigate back to home page
@@ -46,7 +49,7 @@ const AdminPanel = () => {
     const navigateCountry = (): void => setCard("")
 
     useEffect(() => {
-        setIsSidebarOpen(width > 1024);
+        setIsSidebarOpen(false);
         setIsLoading(false)
     }, [width])
 
@@ -72,7 +75,8 @@ const AdminPanel = () => {
             }
         }
         fetchData()
-    }, [countries]);
+    }, []);
+    
 
     useEffect(() => {
         let navigationLink = "/"
@@ -83,16 +87,42 @@ const AdminPanel = () => {
         navigate(navigationLink)
     }, [card, country, navigate])
 
+    
+    useEffect(() => {
+        const loggedIn = localStorage.getItem('loggedIn')
+        if (loggedIn) {
+            const user = JSON.parse(loggedIn)
+            setRole(user.role)
+            selectCountry(user.country ?? "")
+        }
+    }, []); 
+
     return (
         !isLoading
             ? <section className="flex flex-row">
-                <Sidebar isOpen={isSidebarOpen} country={country} selectCountry={selectCountry} countries={countries} navigateHome={navigateHome} toggleSidebar={toggleSidebar}/>
+                {role === "user" ?
+                    <UserSidebar isOpen={isSidebarOpen} selectedCountry={country} selectCard={selectCard} image="" toggleSidebar={toggleSidebar}/>
+                    : <Sidebar isOpen={isSidebarOpen} country={country} selectCountry={selectCountry} countries={countries} toggleSidebar={toggleSidebar} navigateHome={navigateHome}/>
+                }
                 <div className={`w-full transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"}`}>
-                    <AdminNavbar toggleSidebar={toggleSidebar} navigateHome={navigateHome} navigateCountry={navigateCountry} country={country} card={card}/>
+                    <AdminNavbar toggleSidebar={toggleSidebar} navigateHome={navigateHome} navigateCountry={navigateCountry} role={role} country={country} card={card} />
                     <Routes>
-                        <Route path="/" element={<Landing />} />
-                        <Route path="/:country" element={<Country selectedCountry={country} selectCard={selectCard} />} />
-                        <Route path="/:country/:card" element={<Card selectedCountry={country} selectedCard={card} content={content} />} />
+                        <Route path="/" element={
+                            <ProtectedRoute requiredRole="admin">
+                                <Landing countries={countries} selectCountry={selectCountry}/>
+                            </ProtectedRoute>
+                            
+                        } />
+                        <Route path="/:country" element={
+                            <ProtectedRoute requiredRole="user" requiredCountry={country}>
+                                <Country selectedCountry={country} selectCard={selectCard} />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/:country/:card" element={
+                            <ProtectedRoute requiredRole="user" requiredCountry={country}>
+                                <Card selectedCountry={country} selectedCard={card} content={content} />
+                            </ProtectedRoute>
+                        } />
                     </Routes>
                 </div>
                 {/* For mobile view*/}
