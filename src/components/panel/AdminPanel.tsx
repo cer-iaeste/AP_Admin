@@ -16,6 +16,7 @@ import ProtectedRoute from "../../service/ProtectedRoute";
 const AdminPanel = () => {
     const { width } = useWindowSize()
     const [role, setRole] = useState<"admin" | "user">("user")
+    const [countryImage, setCountryImage] = useState<string>("")
     const navigate = useNavigate();
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -94,6 +95,7 @@ const AdminPanel = () => {
             const user = JSON.parse(loggedIn)
             setRole(user.role)
             selectCountry(user.country ?? "")
+            setCountryImage(countries?.find(c => c.name === user.country)?.imageSrc ?? "")
         }
     }, []); 
 
@@ -101,7 +103,7 @@ const AdminPanel = () => {
         !isLoading
             ? <section className="flex flex-row">
                 {role === "user" ?
-                    <UserSidebar isOpen={isSidebarOpen} selectedCountry={country} selectCard={selectCard} image="" toggleSidebar={toggleSidebar}/>
+                    <UserSidebar isOpen={isSidebarOpen} selectedCountry={country} selectCard={selectCard} image={countryImage} toggleSidebar={toggleSidebar}/>
                     : <Sidebar isOpen={isSidebarOpen} country={country} selectCountry={selectCountry} countries={countries} toggleSidebar={toggleSidebar} navigateHome={navigateHome}/>
                 }
                 <div className={`w-full transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"}`}>
