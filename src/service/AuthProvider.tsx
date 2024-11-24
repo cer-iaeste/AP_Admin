@@ -7,6 +7,7 @@ interface AuthContextType {
     user: any;
     role: string;
     country?: string
+    loading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,10 +16,10 @@ export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
     const [user, setUser] = useState<any>(null)
     const [role, setRole] = useState<string>("")
     const [country, setCountry] = useState<string>("")
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            console.log("FB user: ", firebaseUser)
             if (firebaseUser) {
                 setUser(firebaseUser)
 
@@ -33,13 +34,14 @@ export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
                 setRole("")
                 setCountry("")
             }
+            setLoading(false);
         })
 
         return () => unsubscribe()
     }, [])
 
     return (
-        <AuthContext.Provider value={{ user, role, country }}>
+        <AuthContext.Provider value={{ user, role, country, loading }}>
             {children}
         </AuthContext.Provider>
     );

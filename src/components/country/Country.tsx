@@ -15,12 +15,10 @@ const Country: React.FC<CountryProps> = ({ selectedCountry, selectCard }) => {
     const [cards, setCards] = useState<CardType[]>([])
 
     useEffect(() => {
-        console.log(selectedCountry)
         const fetchData = async () => {
             setIsLoading(true)
             const data = await fetchCountryData(selectedCountry)
-            console.log(data)
-            setCountry(data)
+            if(data) setCountry(data)
         }
 
         fetchData()

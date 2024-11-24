@@ -25,35 +25,9 @@ export async function fetchDbData(): Promise<CountryType[]> {
     return fetchCountriesData();
 }
 
-export async function fetchCountryData(country: string): Promise<CountryType | null> {
-    const cachedData = localStorage.getItem(COUNTRIES_CACHE_KEY)
-    if (cachedData) {
-        const parsedData = JSON.parse(cachedData)
-        const result = parsedData.find((data: CountryType) => data.name === country)
-        console.log(result)
-        return result
-    }
-
-    try {
-        // Reference to the specific document "Austria" in the "countries" collection
-        const docRef = doc(db, "countries", "Austria")
-        // Fetch the document data
-        const docSnap = await getDoc(docRef)
-        // Set the data from the document
-        if (docSnap.exists()) {
-            const countryData = docSnap.data() as CountryType
-            // update local storage
-            const updatedCache = cachedData ? JSON.parse(cachedData) : {}
-            updatedCache[country] = countryData
-            localStorage.setItem(COUNTRY_CACHE_KEY, JSON.stringify(updatedCache))
-
-            return countryData
-
-        } else throw new Error("Failed to fetch country data!")
-    } catch (error) {
-        console.error("Error fetching country data: " + country + "; error: " + error)
-        return null;
-    }
+export async function fetchCountryData(country: string): Promise<CountryType | undefined> {
+    const countries = await fetchDbData()
+    return countries.find((data: CountryType) => data.name === country)
 }
 
 export async function updateCountryField(country: string, content: any, column: keyof CountryType, columnName: string) {

@@ -8,18 +8,17 @@ interface SidebarProps {
     isOpen: boolean
     selectCard: (card: string, data: any[]) => void
     selectedCountry: string
-    image: string
     toggleSidebar: () => void
 }
 
-const UserSidebar: React.FC<SidebarProps> = ({ isOpen, selectCard, selectedCountry, image, toggleSidebar }) => {
+const UserSidebar: React.FC<SidebarProps> = ({ isOpen, selectCard, selectedCountry, toggleSidebar }) => {
     const [country, setCountry] = useState<CountryType | null>(null);
     const [cards, setCards] = useState<CardType[]>([])
 
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchCountryData(selectedCountry)
-            setCountry(data)
+            if (data) setCountry(data)
         }
         fetchData()
     }, [selectedCountry]);
@@ -38,7 +37,7 @@ const UserSidebar: React.FC<SidebarProps> = ({ isOpen, selectCard, selectedCount
             <ul>
                 <li key="admin" className="border-b-2 px-2 text-2xl font-semibold flex justify-between">
                     <div className="flex items-center justify-center">
-                        <img src={image} alt={selectedCountry} className="rounded-full h-10 w-10 border" />
+                        <img src={country?.imageSrc} alt={selectedCountry} className="rounded-full h-10 w-10 border" />
                         <div className="flex flex-col font-bold text-[#1B75BB] text-left ml-2">
                             <span className="">IAESTE</span>
                             <span className="">{selectedCountry}</span>

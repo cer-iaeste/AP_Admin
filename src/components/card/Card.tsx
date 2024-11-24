@@ -29,8 +29,6 @@ const Card: React.FC<CardProps> = ({ selectedCountry, selectedCard, content }) =
         const timer = setTimeout(() => {
             setCard(selectedCard);
             setCountry(selectedCountry);
-            console.log(selectedCard)
-            console.log(content)
             // add the proper card component
             switch (selectedCard) {
                 case "Emergency Numbers":

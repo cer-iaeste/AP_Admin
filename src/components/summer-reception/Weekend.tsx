@@ -43,7 +43,6 @@ const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose 
 
     // Handle form submission (save changes)
     const handleSave = () => {
-        console.log("Form Data Submitted: ", weekendData);
         // Add logic to save the changes here
     };
 

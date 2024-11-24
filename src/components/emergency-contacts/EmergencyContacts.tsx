@@ -66,6 +66,16 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
         })
     };
 
+    // Handle delete with confirmation
+    const handleDeleteClick = (index: number) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+        if (confirmDelete) {
+            const newData = structuredClone(emergencyContacts).filter((_: EmergencyContactsType, i: number) => i !== index)
+            setContactData(newData)
+            setIsChanged(true)
+        }
+    }
+
     return (
         <div className="table-margins">
             {!!contactData.length ? (
@@ -74,6 +84,7 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
                         <tr className="card-table-head">
                             <th>Title</th>
                             <th>Emergency Number</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -106,6 +117,15 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
                                         className="w-full p-2 border text-xl bg-[#F1F1E6]"
                                     />
                                 </td>
+                                <td className="w-10">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDeleteClick(index)}
+                                        className="btn delete-btn"
+                                    >
+                                        <i className="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -120,7 +140,7 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
                         className="flex text-xl items-center p-2 rounded-md bg-[#1B75BB] hover-bg-gradient text-white gap-2 justify-center"
                         onClick={handleAddNewItem}
                     >
-                        <i className="fa fa-plus"></i> Add a new emergency number
+                        <i className="fa fa-plus"></i> Add emergency number
                     </button>
                 </div>
             )}

@@ -13,7 +13,7 @@ const AuthService = {
                 return data
             } else alert("User document not found!")
         } catch (error: any) {
-            alert("Error logging in")
+            return
         }
     },
     logout: async () => {

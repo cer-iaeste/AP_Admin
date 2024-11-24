@@ -94,3 +94,5 @@ export const mapCountryCards = (country: CountryType | null): CardType[] => {
 
     return []
 }
+
+export const emptyLocalStorage = () => localStorage.clear()

@@ -57,7 +57,6 @@ const Gallery: React.FC<GalleryProps> = ({ images, country }) => {
                 dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${country}%2Fgallery%2F${file.name}?alt=media`
             }
             setImagesData([...imagesData, newImage.url])
-            console.log(newImage.url)
             setImagesToUpload([...imagesToUpload, newImage])
             setIsChanged(true)
         } else alert("Error while uploading file!")
