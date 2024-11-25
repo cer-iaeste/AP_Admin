@@ -3,56 +3,32 @@ import CardFooter from "../card/CardFooter";
 import "../card/Card.css"
 import { InformationType } from "../../types/types";
 import useWindowSize from "../../hooks/useScreenSize";
-import { updateCountryField } from "../../service/CountryService";
-import { GENERAL_INFO_CONSTANTS } from "../../global/Global";
+import { CardProps, GENERAL_INFO_CONSTANTS } from "../../global/Global";
 
-interface GeneralInfoProps {
-    country: string
+interface GeneralInfoProps extends CardProps {
     information: InformationType[]
 }
 
-const GeneralInfo: React.FC<GeneralInfoProps> = ({ country, information }) => {
+const GeneralInfo: React.FC<GeneralInfoProps> = ({ country, information, handleSave, handleCancel, handleBack, handleInputChange }) => {
     const [infoData, setInfoData] = useState<InformationType[]>([])
     const [isChanged, setIsChanged] = useState(false)
 
     const { width } = useWindowSize()
 
-    const setInitialInfo = (info: InformationType[]) => {
-        const newInfo: InformationType[] = GENERAL_INFO_CONSTANTS.map(info => ({
-            name: info,
-            role: ""
-        }))
-        info?.forEach((item: InformationType) => {
-            const index = newInfo.findIndex(obj => obj.name === item.name)
-            if (index !== -1) newInfo[index].role = item.role
-        })
-        setInfoData(newInfo)
-    }
+    const mapInfo = (info: InformationType[]) => 
+        GENERAL_INFO_CONSTANTS.map(name => ({
+            name,
+            role: info.find(item => item.name === name)?.role || ""
+        }));    
 
     useEffect(() => {
-        setInitialInfo(information)
+        setInfoData(mapInfo(information))
     }, [information])
 
-    // Handle the change in input during editing
-    const handleInputChange = (e: any, index: number) => {
-        const newData = structuredClone(infoData)
-        newData[index].role = e.target.value
-        setInfoData(newData)
-        setIsChanged(true)
-    };
-
-    // Cancel the current action (reset the editing state)
-    const handleCancel = () => {
-        setInitialInfo(information)
-        setIsChanged(false) // Reset action in progress
-    };
-
-    // Save changes (apply the changes and close edit mode)
-    const handleSave = () => {
-        updateCountryField(country, infoData, "information", "General information").then(() => {
-            setIsChanged(false)
-        })
-    };
+    const onSave = () => handleSave(country, infoData, "information", "General information", setIsChanged)
+    const onCancel = () => handleCancel(setInfoData, mapInfo(information), setIsChanged)
+    const onBack = () => handleBack(isChanged, setInfoData, mapInfo(information), setIsChanged)
+    const onInputChange = (e: any, index: number, column: string) => handleInputChange(setInfoData, infoData, index, e.target.value, setIsChanged, column)
 
     return (
         <div className="table-margins">
@@ -74,7 +50,7 @@ const GeneralInfo: React.FC<GeneralInfoProps> = ({ country, information }) => {
                                     placeholder="Description"
                                     rows={width > 640 ? 1 : 3}
                                     value={info.role}
-                                    onChange={(e) => handleInputChange(e, index)}
+                                    onChange={(e) => onInputChange(e, index, "role")}
                                     className="w-full p-2 border text-xl bg-[#F1F1E6]"
                                     style={{ wordWrap: 'break-word' }} // Ensure text wrapping within the cell
                                 />
@@ -86,7 +62,7 @@ const GeneralInfo: React.FC<GeneralInfoProps> = ({ country, information }) => {
             </table>
 
             {/* Reusable CardFooter Component */}
-            <CardFooter isChanged={isChanged} onCancel={handleCancel} onSave={handleSave} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
         </div>
     )
 }

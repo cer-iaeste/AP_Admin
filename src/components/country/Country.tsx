@@ -6,7 +6,7 @@ import { fetchCountryData } from "../../service/CountryService";
 
 interface CountryProps {
     selectedCountry: string
-    selectCard: (card: string, data: any[]) => void
+    selectCard: (card: string, data: any[], imgSrc: string) => void
 }
 
 const Country: React.FC<CountryProps> = ({ selectedCountry, selectCard }) => {
@@ -30,7 +30,7 @@ const Country: React.FC<CountryProps> = ({ selectedCountry, selectCard }) => {
         loadingTimer(setIsLoading)
     }, [country])
 
-    const handleSelectCard = (card: string, content: any[]) => selectCard(card, content)
+    const handleSelectCard = (card: string, content: any[], imgSrc: string) => selectCard(card, content, imgSrc)
 
     return (
         <section className="relative w-full min-h-screen">
@@ -66,7 +66,7 @@ const Country: React.FC<CountryProps> = ({ selectedCountry, selectCard }) => {
                                 {cards.map((card, index) =>
                                     <li key={index}
                                         className={`relative ${card.isSectionEmpty ? "bg-[#F1F1E6]" : "bg-gray-100"} shadow-xl space-y-2 rounded-lg p-2 py-6 sm:p-6 text-center text-[#1B75BB] cursor-pointer hover-bg-gradient h-32 sm:h-44`}>
-                                        <button onClick={() => handleSelectCard(card.title, card.content ?? [])} className="grid grid-rows-2 h-full w-full items-center">
+                                        <button onClick={() => handleSelectCard(card.title, card.content ?? [], country.imageSrc ?? "")} className="grid grid-rows-2 h-full w-full items-center">
                                             {/* Conditional ribbon when card.isEmpty is true */}
                                             {card.isSectionEmpty &&
                                                 <div className="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-br-lg z-10">

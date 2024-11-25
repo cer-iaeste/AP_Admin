@@ -24,7 +24,7 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ toggleSidebar, navigateHome, 
 
   return (
     <div className="mx-auto">
-      <header className="w-full bg-[#F1F1E6]">
+      <header className="w-full bg-[#F1F1E6] border-b border-[#1B75BB]">
         <div className="relative p-1">
           <nav
             className="relative flex items-center justify-between sm:h-10 xl:justify-start"

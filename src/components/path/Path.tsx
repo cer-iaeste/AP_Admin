@@ -15,6 +15,7 @@ interface PathElement {
 
 const Path: React.FC<PathProps> = ({ navigateHome, navigateCountry, country, card, role }) => {
     const [pathElements, setPathElements] = useState<PathElement[]>([]);
+    const countryName = country?.split(" ")[0]
 
     useEffect(() => {
         // reset the path elements
@@ -22,7 +23,7 @@ const Path: React.FC<PathProps> = ({ navigateHome, navigateCountry, country, car
         // add the country name
         if (country) {
             if (role === "admin") elements.push({ href: navigateHome, text: <i className="fa fa-house"></i> }) // add the house icon
-            elements.push({ href: navigateCountry, text: <span>{country}</span> }) // add the country name
+            elements.push({ href: navigateCountry, text: <span>{countryName}</span> }) // add the country name
             if (card) elements.push({ text: <span>{card}</span> }) // add the card
         } 
         // add elements to path

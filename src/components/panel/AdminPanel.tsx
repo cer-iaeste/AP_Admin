@@ -25,6 +25,7 @@ const AdminPanel = () => {
     const [country, setCountry] = useState("")
     const [card, setCard] = useState("")
     const [content, setContent] = useState<any[]>([])
+    const [countryImg, setCountryImg] = useState<string>("")
 
     const toggleSidebar = (): void => setIsSidebarOpen(!isSidebarOpen)
 
@@ -34,8 +35,9 @@ const AdminPanel = () => {
         if (width <= 1024) setIsSidebarOpen(false)
     }
 
-    const selectCard = (selectedCard: string, data: any[]): void => {
+    const selectCard = (selectedCard: string, data: any[], imgSrc: string): void => {
         setContent(data)
+        setCountryImg(imgSrc)
         setCard(selectedCard)
         if (width <= 1024) setIsSidebarOpen(false)
     }
@@ -43,6 +45,7 @@ const AdminPanel = () => {
     // reset the values of the country and card and navigate back to home page
     const navigateHome = (): void => {
         setCard("")
+        setCountryImg("")
         setCountry("")
     }
     // reset the card value and navigate back to country menu cards
@@ -119,7 +122,7 @@ const AdminPanel = () => {
                         } />
                         <Route path="/:country/:card" element={
                             <ProtectedRoute requiredRole="user" requiredCountry={country}>
-                                <Card selectedCountry={country} selectedCard={card} content={content} />
+                                <Card selectedCountry={country} selectedCard={card} content={content} selectedCountryImgSrc={countryImg} navigateCountry={navigateCountry}/>
                             </ProtectedRoute>
                         } />
                     </Routes>

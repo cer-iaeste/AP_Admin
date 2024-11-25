@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import { ref, uploadBytes, deleteObject } from "firebase/storage"; // Import deleteObject and ref if using Firebase storage
 import { storage } from "../../firebase"; // Update with your Firebase config path
 import CardFooter from "../card/CardFooter";
-import { updateCountryField } from "../../service/CountryService";
 import "../summer-reception/Weekend.css"
+import { CardProps } from "../../global/Global";
 
-interface GalleryProps {
-    country: string
+interface GalleryProps extends CardProps{
     images: string[]; // Array of image objects with unique id and URL
 }
 
@@ -16,7 +15,7 @@ interface UploadedImage {
     dbUrl: string
 }
 
-const Gallery: React.FC<GalleryProps> = ({ images, country }) => {
+const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDelete, handleCancel, handleBack }) => {
     const [imagesData, setImagesData] = useState<string[]>([])
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isChanged, setIsChanged] = useState(false)
@@ -26,19 +25,6 @@ const Gallery: React.FC<GalleryProps> = ({ images, country }) => {
     useEffect(() => {
         setImagesData(images)
     }, [images])
-
-    const handleDelete = (index: number, url: string) => {
-        // Get reference to the image in Firebase storage and delete
-        const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-        if (confirmDelete) {
-            const newData = structuredClone(imagesData).filter((_: string, i: number) => i !== index)
-            setImagesData(newData)
-            setImagesToDelete([...imagesToDelete, url])
-            setIsChanged(true)
-        }
-        // const imageRef = ref(storage, url);
-        setIsChanged(true)
-    };
 
     const handleImageClick = (url: string) => {
         setSelectedImage(url);
@@ -61,12 +47,6 @@ const Gallery: React.FC<GalleryProps> = ({ images, country }) => {
             setIsChanged(true)
         } else alert("Error while uploading file!")
     };
-
-    const handleCancel = () => {
-        setImagesData(structuredClone(images))
-        setImagesToDelete([])
-        setIsChanged(false)
-    }
 
     const uploadImagesToStorage = async () => {
         try {
@@ -93,7 +73,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country }) => {
         }
     }
 
-    const handleSave = async () => {
+    const onSave = async () => {
         // upload files to storage
         await uploadImagesToStorage()
         const newGallery = imagesData.map((image: string) => {
@@ -102,11 +82,18 @@ const Gallery: React.FC<GalleryProps> = ({ images, country }) => {
         })
         // delete files from storage
         await removeImagesFromStorage()
-        // update gallery in database
-        updateCountryField(country, newGallery, "gallery", "Gallery").then(() => {
-            setIsChanged(false)
-        })
+        handleSave(country, newGallery, "gallery", "Gallery", setIsChanged)
     }
+    const onCancel = () => {
+        setImagesToDelete([])
+        setImagesToUpload([])
+        handleCancel(setImagesData, images, setIsChanged)
+    }
+    const onDelete = (index: number, url: string) => {
+        const del = handleDelete(index, setImagesData, imagesData, setIsChanged)
+        if (del) setImagesToDelete([...imagesToDelete, url])
+    }
+    const onBack = () => handleBack(isChanged, setImagesData, images, setIsChanged)
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 table-margins">
@@ -120,7 +107,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country }) => {
                     />
                     <button
                         className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300 z-10"
-                        onClick={() => handleDelete(index, image)}
+                        onClick={() => onDelete(index, image)}
                     >
                         <i className="fa-solid fa-trash-can text-red-400 hover:text-red-500 text-2xl" />
                     </button>
@@ -157,7 +144,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country }) => {
                 </div>
             )}
 
-            <CardFooter isChanged={isChanged} onCancel={handleCancel} onSave={handleSave} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
         </div>
     );
 };

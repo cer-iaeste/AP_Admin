@@ -6,7 +6,7 @@ import { fetchCountryData } from "../../service/CountryService";
 
 interface SidebarProps {
     isOpen: boolean
-    selectCard: (card: string, data: any[]) => void
+    selectCard: (card: string, data: any[], imgSrc: string) => void
     selectedCountry: string
     toggleSidebar: () => void
 }
@@ -27,7 +27,7 @@ const UserSidebar: React.FC<SidebarProps> = ({ isOpen, selectCard, selectedCount
         setCards(mapCountryCards(country))
     }, [country])
 
-    const handleSelectCard = (card: string, content: any[]) => selectCard(card, content)
+    const handleSelectCard = (card: string, content: any[], imgSrc: string) => selectCard(card, content, imgSrc)
 
 
     return (
@@ -51,7 +51,7 @@ const UserSidebar: React.FC<SidebarProps> = ({ isOpen, selectCard, selectedCount
                     </button>
                 </li>
                 {cards.map((card, index) =>
-                    <li key={index} data-name={card.title} onClick={() => handleSelectCard(card.title, card.content ?? [])} className={`flex flex-row justify-between items-center p-3 border-b border-gray-300 hover-bg-gradient cursor-pointer text-[#1B75BB] text-xl font-semibold`}>
+                    <li key={index} data-name={card.title} onClick={() => handleSelectCard(card.title, card.content ?? [], country?.imageSrc ?? "")} className={`flex flex-row justify-between items-center p-3 border-b border-gray-300 hover-bg-gradient cursor-pointer text-[#1B75BB] text-xl font-semibold`}>
                         <span className="text-wrap">{card.title}</span>
                         <i className={`${card.icon} aria-hidden="true`} />
                     </li>

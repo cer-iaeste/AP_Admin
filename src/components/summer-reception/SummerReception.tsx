@@ -3,15 +3,14 @@ import CardFooter from "../card/CardFooter";
 import Weekend from "./Weekend"
 import { WeekendType } from "../../types/types";
 import "../card/Card.css"
-import { updateCountryField } from "../../service/CountryService";
+import { CardProps } from "../../global/Global";
 
 
-interface SummerReceptionProps {
-    country: string
+interface SummerReceptionProps extends CardProps{
     summerReception: WeekendType[]
 }
 
-const SummerReception: React.FC<SummerReceptionProps> = ({ country, summerReception }) => {
+const SummerReception: React.FC<SummerReceptionProps> = ({ country, summerReception, handleSave, handleCancel, handleBack, handleDelete }) => {
     const [summerReceptionData, setSummerReceptionData] = useState<WeekendType[]>([]);
     const [selectedWeekend, setSelectedWeekend] = useState<WeekendType | null>(null)
     const [isEditMode, setIsEditMode] = useState(false)
@@ -40,22 +39,26 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ country, summerRecept
         setSelectedWeekend(weekendData)
     }
 
-    // Cancel the current action (reset the editing state)
-    const handleCancel = () => {
-        setSummerReceptionData(summerReception)
-        setIsChanged(false) // Reset action in progress
+    const handleSaveWeekend = (weekend: WeekendType) => {
+        setSummerReceptionData(prev => {
+            // Update existing weekend
+            if (isEditMode) return prev.map(w => (w.name === weekend.name ? weekend : w));
+            // Add new weekend
+            return [...prev, weekend];
+        });
+        setIsChanged(true);
+        closePopup();
     };
+    
 
-    // Save changes (apply the changes and close edit mode)
-    const handleSave = () => {
-        updateCountryField(country, summerReceptionData, "summerReception", "Summer Reception").then(() => {
-            setIsChanged(false)
-        })
-    };
+    const onSave = () => handleSave(country, summerReceptionData, "summerReception", "Summer Reception", setIsChanged)
+    const onCancel = () => handleCancel(setSummerReceptionData, summerReception, setIsChanged)
+    const onBack = () => handleBack(isChanged, setSummerReceptionData, summerReception, setIsChanged)
+    const onDelete = (index: number) => handleDelete(index, setSummerReceptionData, summerReceptionData, setIsChanged)
 
     return (
         <div>
-            {selectedWeekend !== null && <Weekend selectedWeekend={selectedWeekend} isEditMode={isEditMode} onClose={closePopup} />}
+            {selectedWeekend !== null && <Weekend selectedWeekend={selectedWeekend} isEditMode={isEditMode} onClose={closePopup} onSave={handleSaveWeekend}/>}
             <section className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-10 p-1">
                 {!!summerReceptionData.length && summerReceptionData.map((weekend, index) =>
                     <div key={index} className={`p-4 bg-gradient text-white rounded-md flex flex-col`}>
@@ -79,7 +82,7 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ country, summerRecept
                             {/* Remove button */}
                             <button
                                 type="button"
-                                // onClick={() => handleDeleteClick(index)}
+                                onClick={() => onDelete(index)}
                                 className="btn flex items-center rounded-full border-2 border-red-500 bg-white text-red-500 font-semibold p-2 hover:bg-red-500 hover:text-white hover:shadow-xl"
                             >
                                 <i className="fa fa-trash mr-2" aria-hidden="true"></i> Delete
@@ -96,13 +99,13 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ country, summerRecept
                     </div>
                 )}
                 <div className="flex items-end">
-                    <button className="flex text-xl items-center p-2 rounded-md bg-[#1B75BB] hover-bg-gradient text-white gap-2 justify-center"
+                    <button className="add-btn hover-bg-gradient"
                         onClick={() => handlePopupModel(newWeekend, false)}>
                         <i className="fa fa-plus"></i> Add new item
                     </button>
                 </div>
             </section>
-            <CardFooter isChanged={isChanged} onCancel={handleCancel} onSave={handleSave} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
         </div>
     )
 }

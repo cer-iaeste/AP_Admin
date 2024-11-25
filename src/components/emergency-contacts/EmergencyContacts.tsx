@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import CardFooter from "../card/CardFooter";
 import { EmergencyContactsType } from "../../types/types";
-import { updateCountryField } from "../../service/CountryService"
 import "../card/Card.css"
-import { EMERGENCY_NUMBERS_CONSTANTS } from "../../global/Global";
+import { CardProps, EMERGENCY_NUMBERS_CONSTANTS } from "../../global/Global";
 
-interface EmergencyContactsProps {
+interface EmergencyContactsProps extends CardProps{
     emergencyContacts: EmergencyContactsType[]
-    country: string
 }
 
-const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts, country }) => {
+const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts, country, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
     const [contactData, setContactData] = useState<EmergencyContactsType[]>([]);
     const [isChanged, setIsChanged] = useState(false)
 
@@ -29,52 +27,14 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
         );
     };
 
-    // Handle the change in input during editing
-    const handleInputChange = (e: any, index: number) => {
-        const newData = structuredClone(contactData);
-        newData[index].number = e.target.value; // Update the number in the contact data
-        setContactData(newData);
-        setIsChanged(true)
+    const onAdd = () => {
+        if (contactData.length < 4) handleAddNewItem(setContactData, contactData, { title: "", number: "" }, setIsChanged)
     };
-
-    // Handle title selection in dropdown
-    const handleTitleChange = (e: React.ChangeEvent<HTMLSelectElement>, index: number) => {
-        const newData = structuredClone(contactData);
-        newData[index].title = e.target.value; // Set the selected title
-        setContactData(newData);
-        setIsChanged(true);
-    };
-
-    // Handle add new item
-    const handleAddNewItem = () => {
-        if (contactData.length < 4) {
-            setContactData([...contactData, { title: "", number: "" }]);
-            setIsChanged(true);
-        }
-    };
-
-    // Cancel the current action (reset the editing state)
-    const handleCancel = () => {
-        setContactData(structuredClone(emergencyContacts))
-        setIsChanged(false); // Reset action in progress
-    };
-
-    // Save changes (apply the changes and close edit mode)
-    const handleSave = () => {
-        updateCountryField(country, contactData, "emergencyContacts", "Emergency contacts").then(() => {
-            setIsChanged(false); // Reset action in progress
-        })
-    };
-
-    // Handle delete with confirmation
-    const handleDeleteClick = (index: number) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-        if (confirmDelete) {
-            const newData = structuredClone(emergencyContacts).filter((_: EmergencyContactsType, i: number) => i !== index)
-            setContactData(newData)
-            setIsChanged(true)
-        }
-    }
+    const onSave = () => handleSave(country, contactData, "emergencyContacts", "Emergency contacts", setIsChanged)
+    const onDelete = (index: number) => handleDelete(index, setContactData, contactData, setIsChanged)
+    const onCancel = () => handleCancel(setContactData, emergencyContacts, setIsChanged)
+    const onBack = () => handleBack(isChanged, setContactData, emergencyContacts, setIsChanged)
+    const onInputChange = (e: any, index: number, column: string) => handleInputChange(setContactData, contactData, index, e.target.value, setIsChanged, column)
 
     return (
         <div className="table-margins">
@@ -89,14 +49,14 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
                     </thead>
                     <tbody>
                         {contactData.map((contact, index) => (
-                            <tr key={index} className="card-table-row text-lg sm:text-xl">
+                            <tr key={index} className="card-table-row text-base sm:text-xl">
                                 <td className="p-4">
                                     {contact.title !== "" ? (
                                         contact.title
                                     ) : (
                                         <select
                                             value={contact.title}
-                                            onChange={(e) => handleTitleChange(e, index)}
+                                            onChange={(e) => onInputChange(e, index, "title")}
                                             className="w-full text-center p-1"
                                         >
                                             <option value="" disabled>Select Title</option>
@@ -113,14 +73,14 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
                                         type="text"
                                         placeholder="Emergency number"
                                         value={contact.number}
-                                        onChange={(e) => handleInputChange(e, index)}
-                                        className="w-full p-2 border text-xl bg-[#F1F1E6]"
+                                        onChange={(e) => onInputChange(e, index, "number")}
+                                        className="w-full p-2 border text-base sm:text-xl bg-[#F1F1E6]"
                                     />
                                 </td>
                                 <td className="w-10">
                                     <button
                                         type="button"
-                                        onClick={() => handleDeleteClick(index)}
+                                        onClick={() => onDelete(index)}
                                         className="btn delete-btn"
                                     >
                                         <i className="fa fa-trash" aria-hidden="true"></i>
@@ -137,8 +97,8 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
             {contactData.length < 4 && (
                 <div className="flex items-end mt-5">
                     <button
-                        className="flex text-xl items-center p-2 rounded-md bg-[#1B75BB] hover-bg-gradient text-white gap-2 justify-center"
-                        onClick={handleAddNewItem}
+                        className="add-btn hover-bg-gradient"
+                        onClick={onAdd}
                     >
                         <i className="fa fa-plus"></i> Add emergency number
                     </button>
@@ -146,7 +106,7 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
             )}
 
             {/* Reusable Footer Component */}
-            <CardFooter isChanged={isChanged} onCancel={handleCancel} onSave={handleSave} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
         </div>
     );
 };

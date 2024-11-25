@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import CardFooter from "../card/CardFooter";
-import { updateCountryField } from "../../service/CountryService";
 import "../card/Card.css"
 import { TransportType, TransportFeature } from "../../types/types";
-import { TRANSPORT_CONSTANTS } from "../../global/Global";
+import { CardProps, TRANSPORT_CONSTANTS } from "../../global/Global";
 
-interface TransportProps {
-    country: string
+interface TransportProps extends CardProps{
     transport: TransportType[]
 }
 
@@ -17,12 +15,12 @@ interface TransportMapType {
     content: TransportFeature[]
 }
 
-const Transport: React.FC<TransportProps> = ({ country, transport }) => {
+const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
     const [transportData, setTransportData] = useState<TransportMapType[]>([])
     const [isChanged, setIsChanged] = useState(false)
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
 
-    const setInitialTransportData = (initialtransport: TransportType[]) => {
+    const mapTransportData = (initialtransport: TransportType[]) => {
 
         const initialData: TransportMapType[] = [
             {
@@ -55,11 +53,11 @@ const Transport: React.FC<TransportProps> = ({ country, transport }) => {
             data.content = initialtransport.find(t => t.id === data.id)?.features ?? []
         })
 
-        setTransportData(initialData)
+        return initialData
     }
 
     useEffect(() => {
-        setInitialTransportData(transport)
+        setTransportData(mapTransportData(transport))
     }, [transport])
 
     const toggleAccordion = (index: number) => {
@@ -68,51 +66,23 @@ const Transport: React.FC<TransportProps> = ({ country, transport }) => {
 
     const hasLinks = (feature: TransportFeature) => feature?.hasOwnProperty("link");
 
-    // Handle the change in input during editing
-    const handleInputChange = (e: any, index: number, itemIndex: number, column: keyof TransportFeature) => {
-        const newData = structuredClone(transportData)
-        newData[index].content[itemIndex][column] = e.target.value
-        setTransportData(newData)
-        setIsChanged(true)
-    };
-
-    // Handle add new item
-    const handleAddNewItem = (index: number, transportId: number) => {
-        const newData = structuredClone(transportData)
+    const onAdd = (index: number, transportId: number) => {
         const newItem: TransportFeature = { name: "" }
         if (transportId !== 1) newItem.link = ""
-        newData[index].content = [...newData[index].content, newItem]
-        setTransportData(newData)
-        setIsChanged(true)
+        handleAddNewItem(setTransportData, transportData, newItem, setIsChanged, index)
     }
-
-    // Handle delete with confirmation
-    const handleDeleteClick = (index: number, itemIndex: number) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-        if (confirmDelete) {
-            const newData = structuredClone(transportData)
-            newData[index].content = newData[index].content.filter((_: TransportFeature, i: number) => i !== itemIndex);
-            setTransportData(newData)
-            setIsChanged(true)
-        }
-    }
-
-    // Cancel the current action (reset the editing state)
-    const handleCancel = () => {
-        setInitialTransportData(transport)
-        setIsChanged(false) // Reset action in progress
-    };
-
-    // Save changes (apply the changes and close edit mode)
-    const handleSave = () => {
+    const onSave = () =>{ 
         const result: TransportType[] = transportData.map(t => ({
             id: t.id,
             features: t.content
         }))
-        updateCountryField(country, result, "transport", "Transport").then(() => {
-            setIsChanged(false)
-        })
-    };
+        handleSave(country, result, "transport", "Transport", setIsChanged)
+    }
+    const onDelete = (index: number, itemIndex: number) => handleDelete(index, setTransportData, transportData, setIsChanged, itemIndex)
+    const onCancel = () => handleCancel(setTransportData, mapTransportData(transport), setIsChanged)
+    const onBack = () => handleBack(isChanged, setTransportData, mapTransportData(transport), setIsChanged)
+    const onItemChange = (e: any, index: number, itemIndex: number, column: keyof TransportFeature) => handleInputChange(setTransportData, transportData, index, e.target.value, setIsChanged, column, itemIndex)
+
 
     return (
         <div className="mt-5">
@@ -145,15 +115,15 @@ const Transport: React.FC<TransportProps> = ({ country, transport }) => {
                                                 <input
                                                     value={feature.name}
                                                     className="w-full p-2 bg-[#F1F1E6] border border-black"
-                                                    onChange={(e) => handleInputChange(e, index, featureIndex, "name")}
+                                                    onChange={(e) => onItemChange(e, index, featureIndex, "name")}
                                                     placeholder="Title"
                                                 />
                                                 {hasLinks(feature) && (
                                                     <input
                                                         value={feature.link}
                                                         className="text-blue-500 underline w-full p-2 bg-[#F1F1E6] border border-black block sm:hidden mt-2"
-                                                        onChange={(e) => handleInputChange(e, index, featureIndex, "link")}
-                                                        placeholder="Link"
+                                                        onChange={(e) => onItemChange(e, index, featureIndex, "link")}
+                                                        placeholder="Link (optional)"
                                                     />
                                                 )}
                                             </td>
@@ -162,8 +132,8 @@ const Transport: React.FC<TransportProps> = ({ country, transport }) => {
                                                     <input
                                                         value={feature.link}
                                                         className="text-blue-500 underline w-full p-2 bg-[#F1F1E6] border border-black"
-                                                        onChange={(e) => handleInputChange(e, index, featureIndex, "link")}
-                                                        placeholder="Link"
+                                                        onChange={(e) => onItemChange(e, index, featureIndex, "link")}
+                                                        placeholder="Link (optional)"
                                                     />
                                                 </td>
                                             )}
@@ -171,7 +141,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport }) => {
                                                 {/* Remove button */}
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleDeleteClick(index, featureIndex)}
+                                                    onClick={() => onDelete(index, featureIndex)}
                                                     className="btn delete-btn mt-1"
                                                 >
                                                     <i className="fa fa-trash" aria-hidden="true"></i>
@@ -182,8 +152,8 @@ const Transport: React.FC<TransportProps> = ({ country, transport }) => {
                                 }
                                 <tr>
                                     <td className="flex items-end p-2">
-                                        <button className="flex text-base sm:text-xl items-center p-2 rounded-md bg-[#1B75BB] hover-bg-gradient text-white gap-2 justify-center"
-                                            onClick={() => handleAddNewItem(index, transport.id)}>
+                                        <button className="add-btn hover-bg-gradient"
+                                            onClick={() => onAdd(index, transport.id)}>
                                             <i className="fa fa-plus"></i> Add new item
                                         </button>
                                     </td>
@@ -194,7 +164,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport }) => {
                 </div>
             ))}
 
-            <CardFooter isChanged={isChanged} onCancel={handleCancel} onSave={handleSave} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
         </div>
     )
 }

@@ -6,9 +6,10 @@ interface WeekendProps {
     selectedWeekend: WeekendType
     isEditMode: boolean
     onClose: () => void
+    onSave: (weekend: WeekendType) => void
 }
 
-const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose }) => {
+const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose, onSave }) => {
     const [weekendData, setWeekendData] = useState<WeekendType>(selectedWeekend);
     const popupRef = useRef(null);
 
@@ -42,9 +43,7 @@ const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose 
 
 
     // Handle form submission (save changes)
-    const handleSave = () => {
-        // Add logic to save the changes here
-    };
+    const handleSave = () =>  onSave(weekendData)
 
     // Handle cancel changes
     const handleCancel = () => {

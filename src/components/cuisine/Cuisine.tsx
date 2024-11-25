@@ -3,10 +3,10 @@ import CardFooter from "../card/CardFooter";
 import { updateCountryField } from "../../service/CountryService";
 import "../card/Card.css"
 import { CuisineType, OtherType } from "../../types/types";
+import { CardProps } from "../../global/Global";
 // import useWindowSize from "../../hooks/useScreenSize";
 
-interface CuisineProps {
-    country: string
+interface CuisineProps extends CardProps {
     cuisine: CuisineType
 }
 
@@ -16,80 +16,45 @@ interface CuisineMapType {
     content: OtherType[]
 }
 
-const Cuisine: React.FC<CuisineProps> = ({ country, cuisine }) => {
+const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
     const [cuisineData, setCuisineData] = useState<CuisineMapType[]>([])
     const [isChanged, setIsChanged] = useState(false)
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
 
     // const { width } = useWindowSize()
-
-    const setInitialCuisineData = () => {
-        const data: CuisineMapType[] = [
-            {
-                title: "Food",
-                icon: "fa fa-burger",
-                content: cuisine.food
-            },
-            {
-                title: "Drinks",
-                icon: "fa fa-martini-glass-citrus",
-                content: cuisine.drinks
-            }
-        ]
-        setCuisineData(data)
-    }
+    const mapCuisineData = (): CuisineMapType[] => [
+        {
+            title: "Food",
+            icon: "fa fa-burger",
+            content: cuisine.food
+        },
+        {
+            title: "Drinks",
+            icon: "fa fa-martini-glass-citrus",
+            content: cuisine.drinks
+        }
+    ]
 
     useEffect(() => {
-        setInitialCuisineData()
+        setCuisineData(mapCuisineData())
     }, [cuisine])
 
     const toggleAccordion = (index: number) => {
         setOpenIndex(openIndex === index ? -1 : index); // Toggle open/close state
     };
 
-    // Handle the change in input during editing
-    const handleInputChange = (e: any, index: number, itemIndex: number, column: keyof OtherType) => {
-        const newData = structuredClone(cuisineData)
-        newData[index].content[itemIndex][column] = e.target.value
-        setCuisineData(newData)
-        setIsChanged(true)
-    };
-
-    // Handle add new item
-    const handleAddNewItem = (index: number) => {
-        const newData = structuredClone(cuisineData)
-        newData[index].content = [...newData[index].content, { title: "", description: "" }]
-        setCuisineData(newData)
-        setIsChanged(true)
-    }
-
-    // Handle delete with confirmation
-    const handleDeleteClick = (index: number, itemIndex: number) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-        if (confirmDelete) {
-            const newData = structuredClone(cuisineData)
-            newData[index].content = newData[index].content.filter((_: OtherType, i: number) => i !== itemIndex);
-            setCuisineData(newData)
-            setIsChanged(true)
-        }
-    }
-
-    // Cancel the current action (reset the editing state)
-    const handleCancel = () => {
-        setInitialCuisineData()
-        setIsChanged(false) // Reset action in progress
-    };
-
-    // Save changes (apply the changes and close edit mode)
-    const handleSave = () => {
+    const onAdd = (index: number) => handleAddNewItem(setCuisineData, cuisineData, { title: "", description: "" }, setIsChanged, index)
+    const onSave = () =>{ 
         const foodData = cuisineData[0].content
         const drinksData = cuisineData[1].content
-        updateCountryField(country, foodData, "food", "Food").then(() => {
-            updateCountryField(country, drinksData, "drinks", "Drinks").then(() => {
-                setIsChanged(false)
-            })
-        })
-    };
+        handleSave(country, foodData, "food", "Food", setIsChanged)
+        handleSave(country, drinksData, "drinks", "Drinks", setIsChanged)
+    }
+    const onDelete = (index: number, itemIndex: number) => handleDelete(index, setCuisineData, cuisineData, setIsChanged, itemIndex)
+    const onCancel = () => handleCancel(setCuisineData, mapCuisineData(), setIsChanged)
+    const onBack = () => handleBack(isChanged, setCuisineData, mapCuisineData(), setIsChanged)
+    const onItemChange = (e: any, index: number, itemIndex: number, column: keyof OtherType) => handleInputChange(setCuisineData, cuisineData, index, e.target.value, setIsChanged, column, itemIndex)
+
 
     return (
         <div className="mt-5 table-margins">
@@ -115,7 +80,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine }) => {
                                     <textarea
                                         value={item.title}
                                         rows={1}
-                                        onChange={(e) => handleInputChange(e, index, itemIndex, "title")}
+                                        onChange={(e) => onItemChange(e, index, itemIndex, "title")}
                                         placeholder="Title"
                                     />
                                 </div>
@@ -127,7 +92,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine }) => {
                                     <textarea
                                         value={item.description}
                                         rows={4}
-                                        onChange={(e) => handleInputChange(e, index, itemIndex, "description")}
+                                        onChange={(e) => onItemChange(e, index, itemIndex, "description")}
                                         placeholder="Description"
                                     />
                                 </div>
@@ -135,7 +100,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine }) => {
                                 <div className="flex mt-2 justify-end">
                                     <button
                                         type="button"
-                                        onClick={() => handleDeleteClick(index, itemIndex)}
+                                        onClick={() => onDelete(index, itemIndex)}
                                         className="btn delete-btn"
                                     >
                                         <i className="fa fa-trash" aria-hidden="true"></i>
@@ -144,8 +109,8 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine }) => {
                             </div>
                         )}
                         <div className="flex items-end">
-                            <button className="flex text-xl items-center p-2 rounded-md bg-[#1B75BB] hover-bg-gradient text-white gap-2 justify-center" 
-                                    onClick={() => handleAddNewItem(index)}>
+                            <button className="add-btn hover-bg-gradient" 
+                                    onClick={() => onAdd(index)}>
                                 <i className="fa fa-plus"></i> Add new item
                             </button>
                         </div>
@@ -153,7 +118,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine }) => {
                 </div>
             ))}
 
-            <CardFooter isChanged={isChanged} onCancel={handleCancel} onSave={handleSave} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
         </div>
     )
 }

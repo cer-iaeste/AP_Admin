@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
 import CardFooter from "../card/CardFooter";
-import { updateCountryField } from "../../service/CountryService";
 import "../card/Card.css"
 import { OtherType } from "../../types/types";
 import useWindowSize from "../../hooks/useScreenSize";
+import { CardProps } from "../../global/Global";
 
-interface OtherProps {
-    country: string
+interface OtherProps extends CardProps {
     other: OtherType[]
 }
 
-const Other: React.FC<OtherProps> = ({ country, other }) => {
+const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
     const [otherData, setOtherData] = useState<OtherType[]>([])
     const [isChanged, setIsChanged] = useState(false)
 
@@ -20,42 +19,12 @@ const Other: React.FC<OtherProps> = ({ country, other }) => {
         setOtherData(other)
     }, [other])
 
-    // Handle the change in input during editing
-    const handleInputChange = (e: any, index: number, column: keyof OtherType) => {
-        const newData = structuredClone(otherData)
-        newData[index][column] = e.target.value
-        setOtherData(newData)
-        setIsChanged(true)
-    };
-
-    // Handle add new item
-    const handleAddNewItem = () => {
-        setOtherData([...otherData, { title: "", description: "" }])
-        setIsChanged(true)
-    }
-
-    // Handle delete with confirmation
-    const handleDeleteClick = (index: number) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-        if (confirmDelete) {
-            const newData = structuredClone(otherData).filter((_: OtherType, i: number) => i !== index)
-            setOtherData(newData)
-            setIsChanged(true)
-        }
-    }
-
-    // Cancel the current action (reset the editing state)
-    const handleCancel = () => {
-        setOtherData(structuredClone(other))
-        setIsChanged(false) // Reset action in progress
-    };
-
-    // Save changes (apply the changes and close edit mode)
-    const handleSave = () => {
-        updateCountryField(country, otherData, "otherInformation", "Other information").then(() => {
-            setIsChanged(false)
-        })
-    };
+    const onAdd = () => handleAddNewItem(setOtherData, otherData, { title: "", description: "" }, setIsChanged)
+    const onSave = () => handleSave(country, otherData, "otherInformation", "Other information", setIsChanged)
+    const onDelete = (index: number) => handleDelete(index, setOtherData, otherData, setIsChanged)
+    const onCancel = () => handleCancel(setOtherData, otherData, setIsChanged)
+    const onBack = () => handleBack(isChanged, setOtherData, other, setIsChanged)
+    const onInputChange = (e: any, index: number, column: string) => handleInputChange(setOtherData, otherData, index, e.target.value, setIsChanged, column)
 
     return (
         <div className="card-grid table-margins">
@@ -69,7 +38,7 @@ const Other: React.FC<OtherProps> = ({ country, other }) => {
                         <textarea
                             value={place.title}
                             rows={2}
-                            onChange={(e) => handleInputChange(e, index, "title")}
+                            onChange={(e) => onInputChange(e, index, "title")}
                             placeholder="Title"
                         />
                     </div>
@@ -81,7 +50,7 @@ const Other: React.FC<OtherProps> = ({ country, other }) => {
                         <textarea
                             value={place.description}
                             rows={width > 640 ? 8 : 4}
-                            onChange={(e) => handleInputChange(e, index, "description")}
+                            onChange={(e) => onInputChange(e, index, "description")}
                             placeholder="Description"
                         />
                     </div>
@@ -89,7 +58,7 @@ const Other: React.FC<OtherProps> = ({ country, other }) => {
                     <div className="flex mt-2 justify-end">
                         <button
                             type="button"
-                            onClick={() => handleDeleteClick(index)}
+                            onClick={() => onDelete(index)}
                             className="btn delete-btn"
                         >
                             <i className="fa fa-trash" aria-hidden="true"></i>
@@ -99,14 +68,14 @@ const Other: React.FC<OtherProps> = ({ country, other }) => {
             ))}
 
             <div className="flex items-end">
-                <button className="flex text-xl items-center p-2 rounded-md bg-[#1B75BB] hover-bg-gradient text-white gap-2 justify-center" 
-                        onClick={handleAddNewItem}>
+                <button className="add-btn hover-bg-gradient" 
+                        onClick={onAdd}>
                     <i className="fa fa-plus"></i> Add new info
                 </button>
             </div>
 
             {/* Reusable CardFooter Component */}
-            <CardFooter isChanged={isChanged} onCancel={handleCancel} onSave={handleSave} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
         </div>
     )
 }

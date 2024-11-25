@@ -1,5 +1,15 @@
 import { CardType, CountryType } from "../types/types";
 
+export interface CardProps {
+    country: string
+    handleAddNewItem: (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => void
+    handleSave: (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => void
+    handleDelete: (index: number, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void, itemIndex?: number) => boolean
+    handleCancel: (setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => void
+    handleBack: (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => void
+    handleInputChange: (setData: (data: any) => void, data: any, index: number, value: any, setIsChanged: (state: boolean) => void, column?: string, itemIndex?: number) => void
+}
+
 export const componentsCards: CardType[] = [
     // { title: "Hero Banner", icon: "fa fa-chalkboard" },
     { title: "Emergency Numbers", icon: "fa fa-phone" },

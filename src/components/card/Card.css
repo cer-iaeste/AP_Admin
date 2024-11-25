@@ -29,26 +29,35 @@
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     border-width: 2px;
     border-color: #1B75BB;
-    font-size: 1.125rem; /* 18px */
-    line-height: 1.75rem; /* 28px */
+    font-size: 1.125rem;
+    /* 18px */
+    line-height: 1.75rem;
+    /* 28px */
 }
 
 @media (min-width: 640px) {
     .form {
-        font-size: 1.5rem; /* 24px */
-        line-height: 2rem; /* 32px */
+        font-size: 1.5rem;
+        /* 24px */
+        line-height: 2rem;
+        /* 32px */
         margin-left: 1.5rem;
         margin-right: 1.5rem;
     }
+
+    .add-btn {
+        font-size: 1.25rem;
+    }
 }
 
-.spacing-y > * + * {
+.spacing-y>*+* {
     margin-top: 1rem;
 }
 
 .table-margins {
     margin-top: 2.5rem;
-    padding-bottom: 6rem; /* Added padding for footer */
+    padding-bottom: 6rem;
+    /* Added padding for footer */
 }
 
 .card-table {
@@ -122,7 +131,7 @@
     text-align: left;
     font-weight: 600;
     font-size: 1.5rem;
-    line-height: 2rem; 
+    line-height: 2rem;
 }
 
 .card-grid textarea {
@@ -151,7 +160,8 @@
 
 .delete-btn {
     background: white;
-    color: rgb(239 68 68);;
+    color: rgb(239 68 68);
+    ;
 }
 
 .delete-btn:hover {
@@ -189,4 +199,24 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+}
+
+.add-btn {
+    display: flex;
+    /* flex */
+    align-items: center;
+    /* items-center */
+    justify-content: center;
+    /* justify-center */
+    font-size: 1rem;
+    padding: 0.5rem;
+    /* p-2 */
+    border-radius: 0.375rem;
+    /* rounded-md */
+    background-color: #1B75BB;
+    /* bg-[#1B75BB] */
+    color: #FFFFFF;
+    /* text-white */
+    gap: 0.5rem;
+    /* gap-2 */
 }
