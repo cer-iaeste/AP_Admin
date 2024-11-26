@@ -1,22 +1,24 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation  } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 import Loader from "../components/loader/Loader";
 
 interface ProtectedRouteProps {
     children: JSX.Element;
-    requiredRole: "admin" | "user"; // e.g., 'admin' or 'user'
-    requiredCountry?: string; // Optional for user-specific countries
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole, requiredCountry }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const auth = useAuth();
+    const location = useLocation();
     
-    if (auth?.loading) return <Loader />
+    if (!auth || auth.loading) return <Loader />
 
-    if (auth?.role === "admin") return children
+    const pathSegments = location.pathname.split("/").filter(Boolean);
+    const countryFromPath = pathSegments[0] || "";
 
-    if (requiredRole === "user" && requiredCountry && auth?.country !== requiredCountry)
-        return <Navigate to={`/${auth?.country}`} />;
+    if (auth.role === "admin") return children
+
+    if (auth.role === "user" && countryFromPath !== auth.country)
+        return <Navigate to={`/${auth.country}`} />;
     
     return children
 }

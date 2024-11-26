@@ -4,14 +4,12 @@ import AuthService from "../../service/AuthService";
 
 interface AdminNavbarProps {
   toggleSidebar: () => void
-  navigateHome: () => void
-  navigateCountry: () => void
   role: "admin" | "user"
   country?: string
   card?: string
 }
 
-const AdminNavbar: React.FC<AdminNavbarProps> = ({ toggleSidebar, navigateHome, navigateCountry, role, country, card }) => {
+const AdminNavbar: React.FC<AdminNavbarProps> = ({ toggleSidebar, role, country, card }) => {
 
   const handleLogout = async () => {
     try {
@@ -41,7 +39,7 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ toggleSidebar, navigateHome, 
                   <div className="sm:col-start-2 justify-center">
                     {(role==="admin" && !country) || (role==="user" && !card) ?
                       <h1 className="text-xl text-[#1B75BB] ">AP Admin Panel</h1>
-                      : <Path navigateHome={navigateHome} navigateCountry={navigateCountry} country={country} card={card} role={role}/>
+                      : <Path role={role}/>
                     }
                   </div>
 

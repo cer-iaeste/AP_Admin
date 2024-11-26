@@ -2,25 +2,26 @@ import React, { useEffect, useState } from "react";
 import cerLogo from "../../images/cer-logo.png";
 import { CountryType } from "../../types/types";
 import "../../App.css"
+import { useNavigate, useParams } from "react-router-dom";
+import { getCountryData } from "../../global/Global";
 
 interface SidebarProps {
     isOpen: boolean
-    selectCountry: (countryName: string) => void
-    country: string
     countries: CountryType[]
-    navigateHome: () => void
     toggleSidebar: () => void
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, selectCountry, country, countries, navigateHome, toggleSidebar }) => {
-
-    const [selectedCountry, setSelectedCountry] = useState("");
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, countries, toggleSidebar }) => {
+    const [selectedCountry, setSelectedCountry] = useState<CountryType | undefined>();
     const [displayedCountries, setDisplayedCountries] = useState<CountryType[]>([]);
+    const { country } = useParams()
+    const navigate = useNavigate();
 
     const handleSelectCountry = (event: any): void => {
-        const countryName = event.currentTarget.dataset.name;
-        setSelectedCountry(countryName);
-        selectCountry(countryName)
+        const countryName = event.currentTarget.dataset.name
+        setSelectedCountry(countryName)
+        navigate(`/${countryName}`)
+        toggleSidebar()
     }
 
     const onFilterCountriesHandler = (e: any): void => {
@@ -32,8 +33,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, selectCountry, country, count
     };
 
     const resetSidebar = (): void => {
-        setSelectedCountry("")
-        navigateHome()
+        setSelectedCountry(undefined)
+        navigate('')
+        toggleSidebar()
     }
 
     useEffect(() => {
@@ -41,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, selectCountry, country, count
     }, [countries])
 
     useEffect(() => {
-        setSelectedCountry(country)
+        getCountryData(country, setSelectedCountry)
     }, [country])
 
     return (
@@ -69,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, selectCountry, country, count
                     />
                 </li>
                 {displayedCountries.length ? displayedCountries.map((country: CountryType) =>
-                    <li key={country.id} data-name={country.name} onClick={handleSelectCountry} className={`flex flex-row items-center p-3 border-b border-gray-300 hover-bg-gradient cursor-pointer ${selectedCountry === country.name ? `bg-gradient text-white` : ""}`}>
+                    <li key={country.id} data-name={country.name} onClick={handleSelectCountry} className={`flex flex-row items-center p-3 border-b border-gray-300 hover-bg-gradient cursor-pointer ${selectedCountry?.name === country.name ? `bg-gradient text-white` : ""}`}>
                         <img src={country.imageSrc} alt={country.imageAlt} className="rounded-full h-10 w-10 border hover:border-white" />
                         <span className="text-lg ml-3 font-semibold text-wrap">{country.name}</span>
                     </li>

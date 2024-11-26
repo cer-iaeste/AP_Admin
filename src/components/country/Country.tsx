@@ -1,51 +1,43 @@
-import React, { useState, useEffect } from "react";
-import { componentsCards, loadingTimer, mapCountryCards } from "../../global/Global";
+import { useState, useEffect } from "react";
+import { loadingTimer, mapCountryCards, getCountryData } from "../../global/Global";
 import Plane from "../plane/Plane";
 import { CardType, CountryType } from "../../types/types";
-import { fetchCountryData } from "../../service/CountryService";
+import { useParams, useNavigate } from "react-router-dom";
 
-interface CountryProps {
-    selectedCountry: string
-    selectCard: (card: string, data: any[], imgSrc: string) => void
-}
-
-const Country: React.FC<CountryProps> = ({ selectedCountry, selectCard }) => {
+const Country = () => {
     const [isLoading, setIsLoading] = useState(true);
-    const [country, setCountry] = useState<CountryType | null>(null)
+    const [selectedCountry, setSelectedCountry] = useState<CountryType>()
     const [cards, setCards] = useState<CardType[]>([])
+    const { country } = useParams()
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true)
-            const data = await fetchCountryData(selectedCountry)
-            if(data) setCountry(data)
-        }
-
-        fetchData()
-
-    }, [selectedCountry]);
+        getCountryData(country, setSelectedCountry, setIsLoading)
+    }, [country]);
 
     useEffect(() => {
-        setCards(mapCountryCards(country))
+        setCards(mapCountryCards(selectedCountry))
         loadingTimer(setIsLoading)
-    }, [country])
+    }, [selectedCountry])
 
-    const handleSelectCard = (card: string, content: any[], imgSrc: string) => selectCard(card, content, imgSrc)
+    const handleSelectCard = (card: string) => {
+        navigate(`/${selectedCountry?.name}/${card}`)
+    }
 
     return (
         <section className="relative w-full min-h-screen">
             {isLoading ? (
-                <Plane country={selectedCountry}></Plane>
+                <Plane country={selectedCountry?.name ?? ""}></Plane>
             ) : (
-                !!country ? (
+                !!selectedCountry ? (
                     <section className="p-2 bg-sky-100 h-full min-h-screen">
                         <div className="max-w-7xl mx-auto">
                             <div className="flex flex-col">
                                 <div className="flex items-center justify-center w-full ">
-                                    <img src={country.imageSrc} alt={country.imageAlt} className="rounded-full h-20 w-20 sm:h-32 sm:w-32 border" />
+                                    <img src={selectedCountry.imageSrc} alt={selectedCountry.imageAlt} className="rounded-full h-20 w-20 sm:h-32 sm:w-32 border" />
                                     <div className="flex flex-col ml-5 font-bold text-[#1B75BB] text-left">
                                         <span className="text=xl sm:text-3xl">IAESTE</span>
-                                        <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{country.name}</span>
+                                        <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{selectedCountry.name}</span>
                                     </div>
                                 </div>
                             </div>
@@ -66,7 +58,7 @@ const Country: React.FC<CountryProps> = ({ selectedCountry, selectCard }) => {
                                 {cards.map((card, index) =>
                                     <li key={index}
                                         className={`relative ${card.isSectionEmpty ? "bg-[#F1F1E6]" : "bg-gray-100"} shadow-xl space-y-2 rounded-lg p-2 py-6 sm:p-6 text-center text-[#1B75BB] cursor-pointer hover-bg-gradient h-32 sm:h-44`}>
-                                        <button onClick={() => handleSelectCard(card.title, card.content ?? [], country.imageSrc ?? "")} className="grid grid-rows-2 h-full w-full items-center">
+                                        <button onClick={() => handleSelectCard(card.title)} className="grid grid-rows-2 h-full w-full items-center">
                                             {/* Conditional ribbon when card.isEmpty is true */}
                                             {card.isSectionEmpty &&
                                                 <div className="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-br-lg z-10">

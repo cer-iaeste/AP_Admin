@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { CountryType } from "../../types/types";
 import cerLogo from "../../images/cer-logo.png"
+import { useNavigate } from "react-router-dom";
 
 interface LandingProps {
-    selectCountry: (countryName: string) => void
     countries: CountryType[]
 }
 
-const Landing: React.FC<LandingProps> = ({ selectCountry, countries }) => {
+const Landing: React.FC<LandingProps> = ({ countries }) => {
     const [displayedCountries, setDisplayedCountries] = useState<CountryType[]>([]);
+    const navigate = useNavigate();
 
     const handleSelectCountry = (event: any): void => {
-        const countryName = event.currentTarget.dataset.name;
-        selectCountry(countryName)
+        const countryName = event.currentTarget.dataset.name
+        navigate(`/${countryName}`)
     }
 
     const onFilterCountriesHandler = (e: any): void => {
