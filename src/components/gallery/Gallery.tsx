@@ -4,6 +4,7 @@ import { storage } from "../../firebase"; // Update with your Firebase config pa
 import CardFooter from "../card/CardFooter";
 import "../summer-reception/Weekend.css"
 import { CardProps } from "../../global/Global";
+import { toast } from 'react-toastify';
 
 interface GalleryProps extends CardProps{
     images: string[]; // Array of image objects with unique id and URL
@@ -45,7 +46,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
             setImagesData([...imagesData, newImage.url])
             setImagesToUpload([...imagesToUpload, newImage])
             setIsChanged(true)
-        } else alert("Error while uploading file!")
+        } else toast.error("Error while uploading file!")
     };
 
     const uploadImagesToStorage = async () => {
@@ -56,7 +57,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
                 await uploadBytes(storageRef, image.file);
             })
         } catch (error) {
-            alert("Error uploading files! " + error)
+            toast.error("Error uploading files! " + error)
             return null
         }
     }
@@ -68,7 +69,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
                 await deleteObject(fileRef)
             })
         } catch(error) {
-            alert("Error removing files from storage! " + error)
+            toast.error("Error removing files from storage! " + error)
             return null
         }
     }

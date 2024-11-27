@@ -1,6 +1,7 @@
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { toast } from 'react-toastify';
 
 const AuthService = {
     login: async (email: string, password: string) => {
@@ -11,7 +12,7 @@ const AuthService = {
                 const data = userDoc.data()
                 localStorage.setItem('loggedIn', JSON.stringify(data))
                 return data
-            } else alert("User document not found!")
+            } else toast.error("User document not found!")
         } catch (error: any) {
             return
         }

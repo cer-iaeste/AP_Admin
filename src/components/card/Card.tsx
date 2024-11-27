@@ -130,7 +130,6 @@ const Card = () => {
 
     const handleInputChange = (setData: (data: any) => void, data: any, index: number, value: any, setIsChanged: (state: boolean) => void, column?: string, itemIndex?: number) => {
         const newData = structuredClone(data)
-        console.log(value, itemIndex)
         if (column) {
             if (itemIndex !== undefined) newData[index].content[itemIndex][column] = value
             else newData[index][column] = value

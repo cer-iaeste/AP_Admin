@@ -1,6 +1,7 @@
 import React from "react";
 import Path from "../path/Path";
 import AuthService from "../../service/AuthService";
+import { toast } from 'react-toastify';
 
 interface AdminNavbarProps {
   toggleSidebar: () => void
@@ -16,7 +17,7 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ toggleSidebar, role, country,
       await AuthService.logout();
       window.location.href = "/login"
     } catch (error: any) {
-      alert("Error loggin out!")
+      toast.error("Error loggin out!")
     }
   }
 

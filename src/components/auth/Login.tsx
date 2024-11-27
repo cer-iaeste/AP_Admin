@@ -4,11 +4,11 @@ import cerLogo from "../../images/cer-logo-white.png";
 import AuthService from "../../service/AuthService";
 import { emptyLocalStorage } from "../../global/Global";
 import Loader from "../loader/Loader";
+import { toast } from 'react-toastify';
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [emailFocused, setEmailFocused] = useState(false);  // To track if email input is focused
     const [passwordFocused, setPasswordFocused] = useState(false);  // To track if password input is focused
@@ -23,10 +23,9 @@ const Login = () => {
         setLoginLoading(true)
         AuthService.login(email, password).then(data => {
             if (data) {
-                setError("")
                 if (data.role === "user" && data.country) nav(`/${data.country}`)
                 else nav("/")
-            } else setError("Invalid login credentials!")
+            } else toast.error("Invalid login credentials!")
             setLoginLoading(false)
         })
     };
@@ -87,9 +86,6 @@ const Login = () => {
                                     )}
                                 </button>
                             </div>
-                            {error && <p className="rounded-lg bg-red-200 text-red-600">
-                                <i className="fa-solid fa-triangle-exclamation mr-2"></i>{error}
-                            </p>}
                             <button
                                 type="submit"
                                 className="w-full px-4 py-2 text-white bg-[#282c34] rounded-lg hover:bg-[#61dafb] border-2 border-black shadow-xl"
