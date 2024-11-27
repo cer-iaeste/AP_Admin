@@ -92,7 +92,7 @@ const Card = () => {
         if (confirmDelete) {
             let newData = structuredClone(data)
 
-            if (!itemIndex) newData = newData.filter((_: any, i: number) => i !== index)
+            if (itemIndex === undefined) newData = newData.filter((_: any, i: number) => i !== index)
             else newData[index].content = newData[index].content.filter((_: any, i: number) => i !== itemIndex);
 
             setData(newData)
@@ -130,8 +130,9 @@ const Card = () => {
 
     const handleInputChange = (setData: (data: any) => void, data: any, index: number, value: any, setIsChanged: (state: boolean) => void, column?: string, itemIndex?: number) => {
         const newData = structuredClone(data)
+        console.log(value, itemIndex)
         if (column) {
-            if (itemIndex) newData[index].content[itemIndex][column] = value
+            if (itemIndex !== undefined) newData[index].content[itemIndex][column] = value
             else newData[index][column] = value
         }
         else newData[index] = value

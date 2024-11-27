@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import CardFooter from "../card/CardFooter";
-import { updateCountryField } from "../../service/CountryService";
 import "../card/Card.css"
 import { CuisineType, OtherType } from "../../types/types";
 import { CardProps } from "../../global/Global";
