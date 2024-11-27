@@ -59,7 +59,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
     return (
         <div className="mt-5 table-margins">
             {cuisineData.map((data, index) => (
-                <div key={index} className="mb-4 border border-[#1B75BB]">
+                <div key={data.title} className="mb-4 border border-[#1B75BB]">
                     <div
                         className="accordion-header hover-bg-gradient"
                         onClick={() => toggleAccordion(index)} // Call toggle function on click
@@ -72,7 +72,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
                     </div>
                     <div className={`card-grid bg-amber-100 ${openIndex === index ? "max-h-full p-2" : "max-h-0 overflow-hidden"}`}>
                         {data.content?.map((item, itemIndex) =>
-                            <div key={index} className="card-grid-body space-y-2">
+                            <div key={data.title + itemIndex} className="card-grid-body space-y-2">
                                 <div className="flex flex-col text-start">
                                     <label>
                                         Title

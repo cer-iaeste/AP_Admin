@@ -18,6 +18,7 @@ const Login = () => {
     emptyLocalStorage();
 
     const handleLogin = async (e: React.FormEvent) => {
+        emptyLocalStorage();
         e.preventDefault();
         setLoginLoading(true)
         AuthService.login(email, password).then(data => {

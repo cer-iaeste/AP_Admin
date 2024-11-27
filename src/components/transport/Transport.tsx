@@ -49,14 +49,14 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
             },
         ]
 
-        initialData.forEach(data => {
+        return initialData.map(data => {
             data.content = initialtransport.find(t => t.id === data.id)?.features ?? []
+            return data
         })
-
-        return initialData
     }
 
     useEffect(() => {
+        console.log(transport)
         setTransportData(mapTransportData(transport))
     }, [transport])
 
@@ -67,8 +67,10 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
     const hasLinks = (feature: TransportFeature) => feature?.hasOwnProperty("link");
 
     const onAdd = (index: number, transportId: number) => {
+        console.log(index, transportId)
         const newItem: TransportFeature = { name: "" }
         if (transportId !== 1) newItem.link = ""
+        console.log(newItem)
         handleAddNewItem(setTransportData, transportData, newItem, setIsChanged, index)
     }
     const onSave = () =>{ 
@@ -114,7 +116,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
                                             <td className="p-2 text-lg">
                                                 <input
                                                     value={feature.name}
-                                                    className="w-full p-2 bg-[#F1F1E6] border border-black"
+                                                    className="w-full p-2 bg-[#F1F1E6] border border-black font-semibold"
                                                     onChange={(e) => onItemChange(e, index, featureIndex, "name")}
                                                     placeholder="Title"
                                                 />

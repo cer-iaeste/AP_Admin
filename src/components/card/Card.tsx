@@ -20,19 +20,23 @@ import { getCard, getCountryData } from "../../global/Global";
 const Card = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCountry, setSelectedCountry] = useState<CountryType>();
-    const [selectedCard, setSelectedCard] = useState<CardType>();
+    const [selectedCard, setSelectedCard] = useState<CardType | undefined>();
     const [cardComponent, setCardComponent] = useState<ReactElement>()
     const { country, card } = useParams()
     const navigate = useNavigate();
 
     useEffect(() => {
         getCountryData(country, setSelectedCountry, setIsLoading)
-        getCard(selectedCountry, card, setSelectedCard)
     }, [country, card]);
 
     useEffect(() => {
+        if (card && selectedCountry) getCard(selectedCountry, card, setSelectedCard)
+    }, [card, selectedCountry])
+
+    useEffect(() => {
+        if (!selectedCard) return; // Exit early if either value is not yet set
+
         const timer = setTimeout(() => {
-            setSelectedCard(selectedCard);
             // add the proper card component
             switch (selectedCard?.title) {
                 case "Emergency Numbers":
@@ -70,7 +74,7 @@ const Card = () => {
             setIsLoading(false);
         }, 1100);
         return () => clearTimeout(timer);
-    }, [selectedCountry, selectedCard]);
+    }, [selectedCard]);
 
     const handleCancel = (setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => {
         setData(structuredClone(data))
@@ -99,17 +103,23 @@ const Card = () => {
     }
 
     const handleBack = (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => {
+        // local helper function
+        const navigateBack = () => {
+            setSelectedCard(undefined)
+            navigate(`/${country}`)
+        }
+
         if (isChanged) {
             const confirmBack = window.confirm("Are you sure you want to back? All unsaved changes will be lost");
             if (confirmBack) {
                 handleCancel(setData, data, setIsChanged)
-                navigate(`/${country}`)
+                navigateBack()
             }
-        } else navigate(`/${country}`)
+        } else navigateBack()
     }
 
     const handleAddNewItem = (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => {
-        if (!index) setData([...data, newItem]);
+        if (index === undefined) setData([...data, newItem]);
         else {
             const newData = structuredClone(data)
             newData[index].content = [...newData[index].content, newItem]
