@@ -22,7 +22,7 @@ const Places: React.FC<PlacesProps> = ({ country, places, handleSave, handleDele
     const onAdd = () => handleAddNewItem(setPlacesData, placesData, { name: "", description: "" }, setIsChanged)
     const onSave = () => handleSave(country, placesData, "cities", "Recommended places", setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setPlacesData, placesData, setIsChanged)
-    const onCancel = () => handleCancel(setPlacesData, places, setIsChanged)
+    const onCancel = () => handleCancel(isChanged, setPlacesData, places, setIsChanged)
     const onBack = () => handleBack(isChanged, setPlacesData, places, setIsChanged)
     const onInputChange = (e: any, index: number, column: string) => handleInputChange(setPlacesData, placesData, index, e.target.value, setIsChanged, column)
 

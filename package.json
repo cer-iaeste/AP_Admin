@@ -14,6 +14,7 @@
     "firebase": "^10.14.1",
     "iaeste_ap_admin": "file:",
     "react": "^18.3.1",
+    "react-confirm-alert": "^3.0.6",
     "react-dom": "^18.3.1",
     "react-firebase-hooks": "^5.1.1",
     "react-query": "3.39.3",

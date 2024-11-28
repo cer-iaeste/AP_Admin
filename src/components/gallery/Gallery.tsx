@@ -88,10 +88,10 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
     const onCancel = () => {
         setImagesToDelete([])
         setImagesToUpload([])
-        handleCancel(setImagesData, images, setIsChanged)
+        handleCancel(isChanged, setImagesData, images, setIsChanged)
     }
-    const onDelete = (index: number, url: string) => {
-        const del = handleDelete(index, setImagesData, imagesData, setIsChanged)
+    const onDelete = async (index: number, url: string) => {
+        const del = await handleDelete(index, setImagesData, imagesData, setIsChanged)
         if (del) setImagesToDelete([...imagesToDelete, url])
     }
     const onBack = () => handleBack(isChanged, setImagesData, images, setIsChanged)

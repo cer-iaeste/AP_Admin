@@ -50,7 +50,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
         handleSave(country, drinksData, "drinks", "Drinks", setIsChanged)
     }
     const onDelete = (index: number, itemIndex: number) => handleDelete(index, setCuisineData, cuisineData, setIsChanged, itemIndex)
-    const onCancel = () => handleCancel(setCuisineData, mapCuisineData(), setIsChanged)
+    const onCancel = () => handleCancel(isChanged, setCuisineData, mapCuisineData(), setIsChanged)
     const onBack = () => handleBack(isChanged, setCuisineData, mapCuisineData(), setIsChanged)
     const onItemChange = (e: any, index: number, itemIndex: number, column: keyof OtherType) => handleInputChange(setCuisineData, cuisineData, index, e.target.value, setIsChanged, column, itemIndex)
 

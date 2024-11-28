@@ -20,9 +20,7 @@ const CardFooter: React.FC<FooterProps> = ({ isChanged, onCancel, onSave, onBack
     const handleSave = async () => {
         setIsLoading(true); // Start loading
         setIsDisabled(true); // Disable buttons
-
-        // Call the onSave function (this should include your save logic)
-        onSave(); // Assuming onSave is a promise
+        onSave(); 
     };
 
     return (
@@ -56,17 +54,8 @@ const CardFooter: React.FC<FooterProps> = ({ isChanged, onCancel, onSave, onBack
                         onClick={handleSave}
                         className={`btn flex items-center rounded-md border-2 border-[#1B75BB] text-[#1B75BB] p-1 ${!isDisabled ? `bg-white hover:bg-[#1B75BB] hover:text-white hover:shadow-xl` : "bg-gray-300"}`}
                     >
-                        {isLoading ? (
-                            <>
-                                <i className={`fa fa-spinner fa-spin mr-1 p-1`} aria-hidden="true"></i>
-                                Loading...
-                            </>
-                        ) : (
-                            <>
-                                <i className={`fa fa-save mr-0 sm:mr-1 p-1`} aria-hidden="true"></i>
-                                <span className='hidden sm:block'>Save Changes</span>
-                            </>
-                        )}
+                        <i className={`fa fa-save mr-0 sm:mr-1 p-1`} aria-hidden="true"></i>
+                        <span className='hidden sm:block'>Save Changes</span>
                     </button>
                 </div>
             </div>

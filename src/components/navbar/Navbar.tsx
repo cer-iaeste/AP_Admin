@@ -16,6 +16,7 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ toggleSidebar, role, country,
     try {
       await AuthService.logout();
       window.location.href = "/login"
+      toast.success("Logout successfull!")
     } catch (error: any) {
       toast.error("Error loggin out!")
     }

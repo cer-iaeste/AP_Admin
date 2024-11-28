@@ -15,13 +15,14 @@ import Gallery from "../gallery/Gallery";
 import { updateCountryField } from "../../service/CountryService";
 import { CardType, CountryType } from "../../types/types";
 import { useParams, useNavigate } from "react-router-dom";
-import { getCard, getCountryData } from "../../global/Global";
+import { getCard, getCountryData, confirmModalWindow } from "../../global/Global";
 
 const Card = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCountry, setSelectedCountry] = useState<CountryType>();
     const [selectedCard, setSelectedCard] = useState<CardType | undefined>();
     const [cardComponent, setCardComponent] = useState<ReactElement>()
+
     const { country, card } = useParams()
     const navigate = useNavigate();
 
@@ -75,20 +76,33 @@ const Card = () => {
         }, 1100);
         return () => clearTimeout(timer);
     }, [selectedCard]);
+    
+    // fucntions for handling events with cards
+    const handleCancel = async (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void): Promise<boolean> => {
+        // local helper function
+        const handleReset = (): void => {
+            setData(structuredClone(data))
+            setIsChanged(false)
+        }
 
-    const handleCancel = (setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => {
-        setData(structuredClone(data))
-        setIsChanged(false); 
+        if (!isChanged) {
+            handleReset()
+            return true
+        }
+
+        const confirmation = await confirmModalWindow("All unsaved changes will be lost")
+        if (confirmation) handleReset()
+        return confirmation
     }
-    // Save changes (apply the changes and close edit mode)
+
     const handleSave = (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => {
         updateCountryField(country, data, column, title).then(() => {
-            setIsChanged(false); // Reset action in progress
+            setIsChanged(false);
         })
     }
 
-    const handleDelete = (index: number, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void, itemIndex?: number): boolean => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+    const handleDelete = async (index: number, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void, itemIndex?: number): Promise<boolean> => {
+        const confirmDelete = await confirmModalWindow("Are you sure you want to delete this item?")
         if (confirmDelete) {
             let newData = structuredClone(data)
 
@@ -102,20 +116,12 @@ const Card = () => {
         return false
     }
 
-    const handleBack = (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => {
-        // local helper function
-        const navigateBack = () => {
+    const handleBack = async (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => {
+        const confirmBack = await handleCancel(isChanged, setData, data, setIsChanged)
+        if (confirmBack) {
             setSelectedCard(undefined)
             navigate(`/${country}`)
         }
-
-        if (isChanged) {
-            const confirmBack = window.confirm("Are you sure you want to back? All unsaved changes will be lost");
-            if (confirmBack) {
-                handleCancel(setData, data, setIsChanged)
-                navigateBack()
-            }
-        } else navigateBack()
     }
 
     const handleAddNewItem = (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => {

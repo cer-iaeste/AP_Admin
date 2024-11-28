@@ -52,7 +52,7 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ country, summerRecept
     
 
     const onSave = () => handleSave(country, summerReceptionData, "summerReception", "Summer Reception", setIsChanged)
-    const onCancel = () => handleCancel(setSummerReceptionData, summerReception, setIsChanged)
+    const onCancel = () => handleCancel(isChanged, setSummerReceptionData, summerReception, setIsChanged)
     const onBack = () => handleBack(isChanged, setSummerReceptionData, summerReception, setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setSummerReceptionData, summerReceptionData, setIsChanged)
 

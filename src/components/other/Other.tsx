@@ -22,7 +22,7 @@ const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete,
     const onAdd = () => handleAddNewItem(setOtherData, otherData, { title: "", description: "" }, setIsChanged)
     const onSave = () => handleSave(country, otherData, "otherInformation", "Other information", setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setOtherData, otherData, setIsChanged)
-    const onCancel = () => handleCancel(setOtherData, otherData, setIsChanged)
+    const onCancel = () => handleCancel(isChanged, setOtherData, otherData, setIsChanged)
     const onBack = () => handleBack(isChanged, setOtherData, other, setIsChanged)
     const onInputChange = (e: any, index: number, column: string) => handleInputChange(setOtherData, otherData, index, e.target.value, setIsChanged, column)
 

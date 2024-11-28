@@ -57,7 +57,7 @@ const Country = () => {
 
                                 {cards.map((card, index) =>
                                     <li key={index}
-                                        className={`relative ${card.isSectionEmpty ? "bg-[#F1F1E6]" : "bg-gray-100"} shadow-xl space-y-2 rounded-lg p-2 py-6 sm:p-6 text-center text-[#1B75BB] cursor-pointer hover-bg-gradient h-32 sm:h-44`}>
+                                        className={`relative bg-gray-100 shadow-xl space-y-2 rounded-lg p-2 py-6 sm:p-6 text-center text-[#1B75BB] cursor-pointer hover-bg-gradient 105 h-32 sm:h-44`}>
                                         <button onClick={() => handleSelectCard(card.title)} className="grid grid-rows-2 h-full w-full items-center">
                                             {/* Conditional ribbon when card.isEmpty is true */}
                                             {card.isSectionEmpty &&

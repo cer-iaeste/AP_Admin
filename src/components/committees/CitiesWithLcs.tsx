@@ -17,7 +17,7 @@ const CitiesWithLcs: React.FC<CitiesProps> = ({ cities, country, handleSave, han
 
     const onAdd = () => handleAddNewItem(setCommitteesData, committeesData, "", setIsChanged)
     const onSave = () => handleSave(country, committeesData, "committees", "Cities with lcs", setIsChanged)
-    const onCancel = () => handleCancel(setCommitteesData, committeesData, setIsChanged)
+    const onCancel = () => handleCancel(isChanged, setCommitteesData, committeesData, setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setCommitteesData, committeesData, setIsChanged)
     const onBack = () => handleBack(isChanged, setCommitteesData, committeesData, setIsChanged)
     const onInputChange = (e: any, index: number) => handleInputChange(setCommitteesData, committeesData, index, e.target.value, setIsChanged)

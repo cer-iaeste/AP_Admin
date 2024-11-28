@@ -32,7 +32,7 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
     };
     const onSave = () => handleSave(country, contactData, "emergencyContacts", "Emergency contacts", setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setContactData, contactData, setIsChanged)
-    const onCancel = () => handleCancel(setContactData, emergencyContacts, setIsChanged)
+    const onCancel = () => handleCancel(isChanged, setContactData, emergencyContacts, setIsChanged)
     const onBack = () => handleBack(isChanged, setContactData, emergencyContacts, setIsChanged)
     const onInputChange = (e: any, index: number, column: string) => handleInputChange(setContactData, contactData, index, e.target.value, setIsChanged, column)
 

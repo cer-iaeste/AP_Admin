@@ -81,7 +81,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
         handleSave(country, result, "transport", "Transport", setIsChanged)
     }
     const onDelete = (index: number, itemIndex: number) => handleDelete(index, setTransportData, transportData, setIsChanged, itemIndex)
-    const onCancel = () => handleCancel(setTransportData, mapTransportData(transport), setIsChanged)
+    const onCancel = () => handleCancel(isChanged, setTransportData, mapTransportData(transport), setIsChanged)
     const onBack = () => handleBack(isChanged, setTransportData, mapTransportData(transport), setIsChanged)
     const onItemChange = (e: any, index: number, itemIndex: number, column: keyof TransportFeature) => handleInputChange(setTransportData, transportData, index, e.target.value, setIsChanged, column, itemIndex)
 

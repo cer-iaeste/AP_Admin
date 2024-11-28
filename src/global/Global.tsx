@@ -1,13 +1,15 @@
 import { CardType, CountryType } from "../types/types";
 import { fetchCountryData } from "../service/CountryService";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 // interfaces
 export interface CardProps {
     country: string
     handleAddNewItem: (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => void
     handleSave: (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => void
-    handleDelete: (index: number, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void, itemIndex?: number) => boolean
-    handleCancel: (setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => void
+    handleDelete: (index: number, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void, itemIndex?: number) => Promise<boolean>
+    handleCancel: (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => void
     handleBack: (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => void
     handleInputChange: (setData: (data: any) => void, data: any, index: number, value: any, setIsChanged: (state: boolean) => void, column?: string, itemIndex?: number) => void
 }
@@ -41,7 +43,7 @@ export const EMERGENCY_NUMBERS_CONSTANTS = {
     "Emergency Line": 4
 }
 
-export const GENERAL_INFO_CONSTANTS  = [
+export const GENERAL_INFO_CONSTANTS = [
     "Capital city",
     "Language",
     "Time zone",
@@ -99,10 +101,10 @@ export const mapCountryCards = (country: CountryType | null | undefined): CardTy
         return !content.food.length || !content.drinks.length
     }
 
-    return country ? 
+    return country ?
         componentsCards.map((card: CardType) => {
             const content = getCardContent(country, card.title)
-            return ({...card, isSectionEmpty: checkIfSectionIsEmpty(content)})
+            return ({ ...card, isSectionEmpty: checkIfSectionIsEmpty(content) })
         })
         : []
 }
@@ -122,6 +124,41 @@ export const getCountryData = async (country: string | undefined | null, setCoun
     if (country) {
         if (setIsLoading) setIsLoading(true)
         const data = await fetchCountryData(country)
-        if(data) setCountry(data)
+        if (data) setCountry(data)
     }
+}
+
+export const confirmModalWindow = (message: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+        confirmAlert({
+            customUI: ({ onClose }) => {
+                return (
+                    <div className="bg-white rounded-lg shadow-lg p-6 min-w-md mx-auto justify-center flex flex-col">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Are you sure?</h2>
+                        <p className="text-gray-600 mb-6">{message}</p>
+                        <div className="flex justify-end space-x-3 font-semibold">
+                            <button
+                                onClick={() => {
+                                    resolve(false)
+                                    onClose()
+                                }}
+                                className="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+                            >
+                                No
+                            </button>
+                            <button
+                                onClick={() => {
+                                    resolve(true)
+                                    onClose()
+                                }}
+                                className="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700"
+                            >
+                                Yes
+                            </button>
+                        </div>
+                    </div>
+                )
+            }
+        })
+    })
 }

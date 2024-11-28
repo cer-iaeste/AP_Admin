@@ -20,7 +20,7 @@ const FunFacts: React.FC<FunFactsProps> = ({ country, facts, handleSave, handleD
     const onAdd = () => handleAddNewItem(setFactsData, factsData, "", setIsChanged)
     const onSave = () => handleSave(country, factsData, "facts", "Fun facts", setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setFactsData, factsData, setIsChanged)
-    const onCancel = () => handleCancel(setFactsData, facts, setIsChanged)
+    const onCancel = () => handleCancel(isChanged, setFactsData, facts, setIsChanged)
     const onBack = () => handleBack(isChanged, setFactsData, facts, setIsChanged)
     const onInputChange = (e: any, index: number) => handleInputChange(setFactsData, factsData, index, e.target.value, setIsChanged)
 
