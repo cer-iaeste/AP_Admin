@@ -1,7 +1,7 @@
 import { CountryType } from "../types/types";
 import { doc, getDoc, getDocs, collection, getFirestore, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import { toast } from 'react-toastify';
+import { getCountryDbName } from "../global/Global";
 
 const COUNTRY_CACHE_KEY = "countryData"
 const COUNTRIES_CACHE_KEY = "countriesData"
@@ -34,11 +34,7 @@ export async function fetchCountryData(country: string): Promise<CountryType | u
 export async function updateCountryField(country: string, content: any, column: keyof CountryType, columnName: string) {
     const db = getFirestore()
 
-    let countryName = country
-    if (country === "Bosnia & Herzegovina") countryName = "Bosnia"
-    else if (country === "Czech Republic") countryName = "Czechia"
-
-    const countryRef = doc(db, "countries", countryName)
+    const countryRef = doc(db, "countries", getCountryDbName(country))
     const docSnap = await getDoc(countryRef)
     if (docSnap.exists()) {
 
@@ -48,9 +44,7 @@ export async function updateCountryField(country: string, content: any, column: 
 
         updateLocalStorageCountryData(country, column, content)
 
-        toast.success(`${columnName} updated successfully!`)
-
-    } else toast.error("Document not found!")
+    } else throw new Error("Document not found!")
 }
 
 export function updateLocalStorageCountryData(updateCountry: string, updateColumn: keyof CountryType, updateContent: any) {

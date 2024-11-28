@@ -16,6 +16,7 @@ import { updateCountryField } from "../../service/CountryService";
 import { CardType, CountryType } from "../../types/types";
 import { useParams, useNavigate } from "react-router-dom";
 import { getCard, getCountryData, confirmModalWindow } from "../../global/Global";
+import { toast } from "react-toastify";
 
 const Card = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -96,8 +97,18 @@ const Card = () => {
     }
 
     const handleSave = (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => {
-        updateCountryField(country, data, column, title).then(() => {
-            setIsChanged(false);
+
+        const updatePromise = updateCountryField(country, data, column, title)
+
+        toast.promise(updatePromise, {
+            pending: "Saving changes...",
+            success: {
+                render({ data }) {
+                    setIsChanged(false);
+                    return `${title} updated successfully!`
+                }
+            },
+            error: "Document not found!"
         })
     }
 

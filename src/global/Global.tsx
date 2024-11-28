@@ -162,3 +162,16 @@ export const confirmModalWindow = (message: string): Promise<boolean> => {
         })
     })
 }
+
+export const getCountryDbName = (country: string): string => {
+    switch (country) {
+        case "Bosnia & Herzegovina":
+            return "Bosnia"
+        case "Czech Republic":
+            return "Czechia"
+        case "Turkiye":
+            return "Turkey"
+        default:
+            return country
+    }
+}

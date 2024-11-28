@@ -1,5 +1,4 @@
 import React from "react";
-import Path from "../path/Path";
 import AuthService from "../../service/AuthService";
 import { toast } from 'react-toastify';
 
@@ -33,22 +32,24 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ toggleSidebar, role, country,
             <div className="flex flex-grow">
               <div className="grid grid-cols-3 sm:grid-cols-5 w-full items-center">
                 <button
-                  className="icon cursor-pointer rounded-full px-2.5 py-1 text-[#1B75BB] hover:text-sky-300 justify-start w-20"
+                  className="icon cursor-pointer rounded-full px-2.5 py-1 text-[#1B75BB] hover-bg-gradient justify-start w-10"
                   onClick={toggleSidebar}>
                   <i className="fa fa-bars text-base sm:text-xl"></i>
                 </button>
                 <div className="grid grid-cols-subgrid col-span-1 sm:col-span-3">
                   <div className="sm:col-start-2 justify-center">
-                    {(role==="admin" && !country) || (role==="user" && !card) ?
-                      <h1 className="text-xl text-[#1B75BB] ">AP Admin Panel</h1>
-                      : <Path role={role}/>
+                    {role === "admin" ?
+                      <a href="/" className="text-xl text-[#1B75BB] flex justify-center items-center gap-2 rounded-md p-1 hover-bg-gradient ">
+                        <i className="fa fa-house"/> AP Admin Panel
+                      </a>
+                      : <h1 className="text-xl text-[#1B75BB] ">AP Admin Panel</h1>
                     }
                   </div>
 
                 </div>
                 <div className="flex w-full justify-end">
                   <button
-                    className="flex flex-row items-center cursor-pointer rounded-md border border-[#1B75BB] ml-4 px-2.5 py-1 text-[#1B75BB] hover:text-white hover:bg-[#1B75BB]"
+                    className="flex flex-row items-center cursor-pointer rounded-md border border-[#1B75BB] ml-4 px-2.5 py-1 text-[#1B75BB] hover-bg-gradient"
                     onClick={handleLogout}>
                     <i className="fa-solid fa-person-hiking mr-1"></i>
                     <span className="hidden sm:block">Log out</span>
