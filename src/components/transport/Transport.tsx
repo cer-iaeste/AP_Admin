@@ -56,7 +56,6 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
     }
 
     useEffect(() => {
-        console.log(transport)
         setTransportData(mapTransportData(transport))
     }, [transport])
 
@@ -67,10 +66,8 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
     const hasLinks = (feature: TransportFeature) => feature?.hasOwnProperty("link");
 
     const onAdd = (index: number, transportId: number) => {
-        console.log(index, transportId)
         const newItem: TransportFeature = { name: "" }
         if (transportId !== 1) newItem.link = ""
-        console.log(newItem)
         handleAddNewItem(setTransportData, transportData, newItem, setIsChanged, index)
     }
     const onSave = () =>{ 

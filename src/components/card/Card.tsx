@@ -17,6 +17,7 @@ import { CardType, CountryType } from "../../types/types";
 import { useParams, useNavigate } from "react-router-dom";
 import { getCard, getCountryData, confirmModalWindow } from "../../global/Global";
 import { toast } from "react-toastify";
+import Hero from "../hero/Hero";
 
 const Card = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +73,7 @@ const Card = () => {
                     setCardComponent(<Gallery images={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
                     break
                 default:
-                    setCardComponent(<Gallery images={selectedCard?.content ?? ""} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
+                    setCardComponent(<Hero banner={selectedCard?.content ?? ""} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
                     break
             }
 

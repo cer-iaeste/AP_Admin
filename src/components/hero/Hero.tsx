@@ -16,7 +16,7 @@ interface UploadedImage {
     dbUrl: string
 }
 
-const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleDelete, handleCancel, handleBack }) => {
+const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleCancel, handleBack }) => {
     const [image, setImage] = useState<string>("")
     const [viewImage, setViewImage] = useState<string | null>(null)
     const [isChanged, setIsChanged] = useState(false)
@@ -56,7 +56,7 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleDe
                 const storageRef = ref(storage, `${countryName}/gallery/${imageToUpload.file.name}`);
                 // Upload to storage
                 await uploadBytes(storageRef, imageToUpload.file);
-            } else toast.error("No image to upload!")
+            }
         } catch (error) {
             toast.error("Error uploading files! " + error)
             return null
@@ -68,7 +68,7 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleDe
             if (imageToDelete !== "") {
                 const fileRef = ref(storage, imageToDelete)
                 await deleteObject(fileRef)
-            } else toast.error("No image to delete!")
+            }
         } catch (error) {
             toast.error("Error removing file from storage! " + error)
             return null
@@ -81,7 +81,7 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleDe
         // delete files from storage
         await removeImagesFromStorage()
         // save image
-        // handleSave(country, image, "banner", "Hero banner", setIsChanged)
+        handleSave(country, image, "banner", "Hero banner", setIsChanged)
     }
     const onCancel = async () => {
         const confirmation = await handleCancel(isChanged, setImage, banner, setIsChanged)
@@ -98,9 +98,9 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleDe
     const onBack = () => handleBack(isChanged, setImage, banner, setIsChanged)
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 table-margins">
+        <div className="table-margins flex justify-center">
             {image ?
-                <div className="relative group max-h-72">
+                <div className="w-2/3 relative group border-4 border-black rounded-md">
                     <img
                         src={image}
                         alt="Gallery item"
@@ -118,7 +118,7 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleDe
                         <i className="fa fa-eye text-white text-4xl" />
                     </div>
                 </div> :
-                <div className="relative group flex items-center justify-center border-dashed border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 h-72">
+                <div className="w-2/3 h-72 relative group flex items-center justify-center border-dashed border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400">
                     <input
                         type="file"
                         onChange={handleUpload}
@@ -135,7 +135,7 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleDe
             {/* Popup Modal for Enlarged Image */}
             {viewImage &&
                 <div className="overlay">
-                    <div className="relative bg-black rounded-xl shadow-md w-4/5 h-4/5 flex justify-center">
+                    <div className="relative bg-black rounded-xl shadow-md w-full h-5/6 flex justify-center">
                         <img src={viewImage} alt="Enlarged" className="" />
                         <button
                             onClick={closeModal}

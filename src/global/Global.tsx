@@ -90,15 +90,19 @@ export const getCardContent = (country: CountryType | null | undefined, title: s
                 drinks: country?.drinks ?? []
             }
         default:
-            return [];
+            return country?.banner ?? ""
     }
 }
 
 export const mapCountryCards = (country: CountryType | null | undefined): CardType[] => {
     // local helper function
     const checkIfSectionIsEmpty = (content: any): boolean => {
-        if (!content.hasOwnProperty("food")) return !content.length
-        return !content.food.length || !content.drinks.length
+        
+        if (typeof(content) !== 'string') {
+            if (!content?.hasOwnProperty("food")) return !content.length
+            return !content.food.length || !content.drinks.length
+        }
+        return content === ""
     }
 
     return country ?

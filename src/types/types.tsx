@@ -5,6 +5,7 @@ export interface CountryType {
     imageSrc: string
     imageAlt: string
     pdf: string
+    banner?: string
     cities: CityType[]
     committees: string[]
     emergencyContacts: EmergencyContactsType[]

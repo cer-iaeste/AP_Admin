@@ -126,6 +126,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
             <div className="relative group flex items-center justify-center border-dashed border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 h-72">
                 <input
                     type="file"
+                    accept="image/*"
                     onChange={handleUpload}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                     title="Upload image"
