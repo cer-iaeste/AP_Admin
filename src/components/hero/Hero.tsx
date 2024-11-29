@@ -5,27 +5,41 @@ import CardFooter from "../card/CardFooter";
 import "../summer-reception/Weekend.css"
 import { CardProps, getCountryDbName } from "../../global/Global";
 import { toast } from 'react-toastify';
+import ImagePopup from "../../global/ImagePopup";
 
-interface HeroBannerProps extends CardProps {
-    banner: string; // Array of image objects with unique id and URL
+interface HeroType {
+    banner: string
+    pdf: string
+    socialLinks: { [key: string]: string }[]
 }
 
-interface UploadedImage {
+interface HeroBannerProps extends CardProps {
+    content: HeroType; // Array of image objects with unique id and URL
+}
+
+interface UploadedFile {
     file: File
     url: string
     dbUrl: string
 }
 
-const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleCancel, handleBack }) => {
+const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleCancel, handleBack }) => {
+    const [isChanged, setIsChanged] = useState(false)
+    // image
     const [image, setImage] = useState<string>("")
     const [viewImage, setViewImage] = useState<string | null>(null)
-    const [isChanged, setIsChanged] = useState(false)
-    const [imageToUpload, setImageToUpload] = useState<UploadedImage>()
+    const [imageToUpload, setImageToUpload] = useState<UploadedFile>()
     const [imageToDelete, setImageToDelete] = useState<string>("")
+    // pdf
+    const [pdf, setPdf] = useState<string>("")
+    const [pdfToUpload, setPdfToUpload] = useState<UploadedFile>()
+    const [pdfToDelete, setPdfToDelete] = useState<string>("")
+    // links
+    const [links, setLinks] = useState<{ [key: string]: string }[]>([])
 
     useEffect(() => {
-        setImage(banner)
-    }, [banner])
+        setImage(content.banner)
+    }, [content])
 
     const handleImageClick = (url: string) => {
         setViewImage(url);
@@ -38,7 +52,7 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleCa
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (file) {
-            const newImage: UploadedImage = {
+            const newImage: UploadedFile = {
                 file,
                 url: URL.createObjectURL(file),
                 dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${country}%2Fgallery%2F${file.name}?alt=media`
@@ -49,7 +63,7 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleCa
         } else toast.error("Error while uploading file!")
     };
 
-    const uploadImagesToStorage = async () => {
+    const uploadImageToStorage = async () => {
         try {
             if (imageToUpload) {
                 const countryName = getCountryDbName(country)
@@ -63,7 +77,7 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleCa
         }
     }
 
-    const removeImagesFromStorage = async () => {
+    const removeImageFromStorage = async () => {
         try {
             if (imageToDelete !== "") {
                 const fileRef = ref(storage, imageToDelete)
@@ -77,14 +91,14 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleCa
 
     const onSave = async () => {
         // upload files to storage
-        await uploadImagesToStorage()
+        await uploadImageToStorage()
         // delete files from storage
-        await removeImagesFromStorage()
+        await removeImageFromStorage()
         // save image
         handleSave(country, image, "banner", "Hero banner", setIsChanged)
     }
     const onCancel = async () => {
-        const confirmation = await handleCancel(isChanged, setImage, banner, setIsChanged)
+        const confirmation = await handleCancel(isChanged, setImage, content?.banner, setIsChanged)
         if (confirmation) {
             setImageToDelete("")
             setImageToUpload(undefined)
@@ -92,15 +106,15 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleCa
     }
     const onDelete = (url: string) => {
         setImage("")
-        if (url === banner) setImageToDelete(url)
+        if (url === content?.banner) setImageToDelete(url)
         setIsChanged(true)
     }
-    const onBack = () => handleBack(isChanged, setImage, banner, setIsChanged)
+    const onBack = () => handleBack(isChanged, setImage, content?.banner, setIsChanged)
 
     return (
-        <div className="table-margins flex justify-center">
+        <div className="grid md:grid-cols-2 gap-4 table-margins">
             {image ?
-                <div className="w-2/3 relative group border-4 border-black rounded-md">
+                <div className="relative group border-2 border-[#1B75BB] rounded-md">
                     <img
                         src={image}
                         alt="Gallery item"
@@ -118,7 +132,7 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleCa
                         <i className="fa fa-eye text-white text-4xl" />
                     </div>
                 </div> :
-                <div className="w-2/3 h-72 relative group flex items-center justify-center border-dashed border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400">
+                <div className="relative group flex items-center justify-center border-dashed border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400">
                     <input
                         type="file"
                         onChange={handleUpload}
@@ -129,23 +143,103 @@ const Hero: React.FC<HeroBannerProps> = ({ banner, country, handleSave, handleCa
                 </div>
             }
 
-            {/* Upload Button Card */}
+            <div className="border-2 border-[#1B75BB] rounded-md bg-[#F1F1E6] relative grid grid-cols-2 gap-4 p-4 items-center justify-start">
+                {/* Horizontal Line */}
+                <div className="absolute inset-x-0 top-1/2 transform -translate-y-1/2 border-t-2 border-[#1B75BB]"></div>
+
+                {/* Vertical Line */}
+                <div className="absolute inset-y-0 left-1/2 transform -translate-x-1/2 border-l-2 border-[#1B75BB]"></div>
+                
+                {/* PDF Field */}
+                <div className="flex flex-col items-center">
+                    <i className="fa-solid fa-file-pdf text-red-500 text-4xl mb-2"></i>
+                    <button
+                        className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                        onClick={() => {
+                            document.getElementById("pdf-upload")?.click();
+                        }}
+                    >
+                        Upload PDF
+                    </button>
+                    <input
+                        id="pdf-upload"
+                        type="file"
+                        accept="application/pdf"
+                        className="hidden"
+                        onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            if (file) {
+                                const newPdf: UploadedFile = {
+                                    file,
+                                    url: URL.createObjectURL(file),
+                                    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${country}%2Fpdf%2F${file.name}?alt=media`,
+                                };
+                                setPdf(newPdf.url);
+                                setPdfToUpload(newPdf);
+                                setIsChanged(true);
+                            } else toast.error("Error while uploading PDF!");
+                        }}
+                    />
+                </div>
+
+                {/* Instagram Link */}
+                <div className="flex flex-col items-center">
+                    <i className="fa-brands fa-instagram text-pink-500 text-4xl mb-2"></i>
+                    <input
+                        type="text"
+                        placeholder="Instagram Link"
+                        value=""
+                        className="border border-gray-300 rounded px-2 py-1 w-full"
+                        onChange={(e) =>
+                            setLinks((prev) =>
+                                prev.map((link) =>
+                                    link.instagram ? { ...link, instagram: e.target.value } : link
+                                )
+                            )
+                        }
+                    />
+                </div>
+
+                {/* Facebook Link */}
+                <div className="flex flex-col items-center">
+                    <i className="fa-brands fa-facebook text-blue-500 text-4xl mb-2"></i>
+                    <input
+                        type="text"
+                        placeholder="Facebook Link"
+                        value=""
+                        className="border border-gray-300 rounded px-2 py-1 w-full"
+                        onChange={(e) =>
+                            setLinks((prev) =>
+                                prev.map((link) =>
+                                    link.facebook ? { ...link, facebook: e.target.value } : link
+                                )
+                            )
+                        }
+                    />
+                </div>
+
+                {/* Website Link */}
+                <div className="flex flex-col items-center">
+                    <i className="fa-solid fa-globe text-green-500 text-4xl mb-2"></i>
+                    <input
+                        type="text"
+                        placeholder="Website Link"
+                        value=""
+                        className="border border-gray-300 rounded px-2 py-1 w-full"
+                        onChange={(e) =>
+                            setLinks((prev) =>
+                                prev.map((link) =>
+                                    link.website ? { ...link, website: e.target.value } : link
+                                )
+                            )
+                        }
+                    />
+                </div>
+            </div>
 
 
             {/* Popup Modal for Enlarged Image */}
-            {viewImage &&
-                <div className="overlay">
-                    <div className="relative bg-black rounded-xl shadow-md w-full h-5/6 flex justify-center">
-                        <img src={viewImage} alt="Enlarged" className="" />
-                        <button
-                            onClick={closeModal}
-                            className="absolute top-2 right-2 text-red-500 rounded-full p-1"
-                        >
-                            <i className="fa fa-circle-xmark text-3xl"></i>
-                        </button>
-                    </div>
-                </div>
-            }
+            {viewImage && <ImagePopup image={viewImage} closeModal={closeModal} />}
 
             <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
         </div>

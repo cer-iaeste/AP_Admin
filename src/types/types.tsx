@@ -6,6 +6,7 @@ export interface CountryType {
     imageAlt: string
     pdf: string
     banner?: string
+    socialLinks: {[key: string]: string}[]
     cities: CityType[]
     committees: string[]
     emergencyContacts: EmergencyContactsType[]

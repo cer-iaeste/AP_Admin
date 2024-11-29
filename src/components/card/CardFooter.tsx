@@ -24,7 +24,7 @@ const CardFooter: React.FC<FooterProps> = ({ isChanged, onCancel, onSave, onBack
     };
 
     return (
-        <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-[#1B75BB] p-1 sm:p-2">
+        <footer className="fixed bottom-0 left-0 w-full bg-[#F1F1E6] border-t border-[#1B75BB] p-1 sm:p-2">
             <div className='flex flex-row justify-between container'>
                 {/* Cancel Button */}
                 <button

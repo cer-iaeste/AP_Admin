@@ -5,6 +5,7 @@ import CardFooter from "../card/CardFooter";
 import "../summer-reception/Weekend.css"
 import { CardProps, getCountryDbName } from "../../global/Global";
 import { toast } from 'react-toastify';
+import ImagePopup from "../../global/ImagePopup";
 
 interface GalleryProps extends CardProps{
     images: string[]; // Array of image objects with unique id and URL
@@ -102,7 +103,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 table-margins">
             {imagesData.map((image, index) => (
-                <div key={index} className="relative group max-h-72">
+                <div key={index} className="relative group max-h-72 border-2 border-[#1B75BB] rounded-md">
                     <img
                         src={image}
                         alt="Gallery item"
@@ -135,19 +136,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
             </div>
 
             {/* Popup Modal for Enlarged Image */}
-            {selectedImage && (
-                <div className="overlay">
-                    <div className="relative bg-black rounded-xl shadow-md w-4/5 h-4/5 flex justify-center">
-                        <img src={selectedImage} alt="Enlarged" className="" />
-                        <button
-                            onClick={closeModal}
-                            className="absolute top-2 right-2 text-red-500 rounded-full p-1"
-                        >
-                            <i className="fa fa-circle-xmark text-3xl"></i>
-                        </button>
-                    </div>
-                </div>
-            )}
+            {selectedImage && <ImagePopup image={selectedImage} closeModal={closeModal} />}
 
             <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
         </div>

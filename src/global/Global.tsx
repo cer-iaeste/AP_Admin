@@ -90,24 +90,26 @@ export const getCardContent = (country: CountryType | null | undefined, title: s
                 drinks: country?.drinks ?? []
             }
         default:
-            return country?.banner ?? ""
+            return {
+                banner: country?.banner ?? "",
+                pdf: country?.pdf ?? "",
+                socialLinks: country?.socialLinks ?? []
+            }
     }
 }
 
 export const mapCountryCards = (country: CountryType | null | undefined): CardType[] => {
     // local helper function
     const checkIfSectionIsEmpty = (content: any): boolean => {
-        
-        if (typeof(content) !== 'string') {
-            if (!content?.hasOwnProperty("food")) return !content.length
-            return !content.food.length || !content.drinks.length
-        }
-        return content === ""
+        if (!content?.hasOwnProperty("food") && !content?.hasOwnProperty("banner")) return !content.length
+        if (content?.hasOwnProperty("food")) return !content.food.length || !content.drinks.length
+        return content.banner === "" && content.pdf === "" && !content.socialLinks.length
     }
 
     return country ?
         componentsCards.map((card: CardType) => {
             const content = getCardContent(country, card.title)
+            console.log(card.title, content)
             return ({ ...card, isSectionEmpty: checkIfSectionIsEmpty(content) })
         })
         : []

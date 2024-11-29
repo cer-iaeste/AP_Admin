@@ -73,7 +73,7 @@ const Card = () => {
                     setCardComponent(<Gallery images={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
                     break
                 default:
-                    setCardComponent(<Hero banner={selectedCard?.content ?? ""} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
+                    setCardComponent(<Hero content={selectedCard?.content ?? ""} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
                     break
             }
 
