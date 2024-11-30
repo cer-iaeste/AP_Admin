@@ -25,27 +25,28 @@ const FunFacts: React.FC<FunFactsProps> = ({ country, facts, handleSave, handleD
     const onInputChange = (e: any, index: number) => handleInputChange(setFactsData, factsData, index, e.target.value, setIsChanged)
 
     return (
-        <div className="card-grid table-margins">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-6 table-margins mx-2">
             {factsData.map((fact, index) => (
-                <div key={index} className="card-grid-body">
+                <div key={index} className="card-container">
                     {/* Title in the top right */}
-                    <div className="card-grid-header">
-                        <span className="card-grid-title">
-                            Fun fact #{index + 1}
-                        </span>
+                    <div className="card-header">
+                        Fun fact #{index + 1}
+                    </div>
+                    <div className="card-header-right">
                         <button
                             type="button"
                             onClick={() => onDelete(index)}
-                            className="btn delete-btn"
+                            className="font-semibold"
                         >
-                            <i className="fa fa-trash" aria-hidden="true"></i>
+                            Remove
+                            <i className="fa fa-trash ml-1" aria-hidden="true"></i>
                         </button>
                     </div>
 
                     {/* Value input below buttons */}
                     <textarea
                         value={fact}
-                        rows={width > 640 ? 8 : 4}
+                        rows={4}
                         onChange={(e) => onInputChange(e, index)} // Update input value
                         className="w-full border-2 p-2 text-xl"
                     />
@@ -59,7 +60,7 @@ const FunFacts: React.FC<FunFactsProps> = ({ country, facts, handleSave, handleD
             </div>
 
             {/* Reusable CardFooter Component */}
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
         </div>
     )
 }

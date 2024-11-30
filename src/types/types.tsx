@@ -42,7 +42,7 @@ export interface EmergencyContactsType {
 export interface InformationType {
     name: string
     role: string
-    imageUrl?: string
+    icon?: string
 }
 
 export interface WeekendType {

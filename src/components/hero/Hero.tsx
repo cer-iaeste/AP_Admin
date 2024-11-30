@@ -23,6 +23,12 @@ interface UploadedFile {
     dbUrl: string
 }
 
+interface SocialLink {
+    name: string
+    icon: string
+    value: string
+}
+
 const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleCancel, handleBack }) => {
     const [isChanged, setIsChanged] = useState(false)
     // image
@@ -35,15 +41,15 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
     const [pdfToUpload, setPdfToUpload] = useState<UploadedFile>()
     const [pdfToDelete, setPdfToDelete] = useState<string>("")
     // links
-    const [links, setLinks] = useState<{ [key: string]: string }[]>([])
+    const [links, setLinks] = useState<SocialLink[]>([
+        { name: 'Instagram', icon: 'fab fa-instagram', value: '' },
+        { name: 'Facebook', icon: 'fab fa-facebook', value: '' },
+        { name: 'Website', icon: 'fas fa-globe', value: '' },
+    ])
 
     useEffect(() => {
         setImage(content.banner)
     }, [content])
-
-    const handleImageClick = (url: string) => {
-        setViewImage(url);
-    };
 
     const closeModal = () => {
         setViewImage(null);
@@ -52,14 +58,26 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (file) {
-            const newImage: UploadedFile = {
-                file,
-                url: URL.createObjectURL(file),
-                dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${country}%2Fgallery%2F${file.name}?alt=media`
+            if (file.type === "application/pdf") {
+                const newPdf: UploadedFile = {
+                    file,
+                    url: URL.createObjectURL(file),
+                    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${country}%2Fgallery%2F${file.name}?alt=media`
+                }
+                setPdf(newPdf.file.name)
+                setPdfToUpload(newPdf)
+                setIsChanged(true)
+            } else {
+                const newImage: UploadedFile = {
+                    file,
+                    url: URL.createObjectURL(file),
+                    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${country}%2Fgallery%2F${file.name}?alt=media`
+                }
+                setImage(newImage.url)
+                setImageToUpload(newImage)
+                setIsChanged(true)
             }
-            setImage(newImage.url)
-            setImageToUpload(newImage)
-            setIsChanged(true)
+
         } else toast.error("Error while uploading file!")
     };
 
@@ -104,145 +122,124 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
             setImageToUpload(undefined)
         }
     }
-    const onDelete = (url: string) => {
+    const onDelete = () => {
         setImage("")
-        if (url === content?.banner) setImageToDelete(url)
+        if (image === content?.banner && content.banner !== "") setImageToDelete(image)
+        setIsChanged(true)
+    }
+    const onDeletePdf = () => {
+        setPdf("")
+        if (pdf === content?.banner && content.banner !== "") setPdfToDelete(image)
         setIsChanged(true)
     }
     const onBack = () => handleBack(isChanged, setImage, content?.banner, setIsChanged)
 
     return (
-        <div className="grid md:grid-cols-2 gap-4 table-margins">
-            {image ?
-                <div className="relative group border-2 border-[#1B75BB] rounded-md">
-                    <img
-                        src={image}
-                        alt="Gallery item"
-                        className="w-full h-full object-cover transition duration-300 ease-in-out transform group-hover:opacity-60"
-
-                    />
-                    <button
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300 z-10"
-                        onClick={() => onDelete(image)}
-                    >
-                        <i className="fa-solid fa-trash-can text-red-400 hover:text-red-500 text-2xl" />
-                    </button>
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
-                        onClick={() => handleImageClick(image)}>
-                        <i className="fa fa-eye text-white text-4xl" />
+        <>
+            <div className="mt-6 table-margins mx-2 space-y-8">
+                {/* Files */}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div key="banner" className="card-container">
+                        <div className="card-header">
+                            Hero banner
+                        </div>
+                        {image ?
+                            <div className="flex justify-between w-full px-3">
+                                <div className="flex underline items-center">
+                                    {country}.image
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-[#1B75BB] text-[#1B75BB] hover:bg-[#1B75BB] hover:text-white transition-transform transform hover:scale-110"
+                                        onClick={() => setViewImage(image)}
+                                        title="View image"
+                                    >
+                                        <i className="fa fa-eye text-lg" />
+                                    </button>
+                                    <button
+                                        className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-red-500 text-red-500 hover:text-white hover:bg-red-500 transition-transform transform hover:scale-110"
+                                        onClick={onDelete}
+                                        title="Delete image"
+                                    >
+                                        <i className="fa fa-trash text-lg" />
+                                    </button>
+                                </div>
+                            </div>
+                            :
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleUpload}
+                                className="w-full px-3 pt-1 rounded-md text-sm text-gray-700 cursor-pointer"
+                                title="Upload image"
+                            />
+                        }
                     </div>
-                </div> :
-                <div className="relative group flex items-center justify-center border-dashed border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400">
-                    <input
-                        type="file"
-                        onChange={handleUpload}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                        title="Upload image"
-                    />
-                    <i className="fa-solid fa-plus text-gray-400 text-4xl group-hover:text-blue-400"></i>
-                </div>
-            }
-
-            <div className="border-2 border-[#1B75BB] rounded-md bg-[#F1F1E6] relative grid grid-cols-2 gap-4 p-4 items-center justify-start">
-                {/* Horizontal Line */}
-                <div className="absolute inset-x-0 top-1/2 transform -translate-y-1/2 border-t-2 border-[#1B75BB]"></div>
-
-                {/* Vertical Line */}
-                <div className="absolute inset-y-0 left-1/2 transform -translate-x-1/2 border-l-2 border-[#1B75BB]"></div>
-                
-                {/* PDF Field */}
-                <div className="flex flex-col items-center">
-                    <i className="fa-solid fa-file-pdf text-red-500 text-4xl mb-2"></i>
-                    <button
-                        className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                        onClick={() => {
-                            document.getElementById("pdf-upload")?.click();
-                        }}
-                    >
-                        Upload PDF
-                    </button>
-                    <input
-                        id="pdf-upload"
-                        type="file"
-                        accept="application/pdf"
-                        className="hidden"
-                        onChange={(event) => {
-                            const file = event.target.files?.[0];
-                            if (file) {
-                                const newPdf: UploadedFile = {
-                                    file,
-                                    url: URL.createObjectURL(file),
-                                    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${country}%2Fpdf%2F${file.name}?alt=media`,
-                                };
-                                setPdf(newPdf.url);
-                                setPdfToUpload(newPdf);
-                                setIsChanged(true);
-                            } else toast.error("Error while uploading PDF!");
-                        }}
-                    />
-                </div>
-
-                {/* Instagram Link */}
-                <div className="flex flex-col items-center">
-                    <i className="fa-brands fa-instagram text-pink-500 text-4xl mb-2"></i>
-                    <input
-                        type="text"
-                        placeholder="Instagram Link"
-                        value=""
-                        className="border border-gray-300 rounded px-2 py-1 w-full"
-                        onChange={(e) =>
-                            setLinks((prev) =>
-                                prev.map((link) =>
-                                    link.instagram ? { ...link, instagram: e.target.value } : link
-                                )
-                            )
+                    <div key="pdf" className="card-container">
+                        <div className="card-header">
+                            Country PDF
+                        </div>
+                        {pdf ?
+                            <div className="flex justify-between w-full px-3">
+                                <div className="flex underline items-center">
+                                    {country}.pdf
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <a
+                                        className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-[#1B75BB] text-[#1B75BB] hover:bg-[#1B75BB] hover:text-white transition-transform transform hover:scale-110"
+                                        href={pdf} target="_blank" rel="noreferrer"
+                                        title="View PDF"
+                                    >
+                                        <i className="fa fa-eye text-lg" />
+                                    </a>
+                                    <button
+                                        className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-red-500 text-red-500 hover:text-white hover:bg-red-500 transition-transform transform hover:scale-110"
+                                        onClick={onDeletePdf}
+                                        title="Delete image"
+                                    >
+                                        <i className="fa fa-trash text-lg" />
+                                    </button>
+                                </div>
+                            </div>
+                            :
+                            <input
+                                type="file"
+                                accept=".pdf"
+                                onChange={handleUpload}
+                                className="w-full px-3 pt-1 rounded-md text-sm text-gray-700 cursor-pointer"
+                                title="Upload image"
+                            />
                         }
-                    />
+                    </div>
+                    <div key="empty" className="hidden lg:block"></div>
+                </div>
+                {/* Links */}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {links.map((link, index) =>
+                        <div key={index} className="card-container">
+                            <div className="card-header">
+                                <i className={`${link.icon} mr-1`} />
+                                {link.name}
+                            </div>
+                            <textarea
+                                placeholder="Link"
+                                rows={1}
+                                value={link?.value}
+                                // onChange={(e) => onInputChange(e, index, "role")}
+                                className="card-textarea"
+                            />
+                        </div>
+                    )}
                 </div>
 
-                {/* Facebook Link */}
-                <div className="flex flex-col items-center">
-                    <i className="fa-brands fa-facebook text-blue-500 text-4xl mb-2"></i>
-                    <input
-                        type="text"
-                        placeholder="Facebook Link"
-                        value=""
-                        className="border border-gray-300 rounded px-2 py-1 w-full"
-                        onChange={(e) =>
-                            setLinks((prev) =>
-                                prev.map((link) =>
-                                    link.facebook ? { ...link, facebook: e.target.value } : link
-                                )
-                            )
-                        }
-                    />
-                </div>
 
-                {/* Website Link */}
-                <div className="flex flex-col items-center">
-                    <i className="fa-solid fa-globe text-green-500 text-4xl mb-2"></i>
-                    <input
-                        type="text"
-                        placeholder="Website Link"
-                        value=""
-                        className="border border-gray-300 rounded px-2 py-1 w-full"
-                        onChange={(e) =>
-                            setLinks((prev) =>
-                                prev.map((link) =>
-                                    link.website ? { ...link, website: e.target.value } : link
-                                )
-                            )
-                        }
-                    />
-                </div>
             </div>
-
-
-            {/* Popup Modal for Enlarged Image */}
             {viewImage && <ImagePopup image={viewImage} closeModal={closeModal} />}
 
             <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
-        </div>
+        </>
+
+
     );
 };
 

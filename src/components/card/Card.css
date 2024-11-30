@@ -220,3 +220,62 @@
     gap: 0.5rem;
     /* gap-2 */
 }
+
+.card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 4px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    position: relative;
+    border: 1px solid #1B75BB;
+  }
+  
+  .card-header {
+    position: absolute;
+    top: -16px;
+    left: -8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 0.5rem;
+    background-color: #1B75BB;
+    color: white;
+    padding: 0 8px;
+    font-weight: 600; 
+    /* margin: 0; */
+  }
+
+  .card-header-right {
+    position: absolute;
+    top: -16px;
+    right: -8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 0.5rem;
+    border: 1px solid red;
+    background-color: white;
+    color: red;
+    padding: 0 8px;
+    font-weight: 600; 
+    /* margin: 0; */
+  }
+
+  .card-header-right:hover {
+    background-color: red;
+    color: white;
+  }
+  
+  .card-textarea {
+    width: 100%;
+    margin: 0 4px;
+    padding: 4px;
+    border: 1px solid #1B75BB;
+    border-radius: 0.375rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    word-wrap: break-word;
+    resize: none;
+  }
