@@ -230,9 +230,21 @@
     border-radius: 0.5rem;
     position: relative;
     border: 1px solid #1B75BB;
-  }
-  
-  .card-header {
+    box-sizing: border-box; /* Ensures padding and border are included in width/height */
+    width: 100%;
+}
+
+.card-subcontainer {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem 0;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 0.5rem
+}
+
+.card-header {
     position: absolute;
     top: -16px;
     left: -8px;
@@ -243,11 +255,15 @@
     background-color: #1B75BB;
     color: white;
     padding: 0 8px;
-    font-weight: 600; 
-    /* margin: 0; */
-  }
+    font-weight: 600;
+   
+}
 
-  .card-header-right {
+.card-header-sub {
+    margin-left: 0.5rem;
+}
+
+.card-header-right {
     position: absolute;
     top: -16px;
     right: -8px;
@@ -259,23 +275,46 @@
     background-color: white;
     color: red;
     padding: 0 8px;
-    font-weight: 600; 
+    font-weight: 600;
+    font-size: 0.9rem;
     /* margin: 0; */
-  }
+}
 
-  .card-header-right:hover {
+.card-header-right:hover {
     background-color: red;
     color: white;
-  }
-  
-  .card-textarea {
+}
+
+.card-footer-right {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 0.5rem;
+    border: 1px solid red;
+    background-color: white;
+    color: red;
+    padding: 0 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    /* margin: 0; */
+}
+
+.card-footer-right:hover {
+    background-color: red;
+    color: white;
+}
+
+.card-textarea {
     width: 100%;
-    margin: 0 4px;
-    padding: 4px;
+    padding: 2px 8px;
     border: 1px solid #1B75BB;
     border-radius: 0.375rem;
-    font-size: 1.125rem;
-    font-weight: 600;
+    /* font-size: 1.125rem; */
+    /* font-weight: 600; */
     word-wrap: break-word;
     resize: none;
-  }
+    scrollbar-width: 'thin';
+}

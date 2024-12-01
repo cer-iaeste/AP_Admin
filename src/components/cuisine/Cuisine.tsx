@@ -43,7 +43,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
     };
 
     const onAdd = (index: number) => handleAddNewItem(setCuisineData, cuisineData, { title: "", description: "" }, setIsChanged, index)
-    const onSave = () =>{ 
+    const onSave = () => {
         const foodData = cuisineData[0].content
         const drinksData = cuisineData[1].content
         handleSave(country, foodData, "food", "Food", setIsChanged)
@@ -58,7 +58,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
     return (
         <div className="mt-5 table-margins">
             {cuisineData.map((data, index) => (
-                <div key={data.title} className="mb-4 border border-[#1B75BB]">
+                <div key={data.title} className="mb-4 border-2 border-[#1B75BB]">
                     <div
                         className="accordion-header hover-bg-gradient"
                         onClick={() => toggleAccordion(index)} // Call toggle function on click
@@ -69,55 +69,63 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
                         </div>
                         <i className={`fa ${openIndex === index ? "fa-minus" : "fa-plus"} transition-transform duration-300`} />
                     </div>
-                    <div className={`card-grid bg-amber-100 ${openIndex === index ? "max-h-full p-2" : "max-h-0 overflow-hidden"}`}>
-                        {data.content?.map((item, itemIndex) =>
-                            <div key={data.title + itemIndex} className="card-grid-body space-y-2">
-                                <div className="flex flex-col text-start">
-                                    <label>
-                                        Title
-                                    </label>
-                                    <textarea
-                                        value={item.title}
-                                        rows={1}
-                                        onChange={(e) => onItemChange(e, index, itemIndex, "title")}
-                                        placeholder="Title"
-                                    />
-                                </div>
+                    <div className={`bg-sky-200 ${openIndex === index ? "max-h-72 overflow-y-scroll p-2" : "max-h-0 overflow-hidden"}`}>
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 my-6 mx-2">
+                            {data.content?.map((item, itemIndex) =>
+                                <div key={data.title + itemIndex} className="card-container">
+                                    <div className="card-footer-right">
+                                        <button
+                                            type="button"
+                                            onClick={() => onDelete(index, itemIndex)}
+                                            className="flex items-center py-1"
+                                            title="Remove item"
+                                        >
+                                            <i className="fa fa-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                    <div className="card-subcontainer">
+                                        {/* Title in the top right */}
+                                        <div className="card-header card-header-sub">
+                                            Title
+                                        </div>
+                                        {/* Value input below buttons */}
+                                        <input
+                                            placeholder="Title"
+                                            value={item.title}
+                                            onChange={(e) => onItemChange(e, index, itemIndex, "title")}
+                                            className="card-textarea mt-1.5"
+                                        />
+                                    </div>
+                                    <div className="card-subcontainer">
+                                        {/* Title in the top right */}
+                                        <div className="card-header card-header-sub">
+                                            Description
+                                        </div>
+                                        {/* Value input below buttons */}
+                                        <textarea
+                                            placeholder="Description (optional)"
+                                            value={item.description}
+                                            rows={4}
+                                            onChange={(e) => onItemChange(e, index, itemIndex, "description")} // Update input value
+                                            className="card-textarea mt-1.5"
+                                        />
+                                    </div>
 
-                                <div className="flex flex-col text-start ">
-                                    <label>
-                                        Description
-                                    </label>
-                                    <textarea
-                                        value={item.description}
-                                        rows={4}
-                                        onChange={(e) => onItemChange(e, index, itemIndex, "description")}
-                                        placeholder="Description"
-                                    />
                                 </div>
-
-                                <div className="flex mt-2 justify-end">
-                                    <button
-                                        type="button"
-                                        onClick={() => onDelete(index, itemIndex)}
-                                        className="btn delete-btn"
-                                    >
-                                        <i className="fa fa-trash" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                        <div className="flex items-end">
-                            <button className="add-btn hover-bg-gradient" 
+                            )}
+                            <div className="flex items-end">
+                                <button className="add-btn hover-bg-gradient"
                                     onClick={() => onAdd(index)}>
-                                <i className="fa fa-plus"></i> Add new item
-                            </button>
+                                    <i className="fa fa-plus"></i> Add new item
+                                </button>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             ))}
 
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
         </div>
     )
 }

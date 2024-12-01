@@ -27,42 +27,47 @@ const Places: React.FC<PlacesProps> = ({ country, places, handleSave, handleDele
     const onInputChange = (e: any, index: number, column: string) => handleInputChange(setPlacesData, placesData, index, e.target.value, setIsChanged, column)
 
     return (
-        <div className="card-grid table-margins">
-            {placesData.map((place, index) => (
-                <div key={index} className="card-grid-body space-y-2">
-                    {/* Title in the top right */}
-                    <div className="flex flex-col text-start">
-                        <label>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 table-margins mx-2">
+            {placesData.map((city, index) => (
+                <div key={index} className="card-container">
+                    <div className="card-footer-right">
+                            <button
+                                type="button"
+                                onClick={() => onDelete(index)}
+                                className="flex items-center py-1"
+                                title="Remove place"
+                            >
+                                <i className="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    <div className="card-subcontainer">
+                        {/* Title in the top right */}
+                        <div className="card-header card-header-sub">
                             Name
-                        </label>
+                        </div>
+                        {/* Value input below buttons */}
                         <textarea
-                            value={place.name}
+                            placeholder="Place name"
                             rows={2}
-                            onChange={(e) => onInputChange(e, index, "name")}
-                            placeholder="City/Place name"
+                            value={city.name}
+                            onChange={(e) => onInputChange(e, index, "name")} // Update input value
+                            className="card-textarea mt-1.5"
                         />
                     </div>
 
-                    <div className="flex flex-col text-start ">
-                        <label>
+                    <div className="card-subcontainer">
+                        {/* Title in the top right */}
+                        <div className="card-header card-header-sub">
                             Description
-                        </label>
+                        </div>
+                        {/* Value input below buttons */}
                         <textarea
-                            value={place.description}
-                            rows={width > 640 ? 8 : 4}
-                            onChange={(e) => onInputChange(e, index, "description")}
                             placeholder="Description"
+                            rows={width > 640 ? 8 : 4}
+                            value={city.description}
+                            onChange={(e) => onInputChange(e, index, "description")} // Update input value
+                            className="card-textarea mt-1.5"
                         />
-                    </div>
-
-                    <div className="flex mt-2 justify-end">
-                        <button
-                            type="button"
-                            onClick={() => onDelete(index)}
-                            className="btn delete-btn"
-                        >
-                            <i className="fa fa-trash" aria-hidden="true"></i>
-                        </button>
                     </div>
                 </div>
             ))}
@@ -74,7 +79,7 @@ const Places: React.FC<PlacesProps> = ({ country, places, handleSave, handleDele
             </div>
 
             {/* Reusable CardFooter Component */}
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
         </div>
     )
 }

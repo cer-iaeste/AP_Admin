@@ -4,7 +4,7 @@ import "../card/Card.css"
 import { TransportType, TransportFeature } from "../../types/types";
 import { CardProps, TRANSPORT_CONSTANTS } from "../../global/Global";
 
-interface TransportProps extends CardProps{
+interface TransportProps extends CardProps {
     transport: TransportType[]
 }
 
@@ -70,7 +70,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
         if (transportId !== 1) newItem.link = ""
         handleAddNewItem(setTransportData, transportData, newItem, setIsChanged, index)
     }
-    const onSave = () =>{ 
+    const onSave = () => {
         const result: TransportType[] = transportData.map(t => ({
             id: t.id,
             features: t.content
@@ -97,73 +97,64 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
                         </div>
                         <i className={`fa ${openIndex === index ? "fa-minus" : "fa-plus"} transition-transform duration-300`} />
                     </div>
-                    <div className={`bg-white border-t border-[#1B75BB]  ${openIndex === index ? "max-h-full" : "max-h-0 overflow-hidden"}`}>
-                        <table className="w-full">
-                            <thead className="w-full border-b border-[#1B75BB]">
-                                <tr className="bg-[#F1F1E6]">
-                                    <th className="p-2 text-left font-semibold">Title</th>
-                                    {hasLinks(transport.content[0]) && <th className="p-2 text-left font-semibold hidden sm:block">Link</th>}
-                                    <th className="p-2 text-left font-semibold w-10">Delete</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {!!transport.content.length &&
-                                    transport.content.map((feature, featureIndex) => (
-                                        <tr key={featureIndex} className="border-b border-[#1B75BB]">
-                                            <td className="p-2 text-lg">
-                                                <input
-                                                    value={feature.name}
-                                                    className="w-full p-2 bg-[#F1F1E6] border border-black font-semibold"
-                                                    onChange={(e) => onItemChange(e, index, featureIndex, "name")}
-                                                    placeholder="Title"
-                                                />
-                                                {hasLinks(feature) && (
-                                                    <input
-                                                        value={feature.link}
-                                                        className="text-blue-500 underline w-full p-2 bg-[#F1F1E6] border border-black block sm:hidden mt-2"
-                                                        onChange={(e) => onItemChange(e, index, featureIndex, "link")}
-                                                        placeholder="Link (optional)"
-                                                    />
-                                                )}
-                                            </td>
-                                            {hasLinks(feature) && (
-                                                <td className="p-2 text-lg sm:block hidden">
-                                                    <input
-                                                        value={feature.link}
-                                                        className="text-blue-500 underline w-full p-2 bg-[#F1F1E6] border border-black"
-                                                        onChange={(e) => onItemChange(e, index, featureIndex, "link")}
-                                                        placeholder="Link (optional)"
-                                                    />
-                                                </td>
-                                            )}
-                                            <td className="p-2 w-10">
-                                                {/* Remove button */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onDelete(index, featureIndex)}
-                                                    className="btn delete-btn mt-1"
-                                                >
-                                                    <i className="fa fa-trash" aria-hidden="true"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                }
-                                <tr>
-                                    <td className="flex items-end p-2">
-                                        <button className="add-btn hover-bg-gradient"
-                                            onClick={() => onAdd(index, transport.id)}>
-                                            <i className="fa fa-plus"></i> Add new item
+                    <div className={`bg-sky-200 border-t border-[#1B75BB]  ${openIndex === index ? "max-h-72 overflow-y-scroll" : "max-h-0 overflow-hidden"}`}>
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 my-6 mx-2">
+                            {transport.content.map((feature, featureIndex) => (
+                                <div key={index} className="card-container">
+                                    <div className="card-footer-right">
+                                        <button
+                                            type="button"
+                                            onClick={() => onDelete(index, featureIndex)}
+                                            className="flex items-center py-1"
+                                            title="Remove item"
+                                        >
+                                            <i className="fa fa-trash" aria-hidden="true"></i>
                                         </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </div>
+                                    <div className="card-subcontainer">
+                                        {/* Title in the top right */}
+                                        <div className="card-header card-header-sub">
+                                            Name
+                                        </div>
+                                        {/* Value input below buttons */}
+                                        <input
+                                            placeholder="Name"
+                                            value={feature.name}
+                                            onChange={(e) => onItemChange(e, index, featureIndex, "name")}
+                                            className="card-textarea mt-1.5"
+                                        />
+                                    </div>
+                                    {hasLinks(feature) && 
+                                        <div className="card-subcontainer">
+                                        {/* Title in the top right */}
+                                        <div className="card-header card-header-sub">
+                                            Link
+                                        </div>
+                                        {/* Value input below buttons */}
+                                        <input
+                                            placeholder="Link (optional)"
+                                            value={feature.link}
+                                            onChange={(e) => onItemChange(e, index,  featureIndex, "link")} // Update input value
+                                            className="card-textarea mt-1.5 underline text-sky-700"
+                                        />
+                                    </div>
+                                    }
+                                    
+                                </div>
+                            ))}
+
+                            <div className="flex items-end">
+                                <button className="add-btn hover-bg-gradient"
+                                    onClick={() => onAdd(index, transport.id)}>
+                                    <i className="fa fa-plus"></i> Add new item
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             ))}
 
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
         </div>
     )
 }

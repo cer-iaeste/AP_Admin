@@ -27,55 +27,60 @@ const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete,
     const onInputChange = (e: any, index: number, column: string) => handleInputChange(setOtherData, otherData, index, e.target.value, setIsChanged, column)
 
     return (
-        <div className="card-grid table-margins">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 table-margins mx-2">
             {otherData.map((place, index) => (
-                <div key={index} className="card-grid-body space-y-2">
-                    {/* Title in the top right */}
-                    <div className="flex flex-col text-start">
-                        <label>
-                            Title
-                        </label>
-                        <textarea
-                            value={place.title}
-                            rows={2}
-                            onChange={(e) => onInputChange(e, index, "title")}
-                            placeholder="Title"
-                        />
-                    </div>
-
-                    <div className="flex flex-col text-start ">
-                        <label>
-                            Description
-                        </label>
-                        <textarea
-                            value={place.description}
-                            rows={width > 640 ? 8 : 4}
-                            onChange={(e) => onInputChange(e, index, "description")}
-                            placeholder="Description"
-                        />
-                    </div>
-
-                    <div className="flex mt-2 justify-end">
+                <div key={index} className="card-container">
+                    <div className="card-footer-right">
                         <button
                             type="button"
                             onClick={() => onDelete(index)}
-                            className="btn delete-btn"
+                            className="flex items-center py-1"
+                            title="Remove item"
                         >
                             <i className="fa fa-trash" aria-hidden="true"></i>
                         </button>
+                    </div>
+                    <div className="card-subcontainer">
+                        {/* Title in the top right */}
+                        <div className="card-header card-header-sub">
+                            Title
+                        </div>
+                        {/* Value input below buttons */}
+                        <textarea
+                            placeholder="Title"
+                            rows={2}
+                            value={place.title}
+                            onChange={(e) => onInputChange(e, index, "title")} // Update input value
+                            className="card-textarea mt-1.5"
+                        />
+                    </div>
+
+                    <div className="card-subcontainer">
+                        {/* Title in the top right */}
+                        <div className="card-header card-header-sub">
+                            Description
+                        </div>
+                        {/* Value input below buttons */}
+                        <textarea
+                            placeholder="Description"
+                            rows={width > 640 ? 8 : 4}
+                            value={place.description}
+                            onChange={(e) => onInputChange(e, index, "description")} // Update input value
+                            className="card-textarea mt-1.5"
+                        />
                     </div>
                 </div>
             ))}
 
             <div className="flex items-end">
-                <button className="add-btn hover-bg-gradient" 
-                        onClick={onAdd}>
+                <button className="add-btn hover-bg-gradient"
+                    onClick={onAdd}>
                     <i className="fa fa-plus"></i> Add new info
                 </button>
             </div>
 
             {/* Reusable CardFooter Component */}
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
         </div>
     )
 }

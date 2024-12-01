@@ -23,43 +23,32 @@ const CitiesWithLcs: React.FC<CitiesProps> = ({ cities, country, handleSave, han
     const onInputChange = (e: any, index: number) => handleInputChange(setCommitteesData, committeesData, index, e.target.value, setIsChanged)
 
     return (
-        <div className="elements-position space-y-5 mt-5 relative pb-24"> {/* Added padding for footer */}
-            <table className="card-table">
-                <thead>
-                    <tr className="card-table-head">
-                        <th>City name</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {!!committeesData.length ? committeesData.map((city, index) => (
-                        <tr key={index} className="card-table-row text-lg sm:text-xl">
-                            <td className="w-full p-1">
-                                <input
-                                    type="text"
-                                    placeholder="City name"
-                                    value={city}
-                                    onChange={(e) => onInputChange(e, index)}
-                                    className="w-full py-2 px-1 border text-2xl bg-[#F1F1E6]"
-                                />
-                            </td>
-                            <td className="p-2">
-                                <button
-                                    type="button"
-                                    onClick={() => onDelete(index)}
-                                    className="btn delete-btn"
-                                >
-                                    <i className="fa fa-trash" aria-hidden="true"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    )) : (
-                        <tr>
-                            <td colSpan={2} className="p-2">No committees available.</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 table-margins mx-2"> {/* Added padding for footer */}
+            {committeesData.map((city, index) => (
+                <div key={index} className="card-container">
+                    {/* Title in the top right */}
+                    <div className="card-header">
+                        City #{index + 1}
+                    </div>
+                    <div className="card-header-right">
+                        <button
+                            type="button"
+                            onClick={() => onDelete(index)}
+                            className="flex items-center py-1"
+                            title="Remove city"
+                        >
+                            <i className="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    {/* Value input below buttons */}
+                    <input
+                        value={city}
+                        onChange={(e) => onInputChange(e, index)} // Update input value
+                        className="card-textarea"
+                    />
+                </div>
+            ))}
 
             <div>
                 <button className="add-btn hover-bg-gradient" onClick={onAdd}>

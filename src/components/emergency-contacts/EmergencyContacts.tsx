@@ -3,8 +3,9 @@ import CardFooter from "../card/CardFooter";
 import { EmergencyContactsType } from "../../types/types";
 import "../card/Card.css"
 import { CardProps, EMERGENCY_NUMBERS_CONSTANTS } from "../../global/Global";
+import { title } from "process";
 
-interface EmergencyContactsProps extends CardProps{
+interface EmergencyContactsProps extends CardProps {
     emergencyContacts: EmergencyContactsType[]
 }
 
@@ -12,8 +13,26 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
     const [contactData, setContactData] = useState<EmergencyContactsType[]>([]);
     const [isChanged, setIsChanged] = useState(false)
 
+    const mapContantData = (emergencyContacts: EmergencyContactsType[]): EmergencyContactsType[] => {
+        const initialContants: EmergencyContactsType[] = [
+            { title: 'Police', number: '' },
+            { title: 'Ambulance', number: '' },
+            { title: 'Fire Department', number: '' },
+            { title: 'Emergency Line', number: '' },
+        ]
+
+        if (!emergencyContacts.length) return initialContants
+
+        const contacts = structuredClone(emergencyContacts)
+
+        return initialContants.map(contact => ({
+            ...contact,
+            number: contacts.find((c: EmergencyContactsType) => c.title === contact.title)?.number ?? ''
+        }))
+    }
+
     useEffect(() => {
-        setContactData(structuredClone(emergencyContacts))
+        setContactData(mapContantData(emergencyContacts))
     }, [emergencyContacts]);
 
     // Function to get dynamic options based on current selected titles in contactData
@@ -27,86 +46,32 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
         );
     };
 
-    const onAdd = () => {
-        if (contactData.length < 4) handleAddNewItem(setContactData, contactData, { title: "", number: "" }, setIsChanged)
-    };
-    const onSave = () => handleSave(country, contactData, "emergencyContacts", "Emergency contacts", setIsChanged)
-    const onDelete = (index: number) => handleDelete(index, setContactData, contactData, setIsChanged)
-    const onCancel = () => handleCancel(isChanged, setContactData, emergencyContacts, setIsChanged)
-    const onBack = () => handleBack(isChanged, setContactData, emergencyContacts, setIsChanged)
+    const onSave = () => {
+        const result = contactData.filter(contact => contact.number !== "")
+        handleSave(country, result, "emergencyContacts", "Emergency contacts", setIsChanged)
+    }
+    const onCancel = () => handleCancel(isChanged, setContactData, mapContantData(emergencyContacts), setIsChanged)
+    const onBack = () => handleBack(isChanged, setContactData, mapContantData(emergencyContacts), setIsChanged)
     const onInputChange = (e: any, index: number, column: string) => handleInputChange(setContactData, contactData, index, e.target.value, setIsChanged, column)
 
     return (
-        <div className="table-margins">
-            {!!contactData.length ? (
-                <table className="card-table">
-                    <thead>
-                        <tr className="card-table-head">
-                            <th>Title</th>
-                            <th>Emergency Number</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {contactData.map((contact, index) => (
-                            <tr key={index} className="card-table-row text-base sm:text-xl">
-                                <td className="p-4">
-                                    {contact.title !== "" ? (
-                                        contact.title
-                                    ) : (
-                                        <select
-                                            value={contact.title}
-                                            onChange={(e) => onInputChange(e, index, "title")}
-                                            className="w-full text-center p-1"
-                                        >
-                                            <option value="" disabled>Select Title</option>
-                                            {getAvailableOptions(index).map((option) => (
-                                                <option key={option} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    )}
-                                </td>
-                                <td className="p-4">
-                                    <input
-                                        type="text"
-                                        placeholder="Emergency number"
-                                        value={contact.number}
-                                        onChange={(e) => onInputChange(e, index, "number")}
-                                        className="w-full p-2 border text-base sm:text-xl bg-[#F1F1E6]"
-                                    />
-                                </td>
-                                <td className="w-10">
-                                    <button
-                                        type="button"
-                                        onClick={() => onDelete(index)}
-                                        className="btn delete-btn"
-                                    >
-                                        <i className="fa fa-trash" aria-hidden="true"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            ) : (
-                <div className="text-gray-500 mt-2">No emergency contacts available.</div>
-            )}
-
-            {contactData.length < 4 && (
-                <div className="flex items-end mt-5">
-                    <button
-                        className="add-btn hover-bg-gradient"
-                        onClick={onAdd}
-                    >
-                        <i className="fa fa-plus"></i> Add emergency number
-                    </button>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-6 table-margins mx-2">
+            {contactData.map((contact, index) => (
+                <div key={index} className="card-container">
+                    <div className="card-header">
+                        {contact.title}
+                    </div>
+                    <input
+                        placeholder={`${contact.title} number`}
+                        value={contact.number}
+                        onChange={(e) => onInputChange(e, index, "number")}
+                        className="card-textarea"
+                    />
                 </div>
-            )}
+            ))}
 
             {/* Reusable Footer Component */}
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
         </div>
     );
 };
