@@ -23,7 +23,7 @@ const CitiesWithLcs: React.FC<CitiesProps> = ({ cities, country, handleSave, han
     const onInputChange = (e: any, index: number) => handleInputChange(setCommitteesData, committeesData, index, e.target.value, setIsChanged)
 
     return (
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 table-margins mx-2"> {/* Added padding for footer */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 table-margins mx-2"> {/* Added padding for footer */}
             {committeesData.map((city, index) => (
                 <div key={index} className="card-container">
                     {/* Title in the top right */}
@@ -42,8 +42,9 @@ const CitiesWithLcs: React.FC<CitiesProps> = ({ cities, country, handleSave, han
                     </div>
 
                     {/* Value input below buttons */}
-                    <input
+                    <textarea
                         value={city}
+                        rows={2}
                         onChange={(e) => onInputChange(e, index)} // Update input value
                         className="card-textarea"
                     />

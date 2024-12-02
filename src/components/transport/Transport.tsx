@@ -107,7 +107,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
                         </div>
                     </div>
 
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-6 mx-2 mb-12">
+                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 mx-2 mb-12">
                         {transportData[openIndex].content.map((feature, featureIndex) =>
                             <div key={openIndex + "_" + featureIndex} className="card-container bg-sky-100">
                                 <div className="card-footer-right">

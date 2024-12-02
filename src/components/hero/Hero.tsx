@@ -244,7 +244,7 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
                                 placeholder="Link"
                                 value={link?.value}
                                 onChange={(e) => onInputChange(e, index)}
-                                className="card-textarea"
+                                className="card-textarea underline text-sky-700"
                             />
                         </div>
                     )}

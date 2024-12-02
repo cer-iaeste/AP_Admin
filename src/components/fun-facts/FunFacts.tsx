@@ -48,7 +48,7 @@ const FunFacts: React.FC<FunFactsProps> = ({ country, facts, handleSave, handleD
                         value={fact}
                         rows={4}
                         onChange={(e) => onInputChange(e, index)} // Update input value
-                        className="w-full border-2 p-2 text-xl"
+                        className="w-full border-2 p-2"
                     />
                 </div>
             ))}
