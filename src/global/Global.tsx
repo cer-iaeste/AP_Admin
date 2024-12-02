@@ -16,7 +16,7 @@ export interface CardProps {
 
 // constants
 export const componentsCards: CardType[] = [
-    { title: "Hero Banner", icon: "fa fa-chalkboard" },
+    { title: "Banner", icon: "fa fa-chalkboard" },
     { title: "Emergency Numbers", icon: "fa fa-phone" },
     { title: "General Information", icon: "fa fa-info-circle" },
     { title: "Cities With LCs", icon: "fa fa-city" },

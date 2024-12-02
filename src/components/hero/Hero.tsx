@@ -40,10 +40,16 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
         { name: 'Website', icon: 'fas fa-globe', value: '' },
     ])
 
+    const mapLinks = (socialLinks: SocialLinkType[]): SocialLinkType[] =>
+        links.map(link => ({
+            ...link,
+            value: socialLinks?.find(sl => sl.name === link.name)?.value ?? ''
+        }))
+
     useEffect(() => {
         setImage(content.banner)
         setPdf(content.pdf)
-        setLinks(content.socialLinks)
+        setLinks(mapLinks(content.socialLinks))
     }, [content])
 
     const closeModal = () => {
@@ -124,10 +130,14 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
         handleSave(country, socialLinks, "socialLinks", "Social links", setIsChanged)
     }
     const onCancel = async () => {
-        const confirmation = await handleCancel(isChanged, setImage, content?.banner, setIsChanged)
+        const confirmation = await handleCancel(isChanged, setImage, content.banner, setIsChanged)
         if (confirmation) {
             setImageToDelete("")
             setImageToUpload(undefined)
+            setPdfToDelete("")
+            setPdfToUpload(undefined)
+            setPdf(content.pdf)
+            setLinks(mapLinks(content.socialLinks))
         }
     }
     const onDelete = () => {
@@ -150,7 +160,7 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div key="banner" className="card-container">
                         <div className="card-header">
-                            Hero banner
+                            Banner
                         </div>
                         {image ?
                             <div className="flex justify-between w-full px-3">
