@@ -102,7 +102,7 @@ export const mapCountryCards = (country: CountryType | null | undefined): CardTy
     // local helper function
     const checkIfSectionIsEmpty = (content: any): boolean => {
         if (!content?.hasOwnProperty("food") && !content?.hasOwnProperty("banner")) return !content.length
-        if (content?.hasOwnProperty("food")) return !content.food.length || !content.drinks.length
+        if (content?.hasOwnProperty("food")) return !content.food.length && !content.drinks.length
         return content.banner === "" && content.pdf === "" && !content.socialLinks.length
     }
 
