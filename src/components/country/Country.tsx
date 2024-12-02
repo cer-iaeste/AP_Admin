@@ -25,14 +25,14 @@ const Country = () => {
     }
 
     return (
-        <section className="relative w-full min-h-screen">
+        <section className="relative w-full">
             {isLoading ? (
                 <Plane country={selectedCountry?.name ?? ""}></Plane>
             ) : (
                 !!selectedCountry ? (
-                    <section className="p-2 bg-sky-100 h-full min-h-screen">
+                    <section className="p-2 bg-sky-100 h-full">
                         <div className="max-w-7xl mx-auto">
-                            <div className="flex flex-col">
+                            <div className="flex flex-col my-4">
                                 <div className="flex items-center justify-center w-full ">
                                     <img src={selectedCountry.imageSrc} alt={selectedCountry.imageAlt} className="rounded-full h-20 w-20 sm:h-32 sm:w-32 border" />
                                     <div className="flex flex-col ml-5 font-bold text-[#1B75BB] text-left">
@@ -41,7 +41,7 @@ const Country = () => {
                                     </div>
                                 </div>
                             </div>
-                            <ul className="mt-6 sm:mt-14 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                            <ul className="mt-8 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {/* <li className={`bg-[#1B75BB] shadow-xl space-y-2 rounded-lg p-2 py-6 sm:p-6 text-center text-white cursor-pointer hover:${bgGradient}`}>
                                     <a href={country.href} target="_blank" rel="noreferrer">
                                         <div className="flex flex items-center justify-center h-1/2">

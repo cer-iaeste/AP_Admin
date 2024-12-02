@@ -6,15 +6,14 @@ import "../summer-reception/Weekend.css"
 import { CardProps, getCountryDbName } from "../../global/Global";
 import { toast } from 'react-toastify';
 import ImagePopup from "../../global/ImagePopup";
-
-interface HeroType {
-    banner: string
-    pdf: string
-    socialLinks: { [key: string]: string }[]
-}
+import { SocialLinkType } from "../../types/types";
 
 interface HeroBannerProps extends CardProps {
-    content: HeroType; // Array of image objects with unique id and URL
+    content: {
+        banner: string
+        pdf: string
+        socialLinks: SocialLinkType[]
+    };
 }
 
 interface UploadedFile {
@@ -23,13 +22,7 @@ interface UploadedFile {
     dbUrl: string
 }
 
-interface SocialLink {
-    name: string
-    icon: string
-    value: string
-}
-
-const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleCancel, handleBack }) => {
+const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleCancel, handleBack, handleInputChange }) => {
     const [isChanged, setIsChanged] = useState(false)
     // image
     const [image, setImage] = useState<string>("")
@@ -41,7 +34,7 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
     const [pdfToUpload, setPdfToUpload] = useState<UploadedFile>()
     const [pdfToDelete, setPdfToDelete] = useState<string>("")
     // links
-    const [links, setLinks] = useState<SocialLink[]>([
+    const [links, setLinks] = useState<SocialLinkType[]>([
         { name: 'Instagram', icon: 'fab fa-instagram', value: '' },
         { name: 'Facebook', icon: 'fab fa-facebook', value: '' },
         { name: 'Website', icon: 'fas fa-globe', value: '' },
@@ -49,6 +42,8 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
 
     useEffect(() => {
         setImage(content.banner)
+        setPdf(content.pdf)
+        setLinks(content.socialLinks)
     }, [content])
 
     const closeModal = () => {
@@ -56,22 +51,23 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
     };
 
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const countryName = getCountryDbName(country)
         const file = event.target.files?.[0]
         if (file) {
             if (file.type === "application/pdf") {
                 const newPdf: UploadedFile = {
                     file,
                     url: URL.createObjectURL(file),
-                    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${country}%2Fgallery%2F${file.name}?alt=media`
+                    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${countryName}%2Fpdf%2F${file.name}?alt=media`
                 }
-                setPdf(newPdf.file.name)
+                setPdf(newPdf.url)
                 setPdfToUpload(newPdf)
                 setIsChanged(true)
             } else {
                 const newImage: UploadedFile = {
                     file,
                     url: URL.createObjectURL(file),
-                    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${country}%2Fgallery%2F${file.name}?alt=media`
+                    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${countryName}%2Fbanner%2F${file.name}?alt=media`
                 }
                 setImage(newImage.url)
                 setImageToUpload(newImage)
@@ -81,39 +77,51 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
         } else toast.error("Error while uploading file!")
     };
 
-    const uploadImageToStorage = async () => {
+    const uploadFile = async(fileToUpload: UploadedFile, folder: string) => {
+        const countryName = getCountryDbName(country)
+        const storageRef = ref(storage, `${countryName}/${folder}/${fileToUpload.file.name}`);
+        // Upload to storage
+        await uploadBytes(storageRef, fileToUpload.file);
+    }
+
+    const uploadFilesToStorage = async () => {
         try {
-            if (imageToUpload) {
-                const countryName = getCountryDbName(country)
-                const storageRef = ref(storage, `${countryName}/gallery/${imageToUpload.file.name}`);
-                // Upload to storage
-                await uploadBytes(storageRef, imageToUpload.file);
-            }
+            if (imageToUpload) await uploadFile(imageToUpload, 'banner')
+            if (pdfToUpload) await uploadFile(pdfToUpload, 'pdf') 
         } catch (error) {
             toast.error("Error uploading files! " + error)
             return null
         }
     }
 
-    const removeImageFromStorage = async () => {
+    const removeFilesFromStorage = async () => {
+        const removeFile = async (file: string) => {
+            const fileRef = ref(storage, file)
+            await deleteObject(fileRef)
+        }
         try {
-            if (imageToDelete !== "") {
-                const fileRef = ref(storage, imageToDelete)
-                await deleteObject(fileRef)
-            }
+            if (imageToDelete !== "") removeFile(imageToDelete)
+            if (pdfToDelete !== "") removeFile(pdfToDelete)
         } catch (error) {
-            toast.error("Error removing file from storage! " + error)
+            toast.error("Error removing files from storage! " + error)
             return null
         }
     }
 
     const onSave = async () => {
         // upload files to storage
-        await uploadImageToStorage()
+        await uploadFilesToStorage()
         // delete files from storage
-        await removeImageFromStorage()
+        await removeFilesFromStorage()
+        // map social links
+        const socialLinks = links.map(link => ({
+            name: link.name,
+            value: link.value
+        }))
         // save image
-        handleSave(country, image, "banner", "Hero banner", setIsChanged)
+        handleSave(country, imageToUpload?.dbUrl, "banner", "Hero banner", setIsChanged)
+        handleSave(country, pdfToUpload?.dbUrl, "pdf", "PDF", setIsChanged)
+        handleSave(country, socialLinks, "socialLinks", "Social links", setIsChanged)
     }
     const onCancel = async () => {
         const confirmation = await handleCancel(isChanged, setImage, content?.banner, setIsChanged)
@@ -133,6 +141,7 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
         setIsChanged(true)
     }
     const onBack = () => handleBack(isChanged, setImage, content?.banner, setIsChanged)
+    const onInputChange = (e: any, index: number) => handleInputChange(setLinks, links, index, e.target.value, setIsChanged, 'value')
 
     return (
         <>
@@ -146,7 +155,7 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
                         {image ?
                             <div className="flex justify-between w-full px-3">
                                 <div className="flex underline items-center">
-                                    {country}.image
+                                    {country}.banner
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <button
@@ -221,11 +230,10 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
                                 <i className={`${link.icon} mr-1`} />
                                 {link.name}
                             </div>
-                            <textarea
+                            <input
                                 placeholder="Link"
-                                rows={1}
                                 value={link?.value}
-                                // onChange={(e) => onInputChange(e, index, "role")}
+                                onChange={(e) => onInputChange(e, index)}
                                 className="card-textarea"
                             />
                         </div>

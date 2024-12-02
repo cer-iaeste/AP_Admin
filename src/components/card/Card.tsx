@@ -18,6 +18,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getCard, getCountryData, confirmModalWindow } from "../../global/Global";
 import { toast } from "react-toastify";
 import Hero from "../hero/Hero";
+import useWindowSize from "../../hooks/useScreenSize";
 
 const Card = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +27,15 @@ const Card = () => {
     const [cardComponent, setCardComponent] = useState<ReactElement>()
 
     const { country, card } = useParams()
-    const navigate = useNavigate();
+    const navigate = useNavigate()
+
+    const [minScreenSize, setMinScreenSize] = useState<number>(0)
+    const { height } = useWindowSize()
+    
+    useEffect(() => {
+        // height - header - footer - margin from footer
+        setMinScreenSize(height - 40 - 40 - 50)
+    }, [height])
 
     useEffect(() => {
         getCountryData(country, setSelectedCountry, setIsLoading)
@@ -168,7 +177,7 @@ const Card = () => {
             ) : (
                 <section className="p-1 bg-sky-100">
                     <div className="container">
-                        <div className="elements-position">
+                        <div className="elements-position" style={{minHeight: minScreenSize + "px"}}>
                             <CardHeader country={selectedCountry?.name ?? ""} card={card} imgSrc={selectedCountry?.imageSrc}/>
 
                             {cardComponent}

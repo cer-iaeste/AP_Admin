@@ -6,7 +6,7 @@ export interface CountryType {
     imageAlt: string
     pdf: string
     banner?: string
-    socialLinks: {[key: string]: string}[]
+    socialLinks: SocialLinkType[]
     cities: CityType[]
     committees: string[]
     emergencyContacts: EmergencyContactsType[]
@@ -75,4 +75,10 @@ export interface CardType {
     icon: string
     content?: any
     isSectionEmpty?: boolean
+}
+
+export interface SocialLinkType {
+    name: string
+    icon?: string
+    value: string
 }

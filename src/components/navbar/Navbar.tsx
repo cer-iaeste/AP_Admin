@@ -22,11 +22,11 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ toggleSidebar, role, country,
   }
 
   return (
-    <div className="mx-auto">
-      <header className="w-full bg-[#F1F1E6] border-b border-[#1B75BB]">
-        <div className="relative p-1">
+    <div className="mx-auto h-10">
+      <header className="w-full h-full pt-1.5 sm:pt-0.5 bg-[#F1F1E6] border-b border-[#1B75BB]">
+        <div className="relative px-2">
           <nav
-            className="relative flex items-center justify-between sm:h-10 xl:justify-start"
+            className="relative flex items-center justify-between xl:justify-start"
             aria-label="Global"
           >
             <div className="flex flex-grow">
@@ -40,9 +40,10 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ toggleSidebar, role, country,
                   <div className="sm:col-start-2 justify-center">
                     {role === "admin" ?
                       <a href="/" className="text-xl text-[#1B75BB] flex justify-center items-center gap-2 rounded-md p-1 hover-bg-gradient ">
-                        <i className="fa fa-house"/> AP Admin Panel
+                        <i className="fa fa-house"/>
+                        <span className="hidden sm:block">Admin Panel</span>
                       </a>
-                      : <h1 className="text-xl text-[#1B75BB] ">AP Admin Panel</h1>
+                      : <h1 className="text-xl text-[#1B75BB] ">Admin Panel</h1>
                     }
                   </div>
 

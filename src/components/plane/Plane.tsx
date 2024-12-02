@@ -15,7 +15,7 @@ const Plane: React.FC<PlaneProps> = ({ country }) => {
 
     return (
         <div
-            className="absolute z-10 inset-0 flex justify-center items-center bg-gradient mix-blend-multiply"
+            className="absolute z-10 inset-0 flex justify-center items-center bg-gradient mix-blend-multiply min-h-screen"
             aria-hidden="true"
         >
             <div className="text-white text-center space-y-4 animatePlane">
