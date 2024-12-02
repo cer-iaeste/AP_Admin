@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import CardFooter from "../card/CardFooter";
 import "../card/Card.css";
 import { InformationType } from "../../types/types";
-import useWindowSize from "../../hooks/useScreenSize";
 import { CardProps, GENERAL_INFO_CONSTANTS } from "../../global/Global";
 
 interface GeneralInfoProps extends CardProps {
@@ -19,8 +18,6 @@ const GeneralInfo: React.FC<GeneralInfoProps> = ({
 }) => {
     const [infoData, setInfoData] = useState<InformationType[]>([]);
     const [isChanged, setIsChanged] = useState(false);
-
-    const { width } = useWindowSize();
 
     const mapInfo = (info: InformationType[]) =>
         GENERAL_INFO_CONSTANTS.map((name) => ({
