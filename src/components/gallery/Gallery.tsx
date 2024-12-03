@@ -37,12 +37,13 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
     };
 
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const countryName = getCountryDbName(country)
         const file = event.target.files?.[0]
         if (file) {
             const newImage: UploadedImage = {
                 file,
                 url: URL.createObjectURL(file),
-                dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${country}%2Fgallery%2F${file.name}?alt=media`
+                dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${countryName}%2Fgallery%2F${file.name}?alt=media`
             }
             setImagesData([...imagesData, newImage.url])
             setImagesToUpload([...imagesToUpload, newImage])
