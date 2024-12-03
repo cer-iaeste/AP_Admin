@@ -3,7 +3,6 @@ import CardFooter from "../card/CardFooter";
 import "../card/Card.css"
 import { CuisineType, OtherType } from "../../types/types";
 import { CardProps } from "../../global/Global";
-// import useWindowSize from "../../hooks/useScreenSize";
 
 interface CuisineProps extends CardProps {
     cuisine: CuisineType
@@ -37,10 +36,6 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
     useEffect(() => {
         setCuisineData(mapCuisineData())
     }, [cuisine])
-
-    const toggleAccordion = (index: number) => {
-        setOpenIndex(openIndex === index ? -1 : index); // Toggle open/close state
-    };
 
     const onAdd = (index: number) => handleAddNewItem(setCuisineData, cuisineData, { title: "", description: "" }, setIsChanged, index)
     const onSave = () => {

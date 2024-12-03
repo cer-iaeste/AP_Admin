@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import CardFooter from "../card/CardFooter";
 import { EmergencyContactsType } from "../../types/types";
 import "../card/Card.css"
-import { CardProps, EMERGENCY_NUMBERS_CONSTANTS } from "../../global/Global";
-import { title } from "process";
+import { CardProps } from "../../global/Global";
 
 interface EmergencyContactsProps extends CardProps {
     emergencyContacts: EmergencyContactsType[]
@@ -34,17 +33,6 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
     useEffect(() => {
         setContactData(mapContantData(emergencyContacts))
     }, [emergencyContacts]);
-
-    // Function to get dynamic options based on current selected titles in contactData
-    const getAvailableOptions = (excludeIndex: number) => {
-        const selectedTitles = contactData
-            .filter((_, index) => index !== excludeIndex) // Exclude current row
-            .map((contact) => contact.title);
-
-        return Object.keys(EMERGENCY_NUMBERS_CONSTANTS).filter(
-            (title) => !selectedTitles.includes(title)
-        );
-    };
 
     const onSave = () => {
         const result = contactData.filter(contact => contact.number !== "")

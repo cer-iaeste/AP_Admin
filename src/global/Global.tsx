@@ -36,13 +36,6 @@ export const TRANSPORT_CONSTANTS = {
     DISCOUNTS: 4
 }
 
-export const EMERGENCY_NUMBERS_CONSTANTS = {
-    "Ambulance": 1,
-    "Police": 2,
-    "Fire Department": 3,
-    "Emergency Line": 4
-}
-
 export const GENERAL_INFO_CONSTANTS = [
     "Capital city",
     "Language",
@@ -109,7 +102,6 @@ export const mapCountryCards = (country: CountryType | null | undefined): CardTy
     return country ?
         componentsCards.map((card: CardType) => {
             const content = getCardContent(country, card.title)
-            console.log(card.title, content)
             return ({ ...card, isSectionEmpty: checkIfSectionIsEmpty(content) })
         })
         : []
@@ -124,7 +116,11 @@ export const getCard = (country: CountryType | undefined, card: string | undefin
         })
 }
 
-export const emptyLocalStorage = () => localStorage.clear()
+export const emptyLocalStorage = () => {
+    localStorage.removeItem("countriesData")
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("loggedIn");
+}
 
 export const getCountryData = async (country: string | undefined | null, setCountry: (data: CountryType) => void, setIsLoading?: (state: boolean) => void) => {
     if (country) {

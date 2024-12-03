@@ -9,7 +9,7 @@ const ImagePopup: React.FC<ImagePopupProps> = ({ image, closeModal }) => {
     return (
         <div className="overlay">
             <div className="relative bg-black rounded-xl shadow-md max-w-7xl w-full h-5/6 flex justify-center">
-                <img src={image} alt="Enlarged" className="" />
+                <img src={image} alt="Enlarged" />
                 <button
                     onClick={closeModal}
                     className="absolute top-2 right-2 text-red-500 rounded-full p-1"

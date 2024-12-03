@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import CardFooter from "../card/CardFooter";
-import useWindowSize from "../../hooks/useScreenSize";
 import "../card/Card.css"
 import { CardProps } from "../../global/Global";
 
@@ -11,7 +10,6 @@ interface FunFactsProps extends CardProps {
 const FunFacts: React.FC<FunFactsProps> = ({ country, facts, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
     const [factsData, setFactsData] = useState<string[]>([])
     const [isChanged, setIsChanged] = useState(false)
-    const { width } = useWindowSize()
 
     useEffect(() => {
         setFactsData(facts)

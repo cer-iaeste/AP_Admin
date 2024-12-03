@@ -13,6 +13,7 @@
     "@types/react-dom": "^18.3.0",
     "firebase": "^10.14.1",
     "iaeste_ap_admin": "file:",
+    "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
     "react-confirm-alert": "^3.0.6",
     "react-dom": "^18.3.1",

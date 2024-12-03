@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import cerLogo from "../../images/cer-logo-white.png";
 import AuthService from "../../service/AuthService";
-import { emptyLocalStorage } from "../../global/Global";
 import { toast } from 'react-toastify';
 
 const Login = () => {
@@ -14,11 +13,8 @@ const Login = () => {
     const [loginLoading, setLoginLoading] = useState(false)
     const nav = useNavigate()
 
-    emptyLocalStorage();
-
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        emptyLocalStorage();
         setLoginLoading(true);
     
         const loginPromise = AuthService.login(email, password);

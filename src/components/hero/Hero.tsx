@@ -50,7 +50,7 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
         setImage(content.banner)
         setPdf(content.pdf)
         setLinks(mapLinks(content.socialLinks))
-    }, [content])
+    }, [content, mapLinks])
 
     const closeModal = () => {
         setViewImage(null);

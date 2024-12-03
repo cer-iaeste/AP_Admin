@@ -5,11 +5,27 @@ import AdminPanel from './components/panel/AdminPanel';
 import Login from "./components/auth/Login";
 import AuthWrapper from "./service/AuthWrapper";
 import { AuthProvider } from "./service/AuthProvider";
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useEffect } from "react";
+import AuthService from "./service/AuthService";
 
 function App() {
   const queryClient = new QueryClient();
+
+  useEffect(() => {
+    const refreshInterval = setInterval(async () => {
+      try {
+        await AuthService.refreshToken()
+      } catch (error: any) {
+        toast.error("Failed to refresh token: ", error)
+      }
+    }, 30 * 60 * 1000) // refresh every 30 mins
+
+    return () => clearInterval(refreshInterval)
+  }, [])
+
+
   return (
     <div className="App">
       <ToastContainer />
