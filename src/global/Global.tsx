@@ -178,7 +178,10 @@ export const getCountryDbName = (country: string): string => {
     }
 }
 
-export const scrollToBottom = () =>  window.scrollTo({
-    top: document.body.scrollHeight,
-    behavior: "smooth",
-});
+export const scrollToBottom = () => {
+    setTimeout(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth",
+    })}, 150)
+}
