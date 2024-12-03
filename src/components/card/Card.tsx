@@ -15,7 +15,7 @@ import Gallery from "../gallery/Gallery";
 import { updateCountryField } from "../../service/CountryService";
 import { CardType, CountryType } from "../../types/types";
 import { useParams, useNavigate } from "react-router-dom";
-import { getCard, getCountryData, confirmModalWindow } from "../../global/Global";
+import { getCard, getCountryData, confirmModalWindow, scrollToBottom } from "../../global/Global";
 import { toast } from "react-toastify";
 import Hero from "../hero/Hero";
 import useWindowSize from "../../hooks/useScreenSize";
@@ -156,6 +156,7 @@ const Card = () => {
             setData(newData)
         }
         setIsChanged(true)
+        scrollToBottom()
     }
 
     const handleInputChange = (setData: (data: any) => void, data: any, index: number, value: any, setIsChanged: (state: boolean) => void, column?: string, itemIndex?: number) => {

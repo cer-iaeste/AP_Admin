@@ -52,10 +52,11 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
 
     return (
         <div className="mt-5">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="hidden md:block"></div>
                 {cuisineData.map((data, index) =>
                     <div key={data.title} onClick={() => setOpenIndex(index)}
-                        className="border border-[#1B75BB] bg-[#1B75BB] justify-center rounded-md p-2 font-semibold text-white text-lg hover-bg-gradient cursor-pointer flex flex-row items-center">
+                        className={`border border-[#1B75BB] ${openIndex !== index ? 'bg-[#1B75BB]' : 'bg-gradient'} justify-center rounded-md p-2 font-semibold text-white text-lg hover-bg-gradient cursor-pointer flex flex-row items-center`}>
                         <i className={data.icon}></i>
                         <h1 className="ml-2">{data.title}</h1>
                     </div>

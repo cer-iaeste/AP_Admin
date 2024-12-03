@@ -177,3 +177,8 @@ export const getCountryDbName = (country: string): string => {
             return country
     }
 }
+
+export const scrollToBottom = () =>  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth",
+});

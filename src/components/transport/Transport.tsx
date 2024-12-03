@@ -81,12 +81,12 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
 
     return (
         <div className="mt-5">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 gap-4">
                 {transportData.map((transport, index) =>
                     <div key={transport.id} onClick={() => setOpenIndex(index)}
-                        className="border border-[#1B75BB] bg-[#1B75BB] justify-center rounded-md p-2 font-semibold text-white text-lg hover-bg-gradient cursor-pointer flex flex-row items-center">
+                        className={`border border-[#1B75BB] ${openIndex !== index ? 'bg-[#1B75BB]' : 'bg-gradient'} justify-center rounded-md p-2 font-semibold text-white text-lg hover-bg-gradient cursor-pointer flex flex-row items-center`}>
                         <i className={transport.icon}></i>
-                        <h1 className="ml-2">{transport.title}</h1>
+                        <h1 className="ml-2 hidden md:block">{transport.title}</h1>
                     </div>
                 )}
             </div>
@@ -132,7 +132,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
                                         rows={3}
                                         onChange={(e) => onItemChange(e, openIndex, featureIndex, "name")}
                                         className="card-textarea mt-1.5"
-                                        style={{ scrollbarWidth: 'thin'}}
+                                        style={{ scrollbarWidth: 'thin' }}
                                     />
                                 </div>
                                 {hasLinks(feature) &&
@@ -150,7 +150,6 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
                                         />
                                     </div>
                                 }
-
                             </div>
                         )}
                     </div>
