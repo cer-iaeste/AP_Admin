@@ -31,11 +31,11 @@ export async function fetchCountryData(country: string): Promise<CountryType | u
     return countries.find((data: CountryType) => data.name === country)
 }
 
-export async function updateCountryField(country: string, content: any, column: keyof CountryType, columnName: string) {
+export async function updateCountryField(country: string, content: any, column: keyof CountryType) {
     const db = getFirestore()
-
     const countryRef = doc(db, "countries", getCountryDbName(country))
     const docSnap = await getDoc(countryRef)
+
     if (docSnap.exists()) {
 
         await updateDoc(countryRef, {
@@ -43,7 +43,6 @@ export async function updateCountryField(country: string, content: any, column: 
         })
 
         updateLocalStorageCountryData(country, column, content)
-
     } else throw new Error("Document not found!")
 }
 

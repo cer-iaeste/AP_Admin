@@ -50,36 +50,29 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
         setImage(content.banner)
         setPdf(content.pdf)
         setLinks(mapLinks(content.socialLinks))
-    }, [content, mapLinks])
+    }, [content])
 
     const closeModal = () => {
         setViewImage(null);
     };
 
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const countryName = getCountryDbName(country)
+        const setNewFile = (file: File, setFile: (fileName: string) => void, setFileToUpload: (file: UploadedFile) => void, folderName: string) => {
+            const countryName = getCountryDbName(country)
+            const newFile: UploadedFile = {
+                file,
+                url: URL.createObjectURL(file),
+                dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${countryName}%2F${folderName}%2F${file.name}?alt=media`
+            }
+            setFile(newFile.url)
+            setFileToUpload(newFile)
+            setIsChanged(true)
+        }
+
         const file = event.target.files?.[0]
         if (file) {
-            if (file.type === "application/pdf") {
-                const newPdf: UploadedFile = {
-                    file,
-                    url: URL.createObjectURL(file),
-                    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${countryName}%2Fpdf%2F${file.name}?alt=media`
-                }
-                setPdf(newPdf.url)
-                setPdfToUpload(newPdf)
-                setIsChanged(true)
-            } else {
-                const newImage: UploadedFile = {
-                    file,
-                    url: URL.createObjectURL(file),
-                    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${countryName}%2Fbanner%2F${file.name}?alt=media`
-                }
-                setImage(newImage.url)
-                setImageToUpload(newImage)
-                setIsChanged(true)
-            }
-
+            if (file.type === "application/pdf") setNewFile(file, setPdf, setPdfToUpload, "pdf")
+            else setNewFile(file, setImage, setImageToUpload, "banner")
         } else toast.error("Error while uploading file!")
     };
 
@@ -124,10 +117,11 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
             name: link.name,
             value: link.value
         }))
-        // save image
-        handleSave(country, imageToUpload?.dbUrl, "banner", "Hero banner", setIsChanged)
-        handleSave(country, pdfToUpload?.dbUrl, "pdf", "PDF", setIsChanged)
+        // save changes
+        if (imageToUpload) handleSave(country, imageToUpload?.dbUrl, "banner", "Hero banner", setIsChanged)
+        if (pdfToUpload) handleSave(country, pdfToUpload?.dbUrl, "pdf", "PDF", setIsChanged)    
         handleSave(country, socialLinks, "socialLinks", "Social links", setIsChanged)
+        
     }
     const onCancel = async () => {
         const confirmation = await handleCancel(isChanged, setImage, content.banner, setIsChanged)

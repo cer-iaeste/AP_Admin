@@ -111,12 +111,12 @@ const Card = () => {
 
     const handleSave = (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => {
 
-        const updatePromise = updateCountryField(country, data, column, title)
+        const updatePromise = updateCountryField(country, data, column)
 
         toast.promise(updatePromise, {
             pending: "Saving changes...",
             success: {
-                render({ data }) {
+                render() {
                     setIsChanged(false);
                     return `${title} updated successfully!`
                 }
