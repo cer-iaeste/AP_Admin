@@ -18,6 +18,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
     const [cuisineData, setCuisineData] = useState<CuisineMapType[]>([])
     const [isChanged, setIsChanged] = useState(false)
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
+    const [cuisineSectionChange, setCuisineSectionChange] = useState<boolean[]>([false, false])
 
     // const { width } = useWindowSize()
     const mapCuisineData = (): CuisineMapType[] => [
@@ -37,17 +38,42 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
         setCuisineData(mapCuisineData())
     }, [cuisine])
 
-    const onAdd = (index: number) => handleAddNewItem(setCuisineData, cuisineData, { title: "", description: "" }, setIsChanged, index)
+    const resetCuisineChange = (promiseResult: boolean) => {
+        if (promiseResult) setCuisineSectionChange([false, false])
+    }
+
+    const addCuisineSectionChange = (index: number) => {
+        if (!cuisineSectionChange[index]) {
+            const cuisineChange = structuredClone(cuisineSectionChange)
+            cuisineChange[index] = true
+            setCuisineSectionChange(cuisineChange)
+        }
+    }
+
+    const onAdd = (index: number) => {
+        handleAddNewItem(setCuisineData, cuisineData, { title: "", description: "" }, setIsChanged, index)
+        addCuisineSectionChange(index)
+    }
     const onSave = () => {
         const foodData = cuisineData[0].content
         const drinksData = cuisineData[1].content
         handleSave(country, foodData, "food", "Food", setIsChanged)
         handleSave(country, drinksData, "drinks", "Drinks", setIsChanged)
+        resetCuisineChange(true)
     }
-    const onDelete = (index: number, itemIndex: number) => handleDelete(index, setCuisineData, cuisineData, setIsChanged, itemIndex)
-    const onCancel = () => handleCancel(isChanged, setCuisineData, mapCuisineData(), setIsChanged)
-    const onBack = () => handleBack(isChanged, setCuisineData, mapCuisineData(), setIsChanged)
-    const onItemChange = (e: any, index: number, itemIndex: number, column: keyof OtherType) => handleInputChange(setCuisineData, cuisineData, index, e.target.value, setIsChanged, column, itemIndex)
+    const onDelete = (index: number, itemIndex: number) => {
+        handleDelete(index, setCuisineData, cuisineData, setIsChanged, itemIndex)
+        addCuisineSectionChange(index)
+    }
+    const onCancel = () => handleCancel(isChanged, setCuisineData, mapCuisineData(), setIsChanged).then(result => resetCuisineChange(result))
+    const onBack = () => {
+        handleBack(isChanged, setCuisineData, mapCuisineData(), setIsChanged)
+        resetCuisineChange(true)
+    }
+    const onItemChange = (e: any, index: number, itemIndex: number, column: keyof OtherType) => {
+        handleInputChange(setCuisineData, cuisineData, index, e.target.value, setIsChanged, column, itemIndex)
+        addCuisineSectionChange(index)
+    }
 
 
     return (
@@ -56,9 +82,14 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
                 <div className="hidden md:block"></div>
                 {cuisineData.map((data, index) =>
                     <div key={data.title} onClick={() => setOpenIndex(index)}
-                        className={`border border-[#1B75BB] ${openIndex !== index ? 'bg-[#1B75BB]' : 'bg-gradient'} justify-center rounded-md p-2 font-semibold text-white text-lg hover-bg-gradient cursor-pointer flex flex-row items-center`}>
+                        className={`border border-[#1B75BB] ${openIndex !== index ? 'bg-[#1B75BB]' : 'bg-gradient'} relative justify-center rounded-md p-2 font-semibold text-white text-lg hover-bg-gradient cursor-pointer flex flex-row items-center`}>
                         <i className={data.icon}></i>
                         <h1 className="ml-2">{data.title}</h1>
+                        {!!cuisineSectionChange[index] &&
+                            <div className="absolute -top-1 -left-1 rounded-lg bg-red-500 text-white w-5 sm:w-8">
+                                <i className="fa-solid fa-exclamation"></i>
+                            </div>
+                        }
                     </div>
                 )}
             </div>

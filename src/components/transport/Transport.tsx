@@ -19,6 +19,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
     const [transportData, setTransportData] = useState<TransportMapType[]>([])
     const [isChanged, setIsChanged] = useState(false)
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
+    const [transportSectionChange, setTransportSectionChange] = useState<boolean[]>([false, false, false, false])
 
     const mapTransportData = (initialtransport: TransportType[]) => {
 
@@ -61,10 +62,23 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
 
     const hasLinks = (feature: TransportFeature) => feature?.hasOwnProperty("link");
 
+    const resetTransportChange = (promiseResult: boolean) => {
+        if (promiseResult) setTransportSectionChange([false, false, false, false])
+    }
+
+    const addTransportSectionChange = (index: number) => {
+        if (!transportSectionChange[index]) {
+            const transportChange = structuredClone(transportSectionChange)
+            transportChange[index] = true
+            setTransportSectionChange(transportChange)
+        }
+    }
+
     const onAdd = (index: number, transportId: number) => {
         const newItem: TransportFeature = { name: "" }
         if (transportId !== 1) newItem.link = ""
         handleAddNewItem(setTransportData, transportData, newItem, setIsChanged, index)
+        addTransportSectionChange(index)
     }
     const onSave = () => {
         const result: TransportType[] = transportData.map(t => ({
@@ -72,11 +86,21 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
             features: t.content
         }))
         handleSave(country, result, "transport", "Transport", setIsChanged)
+        resetTransportChange(true)
     }
-    const onDelete = (index: number, itemIndex: number) => handleDelete(index, setTransportData, transportData, setIsChanged, itemIndex)
-    const onCancel = () => handleCancel(isChanged, setTransportData, mapTransportData(transport), setIsChanged)
-    const onBack = () => handleBack(isChanged, setTransportData, mapTransportData(transport), setIsChanged)
-    const onItemChange = (e: any, index: number, itemIndex: number, column: keyof TransportFeature) => handleInputChange(setTransportData, transportData, index, e.target.value, setIsChanged, column, itemIndex)
+    const onDelete = (index: number, itemIndex: number) => {
+        handleDelete(index, setTransportData, transportData, setIsChanged, itemIndex)
+        addTransportSectionChange(index)
+    }
+    const onCancel = () => handleCancel(isChanged, setTransportData, mapTransportData(transport), setIsChanged).then(result => resetTransportChange(result))
+    const onBack = () => {
+        handleBack(isChanged, setTransportData, mapTransportData(transport), setIsChanged)
+        resetTransportChange(true)
+    }
+    const onItemChange = (e: any, index: number, itemIndex: number, column: keyof TransportFeature) => {
+        handleInputChange(setTransportData, transportData, index, e.target.value, setIsChanged, column, itemIndex)
+        addTransportSectionChange(index)
+    }
 
 
     return (
@@ -84,9 +108,14 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
             <div className="grid grid-cols-4 gap-4">
                 {transportData.map((transport, index) =>
                     <div key={transport.id} onClick={() => setOpenIndex(index)}
-                        className={`border border-[#1B75BB] ${openIndex !== index ? 'bg-[#1B75BB]' : 'bg-gradient'} justify-center rounded-md p-2 font-semibold text-white text-lg hover-bg-gradient cursor-pointer flex flex-row items-center`}>
+                        className={`border border-[#1B75BB] ${openIndex !== index ? 'bg-[#1B75BB]' : 'bg-gradient'} relative justify-center rounded-md p-2 font-semibold text-white text-lg hover-bg-gradient cursor-pointer flex flex-row items-center`}>
                         <i className={transport.icon}></i>
                         <h1 className="ml-2 hidden md:block">{transport.title}</h1>
+                        {!!transportSectionChange[index] &&
+                            <div className="absolute -top-1 -left-1 rounded-lg bg-red-500 text-white w-5 sm:w-8">
+                                <i className="fa-solid fa-exclamation"></i>
+                            </div>
+                        }
                     </div>
                 )}
             </div>
