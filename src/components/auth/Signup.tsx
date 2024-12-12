@@ -154,6 +154,11 @@ const Signup = () => {
                     >
                         Register
                     </button>
+                    <div className="flex flex-col sm:flex-row gap-2 justify-start px-2">
+                        <a href="/login" className="text-gray-300 hover:text-blue-700 ">
+                            <i className="fa fa-chevron-left mr-2" ></i>Back to login
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>
