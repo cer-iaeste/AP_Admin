@@ -1,6 +1,6 @@
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { emptyLocalStorage } from "../global/Global";
 
 const AuthService = {
@@ -36,6 +36,22 @@ const AuthService = {
             }
         } catch (error: any) {
             throw new Error(error.message || "Token refresh failed")
+        }
+    },
+    signup: async (email: string, password: string, country: string) => {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+            const user = userCredential.user
+
+            await setDoc(doc(db, "users", user.uid), {
+                country,
+                role: "user"
+            })
+
+            return true
+        } catch (error) {
+            console.error("Error during signup: ", error)
+            return false
         }
     }
 };

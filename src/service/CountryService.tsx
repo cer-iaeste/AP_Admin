@@ -61,6 +61,22 @@ export function updateLocalStorageCountryData(updateCountry: string, updateColum
     }
 }
 
+export async function fetchUnregisteredCountries() {
+    const db = getFirestore()
+    const queryCountriesSnapshot = await getDocs(collection(db, "countries"))
+    const unregisteredCountries: string[] = []
+    queryCountriesSnapshot.forEach((doc) => unregisteredCountries.push(doc.data().name))
+
+    const queryUsersSnapshot = await getDocs(collection(db, "users"))
+    queryUsersSnapshot.forEach(doc => {
+        const data = doc.data()
+        if (data.hasOwnProperty("country")) {
+            const index = unregisteredCountries.findIndex(c => c === data.country)
+            if (index !== -1) unregisteredCountries.splice(index, 1)
+        }
+    })
+    return unregisteredCountries
+}
 
 
 export function clearCountryCache() {

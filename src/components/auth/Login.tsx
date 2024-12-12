@@ -107,6 +107,10 @@ const Login = () => {
                     >
                         Login
                     </button>
+                    <div className="flex flex-row gap-2 justify-center">
+                        <p className="text-white">Don't have an account?</p>
+                        <a href="/register" className="text-blue-900 hover:text-blue-700 hover:underline">Register here!</a>
+                    </div>
                 </form>
             </div>
         </div>

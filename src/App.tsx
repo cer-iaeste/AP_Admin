@@ -9,6 +9,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from "react";
 import AuthService from "./service/AuthService";
+import Signup from "./components/auth/Signup";
 
 function App() {
   const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ function App() {
             <header className='max-w-full'>
               <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Signup />} />
                 <Route
                   path="*"
                   element={

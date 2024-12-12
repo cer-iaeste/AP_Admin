@@ -124,8 +124,9 @@ export const emptyLocalStorage = () => {
 
 export const getCountryData = async (country: string | undefined | null, setCountry: (data: CountryType) => void, setIsLoading?: (state: boolean) => void) => {
     if (country) {
+        const countryName = country.replace(/%20/g, " ")
         if (setIsLoading) setIsLoading(true)
-        const data = await fetchCountryData(country)
+        const data = await fetchCountryData(countryName)
         if (data) setCountry(data)
     }
 }
