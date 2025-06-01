@@ -12,6 +12,7 @@ import Cuisine from "../cuisine/Cuisine";
 import Transport from "../transport/Transport";
 import SummerReception from "../summer-reception/SummerReception";
 import Gallery from "../gallery/Gallery";
+import SocialLinks from "../social-links/SocialLinks"
 import { updateCountryField } from "../../service/CountryService";
 import { CardType, CountryType } from "../../types/types";
 import { useParams, useNavigate } from "react-router-dom";
@@ -80,6 +81,9 @@ const Card = () => {
                     break
                 case "Gallery":
                     setCardComponent(<Gallery images={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
+                    break
+                case "Social Links":
+                    setCardComponent(<SocialLinks socialLinks={selectedCard?.content ?? [] } country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
                     break
                 default:
                     setCardComponent(<Hero content={selectedCard?.content ?? ""} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)

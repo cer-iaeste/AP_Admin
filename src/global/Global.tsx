@@ -17,6 +17,7 @@ export interface CardProps {
 // constants
 export const componentsCards: CardType[] = [
     { title: "Banner", icon: "fa fa-chalkboard" },
+    { title: "Social Links", icon: "fa fa-share-nodes"},
     { title: "Emergency Numbers", icon: "fa fa-phone" },
     { title: "General Information", icon: "fa fa-info-circle" },
     { title: "Cities With LCs", icon: "fa fa-city" },
@@ -77,6 +78,8 @@ export const getCardContent = (country: CountryType | null | undefined, title: s
             return country?.otherInformation ?? []
         case "Gallery":
             return country?.gallery ?? []
+        case "Social Links":
+            return country?.socialLinks ?? []
         case "Traditional Cuisine":
             return {
                 food: country?.food ?? [],
@@ -86,7 +89,7 @@ export const getCardContent = (country: CountryType | null | undefined, title: s
             return {
                 banner: country?.banner ?? "",
                 pdf: country?.pdf ?? "",
-                socialLinks: country?.socialLinks ?? []
+                // socialLinks: country?.socialLinks ?? []
             }
     }
 }

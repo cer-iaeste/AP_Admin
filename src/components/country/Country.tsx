@@ -30,7 +30,7 @@ const Country = () => {
                 <Plane country={selectedCountry?.name ?? ""}></Plane>
             ) : (
                 !!selectedCountry ? (
-                    <section className="p-2 bg-sky-100 h-full">
+                    <section className="p-2 bg-sky-100 h-full min-h-[95.5vh]">
                         <div className="max-w-7xl mx-auto">
                             <div className="flex flex-col my-4">
                                 <div className="flex items-center justify-center w-full ">
