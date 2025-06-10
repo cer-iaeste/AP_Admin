@@ -11,6 +11,7 @@ interface HeroBannerProps extends CardProps {
     content: {
         banner: string
         pdf: string
+        region: string
     };
 }
 
@@ -31,10 +32,13 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
     const [pdf, setPdf] = useState<string>("")
     const [pdfToUpload, setPdfToUpload] = useState<UploadedFile>()
     const [pdfToDelete, setPdfToDelete] = useState<string>("")
+    // region
+    const [region, setRegion] = useState<string>("")
 
     useEffect(() => {
         setImage(content.banner)
         setPdf(content.pdf)
+        setRegion(content.region)
     }, [content])
 
     const closeModal = () => {
@@ -60,6 +64,11 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
             else setNewFile(file, setImage, setImageToUpload, "banner")
         } else toast.error("Error while uploading file!")
     };
+
+    const handleOnRegionSelectChange = (selectedRegion: string) => {
+        setRegion(selectedRegion)
+        setIsChanged(true)
+    }
 
     const uploadFile = async(fileToUpload: UploadedFile, folder: string) => {
         const countryName = getCountryDbName(country)
@@ -99,7 +108,8 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
         await removeFilesFromStorage()
         // save changes
         if (imageToUpload) handleSave(country, imageToUpload?.dbUrl, "banner", "Hero banner", setIsChanged)
-        if (pdfToUpload) handleSave(country, pdfToUpload?.dbUrl, "pdf", "PDF", setIsChanged)   
+        if (pdfToUpload) handleSave(country, pdfToUpload?.dbUrl, "pdf", "PDF", setIsChanged)
+        handleSave(country, region, "region", "Region", setIsChanged)
     }
 
     const onCancel = async () => {
@@ -110,6 +120,7 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
             setPdfToDelete("")
             setPdfToUpload(undefined)
             setPdf(content.pdf)
+            setRegion(content.pdf)
         }
     }
     const onDelete = () => {
@@ -134,9 +145,9 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
                             Banner
                         </div>
                         {image ?
-                            <div className="flex justify-between w-full px-3">
-                                <div className="flex underline items-center">
-                                    {country}.banner
+                            <div className="flex justify-between w-full p-3">
+                                <div className="flex underline items-center text-xl">
+                                    {country}.jpg
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <button
@@ -170,8 +181,8 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
                             Country PDF
                         </div>
                         {pdf ?
-                            <div className="flex justify-between w-full px-3">
-                                <div className="flex underline items-center">
+                            <div className="flex justify-between w-full p-3">
+                                <div className="flex underline items-center text-xl">
                                     {country}.pdf
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -201,7 +212,28 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
                             />
                         }
                     </div>
-                    <div key="empty" className="hidden lg:block"></div>
+                    <div key="region" className="card-container">
+                        <div className="card-header">
+                            IAESTE Region
+                        </div>
+                        <select
+                            value={region} // This will be your state variable for the selected region
+                            onChange={(e) => handleOnRegionSelectChange(e.target.value)}
+                            className="
+                            block w-full p-2 mt-2 text-xl font-semibold
+                            text-gray-700 bg-white border border-gray-300 rounded-md
+                            shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500
+                            appearance-none pr-8 // Hides default arrow and adds space for custom arrow if desired
+                            cursor-pointer
+                            hover:border-gray-400
+                            transition duration-150 ease-in-out
+                            "
+                        >
+                            <option value="cer">CER</option>
+                            <option value="core">CoRe</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             {viewImage && <ImagePopup image={viewImage} closeModal={closeModal} />}

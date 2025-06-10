@@ -18,6 +18,7 @@ export interface CountryType {
     otherInformation: CuisineType[]
     gallery: GalleryImageType[]
     transport: TransportType[]
+    region: string
 }
 
 export interface CityType {
