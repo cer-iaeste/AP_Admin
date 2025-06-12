@@ -51,7 +51,7 @@ const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete,
                             rows={2}
                             value={place.title}
                             onChange={(e) => onInputChange(e, index, "title")} // Update input value
-                            className="card-textarea mt-1.5"
+                            className="text-input mt-1.5"
                             style={{ scrollbarWidth: 'thin'}}
                         />
                     </div>
@@ -67,7 +67,7 @@ const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete,
                             rows={width > 640 ? 8 : 4}
                             value={place.description}
                             onChange={(e) => onInputChange(e, index, "description")} // Update input value
-                            className="card-textarea mt-1.5"
+                            className="text-input mt-1.5"
                             style={{ scrollbarWidth: 'thin'}}
                         />
                     </div>

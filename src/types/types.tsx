@@ -1,5 +1,5 @@
 export interface CountryType {
-    id: number
+    id: string | number
     name: string
     href: string
     imageSrc: string
@@ -82,4 +82,10 @@ export interface SocialLinkType {
     name: string
     icon?: string
     value: string
+}
+
+export interface SidebarSectionType {
+    name: string,
+    link: string,
+    icon?: string
 }

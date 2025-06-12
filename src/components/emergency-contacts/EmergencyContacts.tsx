@@ -53,7 +53,7 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
                         placeholder={`${contact.title} number`}
                         value={contact.number}
                         onChange={(e) => onInputChange(e, index, "number")}
-                        className="card-textarea"
+                        className="text-input"
                     />
                 </div>
             ))}

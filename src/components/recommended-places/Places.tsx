@@ -51,7 +51,7 @@ const Places: React.FC<PlacesProps> = ({ country, places, handleSave, handleDele
                             rows={2}
                             value={city.name}
                             onChange={(e) => onInputChange(e, index, "name")} // Update input value
-                            className="card-textarea mt-1.5"
+                            className="text-input mt-1.5"
                             style={{ scrollbarWidth: 'thin'}}
                         />
                     </div>
@@ -67,7 +67,7 @@ const Places: React.FC<PlacesProps> = ({ country, places, handleSave, handleDele
                             rows={width > 640 ? 8 : 4}
                             value={city.description}
                             onChange={(e) => onInputChange(e, index, "description")} // Update input value
-                            className="card-textarea mt-1.5"
+                            className="text-input mt-1.5"
                             style={{ scrollbarWidth: 'thin'}}
                         />
                     </div>

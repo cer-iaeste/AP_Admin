@@ -1,53 +1,53 @@
 import React, { useEffect, useState } from "react";
 import cerLogo from "../../images/cer-logo.png";
-import { CountryType } from "../../types/types";
 import "../../App.css"
 import { useNavigate, useParams } from "react-router-dom";
-import { getCountryData } from "../../global/Global";
+import { SIDEBAR_SECTIONS } from "../../global/Global";
+import AuthService from "../../service/AuthService";
+import { toast } from 'react-toastify';
+import useWindowSize from "../../hooks/useScreenSize"
 
 interface SidebarProps {
-    isOpen: boolean
-    countries: CountryType[]
+    isOpen: boolean,
     toggleSidebar: () => void
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, countries, toggleSidebar }) => {
-    const [selectedCountry, setSelectedCountry] = useState<CountryType | undefined>();
-    const [displayedCountries, setDisplayedCountries] = useState<CountryType[]>([]);
-    const { country } = useParams()
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
+    const [selectedSection, setSelectedSection] = useState<Number>(-1);
     const navigate = useNavigate();
+    const params = useParams()
+    const { width } = useWindowSize()
 
-    const handleSelectCountry = (event: any): void => {
-        const countryName = event.currentTarget.dataset.name
-        setSelectedCountry(countryName)
-        navigate(`/${countryName}`)
-        toggleSidebar()
+    const handleSelectSection = (link: string, index: Number): void => {
+        console.log(width)
+        setSelectedSection(index)
+        if (width <= 1024) toggleSidebar()
+        navigate(link)
     }
-
-    const onFilterCountriesHandler = (e: any): void => {
-        const typedCountry = e.target.value;
-        const filteredCountries = !typedCountry
-            ? countries
-            : countries.filter((country: CountryType) => country.name.toLowerCase().includes(typedCountry.toLowerCase()))
-        setDisplayedCountries(filteredCountries)
-    };
 
     const resetSidebar = (): void => {
-        setSelectedCountry(undefined)
+        setSelectedSection(-1)
         navigate('')
-        toggleSidebar()
+        //toggleSidebar()
     }
 
     useEffect(() => {
-        setDisplayedCountries(countries)
-    }, [countries])
+        const section = params['*']
+        setSelectedSection(SIDEBAR_SECTIONS.findIndex(ss => ss.name === section))
+    }, [params])
 
-    useEffect(() => {
-        getCountryData(country, setSelectedCountry)
-    }, [country])
+    const handleLogout = async () => {
+    try {
+      await AuthService.logout();
+      window.location.href = "/login"
+      toast.success("Logout successfull!")
+    } catch (error: any) {
+      toast.error("Error loggin out!")
+    }
+  }
 
     return (
-        <section className={`fixed z-20 top-0 left-0 bg-[#F1F1E6] border-r border-[#1B75BB] w-64 max-h-screen min-h-full overflow-y-scroll transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+        <section className={`fixed z-20 top-0 left-0 bg-[#F1F1E6] border-r border-[#1B75BB] w-48 max-h-screen min-h-full transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
             style={{ scrollbarWidth: "thin" }}
         >
             <ul>
@@ -55,32 +55,31 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, countries, toggleSidebar }) =
                     <button onClick={resetSidebar} className="items-center hover:scale-105">
                         <img alt="CER Summer App" className="h-16 w-auto" src={cerLogo} />
                     </button>
+                    {/*
                     <button
                         className="icon cursor-pointer rounded-full px-2.5 py-1 text-[#1B75BB] hover:text-sky-300 block lg:hidden"
                         onClick={toggleSidebar}
                         >
                         <i className="fa-regular fa-circle-xmark text-3xl "></i>
-                    </button>
+                    </button>*/}
                 </li>
-                <li key="search">
-                    <input
-                        type="text"
-                        className="p-2 max-w-md w-full border border-solid border-black rounded-xl"
-                        placeholder="Search for a country"
-                        onChange={onFilterCountriesHandler}
-                    />
-                </li>
-                {displayedCountries.length ? displayedCountries.map((country: CountryType) =>
-                    <li key={country.id} data-name={country.name} onClick={handleSelectCountry} className={`flex flex-row items-center p-3 border-b border-gray-300 hover-bg-gradient cursor-pointer ${selectedCountry?.name === country.name ? `bg-gradient text-white` : ""}`}>
-                        <img src={country.imageSrc} alt={country.imageAlt} className="rounded-full h-10 w-10 border hover:border-white" />
-                        <span className="text-lg ml-3 font-semibold text-wrap">{country.name}</span>
-                    </li>
-                ) : (
-                    <li className="flex justify-center items-center mt-2 font-semibold text-lg">
-                        <i className="fa fa-triangle-exclamation mr-2"></i>No countires found
+                {SIDEBAR_SECTIONS.map((section, index) => 
+                    <li key={index} onClick={() => handleSelectSection(section.link, index)} className={`flex flex-row items-center px-6 py-3 border-b border-gray-300 hover-bg-gradient cursor-pointer ${selectedSection === index ? `bg-gradient text-white` : "text-[#1B75BB]"}`}>
+                        <i className={section.icon} />
+                        <span className="text-lg ml-3 font-semibold text-wrap">{section.name}</span>
                     </li>
                 )}
             </ul>
+            {/* Log Out Button */}
+            <div className="absolute bottom-0 w-full">
+                <button 
+                    onClick={handleLogout} 
+                    className="flex flex-row items-center px-6 py-3 w-full text-left text-[#1B75BB] border-t border-gray-300 hover-bg-gradient cursor-pointer"
+                >
+                    <i className="fa-solid fa-right-from-bracket" /> {/* Example log out icon */}
+                    <span className="text-lg ml-3 font-semibold">Log Out</span>
+                </button>
+            </div>
         </section>
     )
 }

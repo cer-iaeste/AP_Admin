@@ -1,7 +1,9 @@
-import { CardType, CountryType } from "../types/types";
+import { CardType, CountryType, SidebarSectionType } from "../types/types";
 import { fetchCountryData } from "../service/CountryService";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import cerLogo from "../images/cer-logo.png"
+import iaesteLogo from "../images/iaeste-logo.jpg"
 
 // interfaces
 export interface CardProps {
@@ -47,6 +49,11 @@ export const GENERAL_INFO_CONSTANTS = [
     "Country dialing code",
     "SIM card providers",
     "Population"
+]
+
+export const SIDEBAR_SECTIONS: SidebarSectionType[] = [
+    {name: "Admin Panel", icon: "fa-solid fa-home", link:"/"},
+    {name: "AP Countries", icon: "fa-solid fa-earth-europe", link: "/countries"},
 ]
 
 //functions

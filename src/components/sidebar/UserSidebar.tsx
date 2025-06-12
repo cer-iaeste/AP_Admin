@@ -36,7 +36,7 @@ const UserSidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     }
 
     return (
-        <section className={`fixed z-20 top-0 left-0 bg-[#F1F1E6] border-r border-[#1B75BB] w-64 max-h-screen min-h-full overflow-y-scroll transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+        <section className={`fixed z-20 top-0 left-0 bg-[#F1F1E6] border-r border-[#1B75BB] w-48 max-h-screen min-h-full overflow-y-scroll transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
             style={{ scrollbarWidth: "thin" }}
         >
             <ul>

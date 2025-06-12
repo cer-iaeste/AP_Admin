@@ -1,4 +1,4 @@
-import { useState, useEffect, ReactElement } from "react";
+import { useState, useEffect, ReactElement, useCallback } from "react";
 import Loader from "../loader/Loader";
 import CardHeader from "./CardHeader";
 import "./Card.css"
@@ -32,7 +32,7 @@ const Card = () => {
 
     const [minScreenSize, setMinScreenSize] = useState<number>(0)
     const { height } = useWindowSize()
-    
+
     useEffect(() => {
         // height - header - footer - margin from footer
         setMinScreenSize(height - 40 - 40 - 50)
@@ -46,72 +46,27 @@ const Card = () => {
         if (card && selectedCountry) getCard(selectedCountry, card, setSelectedCard)
     }, [card, selectedCountry])
 
-    useEffect(() => {
-        if (!selectedCard) return; // Exit early if either value is not yet set
 
-        const timer = setTimeout(() => {
-            // add the proper card component
-            switch (selectedCard?.title) {
-                case "Emergency Numbers":
-                    setCardComponent(<EmergencyContacts emergencyContacts={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                case "Cities With LCs":
-                    setCardComponent(<CitiesWithLcs cities={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                case "General Information":
-                    setCardComponent(<GeneralInfo information={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                case "Fun Facts":
-                    setCardComponent(<FunFacts facts={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                case "Recommended Places":
-                    setCardComponent(<Places places={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                case "Other Information":
-                    setCardComponent(<Other other={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                case "Traditional Cuisine":
-                    setCardComponent(<Cuisine cuisine={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                case "Transportation":
-                    setCardComponent(<Transport transport={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                case "Summer Reception":
-                    setCardComponent(<SummerReception summerReception={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                case "Gallery":
-                    setCardComponent(<Gallery images={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                case "Social Links":
-                    setCardComponent(<SocialLinks socialLinks={selectedCard?.content ?? [] } country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
-                default:
-                    setCardComponent(<Hero content={selectedCard?.content ?? ""} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange}/>)
-                    break
+
+    // fucntions for handling events with cards
+    const handleCancel = useCallback(
+        async (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void): Promise<boolean> => {
+            // local helper function
+            const handleReset = (): void => {
+                setData(structuredClone(data)); // structuredClone is a global function, no dependency
+                setIsChanged(false);
+            };
+
+            if (!isChanged) {
+                handleReset();
+                return true;
             }
 
-            setIsLoading(false);
-        }, 1100);
-        return () => clearTimeout(timer);
-    }, [selectedCard]);
-    
-    // fucntions for handling events with cards
-    const handleCancel = async (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void): Promise<boolean> => {
-        // local helper function
-        const handleReset = (): void => {
-            setData(structuredClone(data))
-            setIsChanged(false)
-        }
-
-        if (!isChanged) {
-            handleReset()
-            return true
-        }
-
-        const confirmation = await confirmModalWindow("All unsaved changes will be lost")
-        if (confirmation) handleReset()
-        return confirmation
-    }
+            const confirmation = await confirmModalWindow("All unsaved changes will be lost");
+            if (confirmation) handleReset();
+            return confirmation;
+        }, []
+    );
 
     const handleSave = (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => {
 
@@ -144,13 +99,17 @@ const Card = () => {
         return false
     }
 
-    const handleBack = async (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => {
-        const confirmBack = await handleCancel(isChanged, setData, data, setIsChanged)
-        if (confirmBack) {
-            setSelectedCard(undefined)
-            navigate(`/${country}`)
-        }
-    }
+    const handleBack = useCallback(
+        async (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => {
+            // Call the handleCancel function, which should also be memoized
+            const confirmBack = await handleCancel(isChanged, setData, data, setIsChanged);
+            if (confirmBack) {
+                setSelectedCard(undefined); // Setter function from useState
+                navigate(`/countries/${country}`);    // Function from useNavigate and 'country' variable
+            }
+        },
+        [handleCancel, setSelectedCard, navigate, country]
+    )
 
     const handleAddNewItem = (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => {
         if (index === undefined) setData([...data, newItem]);
@@ -173,7 +132,57 @@ const Card = () => {
         setData(newData)
         setIsChanged(true)
     }
-    
+
+
+    useEffect(() => {
+        if (!selectedCard) return; // Exit early if either value is not yet set
+
+        const timer = setTimeout(() => {
+            // add the proper card component
+            switch (selectedCard?.title) {
+                case "Emergency Numbers":
+                    setCardComponent(<EmergencyContacts emergencyContacts={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                case "Cities With LCs":
+                    setCardComponent(<CitiesWithLcs cities={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                case "General Information":
+                    setCardComponent(<GeneralInfo information={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                case "Fun Facts":
+                    setCardComponent(<FunFacts facts={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                case "Recommended Places":
+                    setCardComponent(<Places places={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                case "Other Information":
+                    setCardComponent(<Other other={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                case "Traditional Cuisine":
+                    setCardComponent(<Cuisine cuisine={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                case "Transportation":
+                    setCardComponent(<Transport transport={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                case "Summer Reception":
+                    setCardComponent(<SummerReception summerReception={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                case "Gallery":
+                    setCardComponent(<Gallery images={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                case "Social Links":
+                    setCardComponent(<SocialLinks socialLinks={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+                default:
+                    setCardComponent(<Hero content={selectedCard?.content ?? ""} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    break
+            }
+
+            setIsLoading(false);
+        }, 1100);
+        return () => clearTimeout(timer);
+    }, [selectedCard, handleBack, selectedCountry?.name, handleCancel]);
+
 
     return (
         <section className="section">
@@ -182,8 +191,8 @@ const Card = () => {
             ) : (
                 <section className="p-1 bg-sky-100">
                     <div className="container">
-                        <div className="elements-position" style={{minHeight: minScreenSize + "px"}}>
-                            <CardHeader country={selectedCountry?.name ?? ""} card={card} imgSrc={selectedCountry?.imageSrc}/>
+                        <div className="elements-position" style={{ minHeight: minScreenSize + "px" }}>
+                            <CardHeader country={selectedCountry?.name ?? ""} card={card} imgSrc={selectedCountry?.imageSrc} />
 
                             {cardComponent}
 

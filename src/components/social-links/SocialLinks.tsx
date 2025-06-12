@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import CardFooter from "../card/CardFooter";
 import "../summer-reception/Weekend.css"
 import { CardProps } from "../../global/Global";
@@ -19,15 +19,19 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks, country, handleS
         { name: 'Email Address', icon: 'fas fa-envelope', value: '' },
     ])
 
-    const mapLinks = (socialLinks: SocialLinkType[]): SocialLinkType[] =>
-        links.map(link => ({
-            ...link,
-            value: socialLinks?.find(sl => sl.name === link.name)?.value ?? ''
-        }))
+    const mapLinks = useCallback(
+        (socialLinks: SocialLinkType[]): SocialLinkType[] => {
+            return links.map(link => ({
+                ...link,
+                value: socialLinks?.find(sl => sl.name === link.name)?.value ?? ''
+            }));
+        },
+        [links] 
+    );
 
     useEffect(() => {
         setLinks(mapLinks(socialLinks))
-    }, [socialLinks])
+    }, [socialLinks, mapLinks])
 
     const onSave = async () => {
         // map social links
@@ -36,7 +40,7 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks, country, handleS
             value: link.value
         }))
         // save changes 
-        handleSave(country, socialLinks, "socialLinks", "Social links", setIsChanged)   
+        handleSave(country, socialLinks, "socialLinks", "Social links", setIsChanged)
     }
 
     const onCancel = async () => {
@@ -62,7 +66,7 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks, country, handleS
                                 placeholder="Link"
                                 value={link?.value}
                                 onChange={(e) => onInputChange(e, index)}
-                                className="card-textarea underline text-sky-700"
+                                className="text-input underline text-sky-700"
                             />
                         </div>
                     )}

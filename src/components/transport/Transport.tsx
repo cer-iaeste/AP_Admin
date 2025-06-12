@@ -160,7 +160,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
                                         value={feature.name}
                                         rows={3}
                                         onChange={(e) => onItemChange(e, openIndex, featureIndex, "name")}
-                                        className="card-textarea mt-1.5"
+                                        className="text-input mt-1.5"
                                         style={{ scrollbarWidth: 'thin' }}
                                     />
                                 </div>
@@ -175,7 +175,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
                                             placeholder="Link (optional)"
                                             value={feature.link}
                                             onChange={(e) => onItemChange(e, openIndex, featureIndex, "link")} // Update input value
-                                            className="card-textarea mt-1.5 underline text-sky-700"
+                                            className="text-input mt-1.5 underline text-sky-700"
                                         />
                                     </div>
                                 }

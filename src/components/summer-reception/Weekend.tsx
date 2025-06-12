@@ -11,7 +11,7 @@ interface WeekendProps {
 
 const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose, onSave }) => {
     const [weekendData, setWeekendData] = useState<WeekendType>(selectedWeekend);
-    const popupRef = useRef(null);
+    const popupRef = useRef<HTMLDivElement>(null); // Specify type for useRef
 
     useEffect(() => {
         setWeekendData(selectedWeekend)
@@ -19,8 +19,8 @@ const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose,
 
     useEffect(() => {
         // escape button
-        const handleEscapeKey = (event: any) => {
-            if (event.keyCode === 27) onClose();
+        const handleEscapeKey = (event: KeyboardEvent) => { // Specify event type
+            if (event.key === 'Escape') onClose(); // Use event.key for modern browsers
         };
 
         document.addEventListener("keydown", handleEscapeKey);
@@ -34,16 +34,14 @@ const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose,
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
 
-        // Create a shallow copy of weekendData and update the necessary field
         setWeekendData((prevData) => ({
             ...prevData,
             [name]: value,
         }));
     };
 
-
     // Handle form submission (save changes)
-    const handleSave = () =>  onSave(weekendData)
+    const handleSave = () => onSave(weekendData)
 
     // Handle cancel changes
     const handleCancel = () => {
@@ -51,29 +49,26 @@ const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose,
         onClose(); // Close the form
     };
 
-    // Format startDate - endDate without year
-    // const formatDateRange = (start, end) => {
-    //     const startDate = new Date(start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    //     const endDate = new Date(end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    //     return `${startDate} - ${endDate}`;
-    // };
-
     return (
         <div className="overlay">
-            <div className={`relative bg-gradient rounded-xl shadow-md w-4/5 h-4/5 flex flex-col`} 
+            {/* The main popup container */}
+            <div className={`relative bg-gradient rounded-xl shadow-md w-4/5 h-4/5 flex flex-col`} // Added flex flex-col
                 ref={popupRef} style={{ maxWidth: '800px', maxHeight: '600px' }}>
-                <div className="absolute top-0 flex w-full mx-auto justify-between items-center py-2 px-5 border-b">
+                
+                {/* Header (static) */}
+                <div className="flex w-full mx-auto justify-between items-center py-2 px-5 border-b flex-shrink-0"> {/* Added flex-shrink-0 */}
                     <span className="text-2xl font-bold text-white">{isEditMode ? "Edit weekend" : "Add new weekend"}</span>
-                    <button onClick={onClose} className="rounded-full bg-white py-1.5 px-3 text-black border border-[#0B3D59]">
-                        <i className="fa-solid fa-x text-[#0B3D59]"></i>
+                    <button onClick={onClose} className="">
+                        <i className="fa-solid fa-x text-white"></i>
                     </button>
                 </div>
-                <div className="w-full p-6 text-white overflow-y-scroll mt-14 mb-20" style={{ scrollbarWidth: "thin" }}>
-                    <form className="space-y-4 mt-4 text-xl">
+                
+                {/* Scrollable Content Area */}
+                <div className="w-full p-6 text-white overflow-y-auto flex-grow" style={{ scrollbarWidth: "thin" }}> {/* Changed mt- to flex-grow, added overflow-y-auto */}
+                    <form className="space-y-4 -mt-8 text-xl">
                         <div className="form-row">
                             <label>
                                 <i className="fa-solid fa-umbrella-beach"></i>
-                                <span>Name: </span>
                             </label>
                             <input
                                 type="text"
@@ -81,35 +76,33 @@ const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose,
                                 value={weekendData.name}
                                 onChange={handleInputChange}
                                 placeholder="Event Name"
-                                className="sm:col-span-4"
+                                className="sm:col-span-12 text-input"
                             />
                         </div>
                         {/* Date Range */}
                         <div className="form-row">
                             <label>
                                 <i className="fa fa-calendar-alt"></i>
-                                <span>Date: </span>
                             </label>
                             <input
-                                    type="date"
-                                    name="startDate"
-                                    value={weekendData.startDate}
-                                    onChange={handleInputChange}
-                                    className="col-span-2"
-                                />
+                                type="date"
+                                name="startDate"
+                                value={weekendData.startDate}
+                                onChange={handleInputChange}
+                                className="col-span-6 text-input"
+                            />
                             <input
-                                    type="date"
-                                    name="endDate"
-                                    value={weekendData.endDate}
-                                    onChange={handleInputChange}
-                                    className="col-span-2"
-                                />
+                                type="date"
+                                name="endDate"
+                                value={weekendData.endDate}
+                                onChange={handleInputChange}
+                                className="col-span-6 text-input"
+                            />
                         </div>
                         {/* Location */}
                         <div className="form-row">
                             <label>
                                 <i className="fa fa-map-marker-alt"></i>
-                                <span>Location: </span>
                             </label>
                             <input
                                 type="text"
@@ -117,7 +110,7 @@ const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose,
                                 value={weekendData.location}
                                 onChange={handleInputChange}
                                 placeholder="Location"
-                                className="col-span-4"
+                                className="col-span-12 text-input"
                             />
                         </div>
 
@@ -125,7 +118,6 @@ const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose,
                         <div className="form-row">
                             <label>
                                 <i className="fa fa-link"></i>
-                                <span>Reg. link: </span>
                             </label>
                             <input
                                 type="text"
@@ -133,29 +125,27 @@ const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose,
                                 value={weekendData.link}
                                 onChange={handleInputChange}
                                 placeholder="Registration Link"
-                                className="underline col-span-4"
+                                className="underline col-span-12 text-input"
                             />
                         </div>
                         {/* Limit */}
                         <div className="form-row">
                             <label>
                                 <i className="fa fa-users"></i>
-                                <span>Limit: </span>
                             </label>
                             <input
                                 type="number"
                                 name="limit"
                                 value={weekendData.limit}
                                 onChange={handleInputChange}
-                                placeholder="Maximum Participants"
-                                className="col-span-4"
+                                placeholder="Max. Participants"
+                                className="col-span-12 text-input"
                             />
                         </div>
                         {/* Description */}
                         <div className="form-row">
                             <label>
                                 <i className="fa fa-file-lines"></i>
-                                <span>Description: </span>
                             </label>
                             <textarea
                                 name="description"
@@ -163,13 +153,14 @@ const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose,
                                 onChange={handleInputChange}
                                 placeholder="Description"
                                 rows={8}
-                                className="col-span-4 p-1 text-black"
+                                className="col-span-12 p-1 text-input"
                             />
                         </div>
                     </form>
                 </div>
+                
                 {/* Fixed Footer */}
-                <footer className="absolute bottom-0 left-0 w-full border-t-2 p-2">
+                <footer className="w-full border-t-2 p-2 flex-shrink-0"> {/* Added flex-shrink-0 */}
                     <div className="flex justify-end space-x-4 font-semibold">
                         <button
                             type="button"

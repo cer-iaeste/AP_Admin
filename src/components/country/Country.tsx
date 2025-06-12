@@ -21,11 +21,11 @@ const Country = () => {
     }, [selectedCountry])
 
     const handleSelectCard = (card: string) => {
-        navigate(`/${selectedCountry?.name}/${card}`)
+        navigate(`/countries/${selectedCountry?.name}/${card}`)
     }
 
     return (
-        <section className="relative w-full">
+        <section className="w-full">
             {isLoading ? (
                 <Plane country={selectedCountry?.name ?? ""}></Plane>
             ) : (
@@ -89,7 +89,7 @@ const Country = () => {
                             <i className="fa fa-triangle-exclamation text-5xl"></i>
                             <h1 className="text-5xl">Country not found</h1>
                             <div className="pt-2 font-bold items-center text-lg">
-                                <i className="fa fa-circle-info mr-3"></i>Start by selecting a country from the sidebar to access the country menu
+                                <i className="fa fa-circle-info mr-3"></i>Start by selecting a section from the sidebar
                             </div>
                         </div>
                     </section>

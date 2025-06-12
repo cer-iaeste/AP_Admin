@@ -24,18 +24,8 @@ const CardFooter: React.FC<FooterProps> = ({ isChanged, onCancel, onSave, onBack
     };
 
     return (
-        <footer className="fixed bottom-0 left-0 w-full bg-[#F1F1E6] border-t border-[#1B75BB] h-10">
-            <div className='flex flex-row justify-between container pt-1.5 sm:pt-0.5 px-4'>
-                {/* Cancel Button */}
-                <button
-                    type="button"
-                    onClick={onBack}
-                    className="flex items-center text-[#1B75BB] font-semibold"
-                >
-                    <i className="fa fa-chevron-left mr-1" aria-hidden="true"></i>
-                    Back
-                </button>
-                <div className="flex justify-end space-x-4 font-semibold">
+        <footer className="fixed bottom-0 left-0 w-full bg-[#F1F1E6] border-t border-[#1B75BB] h-12">
+            <div className="flex justify-end space-x-4 font-semibold p-1.5 max-w-7xl mx-auto">
                     {/* Cancel Button */}
                     <button
                         type="button"
@@ -58,7 +48,6 @@ const CardFooter: React.FC<FooterProps> = ({ isChanged, onCancel, onSave, onBack
                         <span className='hidden sm:block'>Save</span>
                     </button>
                 </div>
-            </div>
 
         </footer>
     );

@@ -52,7 +52,6 @@ const Signup = () => {
 
     useEffect(() => {
         fetchUnregisteredCountries().then(result => setCountries(result))
-        console.log(selectedCountry)
     }, [])
 
 

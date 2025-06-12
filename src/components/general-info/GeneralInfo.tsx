@@ -47,10 +47,10 @@ const GeneralInfo: React.FC<GeneralInfoProps> = ({
                     </div>
                     <textarea
                         placeholder="Description"
-                        rows={3}
+                        rows={2}
                         value={info.role}
                         onChange={(e) => onInputChange(e, index, "role")}
-                        className="card-textarea"
+                        className="text-input"
                         style={{ scrollbarWidth: 'thin'}}
                     />
                 </div>

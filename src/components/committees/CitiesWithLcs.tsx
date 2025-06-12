@@ -42,11 +42,10 @@ const CitiesWithLcs: React.FC<CitiesProps> = ({ cities, country, handleSave, han
                     </div>
 
                     {/* Value input below buttons */}
-                    <textarea
+                    <input
                         value={city}
-                        rows={2}
                         onChange={(e) => onInputChange(e, index)} // Update input value
-                        className="card-textarea"
+                        className="text-input"
                     />
                 </div>
             ))}

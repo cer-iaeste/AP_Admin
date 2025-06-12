@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import CardFooter from "../card/CardFooter";
 import "../card/Card.css"
 import { CuisineType, OtherType } from "../../types/types";
@@ -21,22 +21,24 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
     const [cuisineSectionChange, setCuisineSectionChange] = useState<boolean[]>([false, false])
 
     // const { width } = useWindowSize()
-    const mapCuisineData = (): CuisineMapType[] => [
-        {
-            title: "Food",
-            icon: "fa fa-burger",
-            content: cuisine.food
-        },
-        {
-            title: "Drinks",
-            icon: "fa fa-martini-glass-citrus",
-            content: cuisine.drinks
-        }
-    ]
+    const mapCuisineData = useCallback(() => {
+        return [
+            {
+                title: "Food",
+                icon: "fa fa-burger",
+                content: cuisine.food
+            },
+            {
+                title: "Drinks",
+                icon: "fa fa-martini-glass-citrus",
+                content: cuisine.drinks
+            }
+        ]
+    }, [cuisine])
 
     useEffect(() => {
         setCuisineData(mapCuisineData())
-    }, [cuisine])
+    }, [cuisine, mapCuisineData])
 
     const resetCuisineChange = (promiseResult: boolean) => {
         if (promiseResult) setCuisineSectionChange([false, false])
@@ -134,25 +136,25 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
                                         value={item.title}
                                         rows={2}
                                         onChange={(e) => onItemChange(e, openIndex, itemIndex, "title")}
-                                        className="card-textarea mt-1.5"
+                                        className="text-input mt-1.5"
                                         style={{ scrollbarWidth: 'thin' }}
                                     />
                                 </div>
                                 <div className="card-subcontainer">
-                                        {/* Title in the top right */}
-                                        <div className="card-header card-header-sub">
-                                            Description
-                                        </div>
-                                        {/* Value input below buttons */}
-                                        <textarea
-                                            placeholder="Description (optional)"
-                                            value={item.description}
-                                            rows={4}
-                                            onChange={(e) => onItemChange(e, openIndex, itemIndex, "description")} // Update input value
-                                            className="card-textarea mt-1.5"
-                                            style={{ scrollbarWidth: 'thin' }}
-                                        />
+                                    {/* Title in the top right */}
+                                    <div className="card-header card-header-sub">
+                                        Description
                                     </div>
+                                    {/* Value input below buttons */}
+                                    <textarea
+                                        placeholder="Description (optional)"
+                                        value={item.description}
+                                        rows={4}
+                                        onChange={(e) => onItemChange(e, openIndex, itemIndex, "description")} // Update input value
+                                        className="text-input mt-1.5"
+                                        style={{ scrollbarWidth: 'thin' }}
+                                    />
+                                </div>
                             </div>
                         )}
                     </div>

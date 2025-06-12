@@ -219,15 +219,7 @@ const Hero: React.FC<HeroBannerProps> = ({ content, country, handleSave, handleC
                         <select
                             value={region} // This will be your state variable for the selected region
                             onChange={(e) => handleOnRegionSelectChange(e.target.value)}
-                            className="
-                            block w-full p-2 mt-2 text-xl font-semibold
-                            text-gray-700 bg-white border border-gray-300 rounded-md
-                            shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500
-                            appearance-none pr-8 // Hides default arrow and adds space for custom arrow if desired
-                            cursor-pointer
-                            hover:border-gray-400
-                            transition duration-150 ease-in-out
-                            "
+                            className="text-input"
                         >
                             <option value="cer">CER</option>
                             <option value="core">CoRe</option>
