@@ -1,24 +1,23 @@
 import React from "react";
+import Back from "../../global/Back";
+import { CardType } from "../../types/types";
 
 interface HeaderProps {
     country: string
-    card?: string
-    imgSrc?: string
+    card?: CardType
 }
 
-const CardHeader: React.FC<HeaderProps> = ({ country, card, imgSrc }) => {
+const CardHeader: React.FC<HeaderProps> = ({ country, card }) => {
     return (
-        <section>
-            <div className="flex mt-1 pb-0 sm:pb-4">
-                <div className="flex items-center justify-center w-full ">
-                    <img src={imgSrc} alt={country} className="rounded-full h-20 w-20 sm:h-32 sm:w-32 border" />
-                    <div className="flex flex-col ml-5 font-bold text-[#1B75BB] text-left">
-                        <span className="text=xl sm:text-3xl">IAESTE {country}</span>
-                        <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{card}</span>
-                    </div>
-                </div>
+        <div className="flex flex-col justify-center text-center md:text-left relative">
+            <Back confirmationNeeded={true} />
+            <span className="font-semibold text-4xl lg:text-5xl text-gray-800 mt-16 sm:mt-20">IAESTE {country}</span>
+            <span className="font-semibold text-3xl lg:text-4xl text-gray-800">{card?.header}</span>
+            <div className="font-bold items-center text-lg mt-2 flex justify-center md:justify-start mt-4">
+                <i className="fa fa-circle-info mr-3 text-2xl"></i>
+                <span>{card?.desc}</span>
             </div>
-        </section>
+        </div>
     )
 }
 

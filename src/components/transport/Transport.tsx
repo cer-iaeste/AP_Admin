@@ -15,7 +15,7 @@ interface TransportMapType {
     content: TransportFeature[]
 }
 
-const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
+const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, handleDelete, handleCancel, handleAddNewItem, handleInputChange }) => {
     const [transportData, setTransportData] = useState<TransportMapType[]>([])
     const [isChanged, setIsChanged] = useState(false)
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
@@ -93,10 +93,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
         addTransportSectionChange(index)
     }
     const onCancel = () => handleCancel(isChanged, setTransportData, mapTransportData(transport), setIsChanged).then(result => resetTransportChange(result))
-    const onBack = () => {
-        handleBack(isChanged, setTransportData, mapTransportData(transport), setIsChanged)
-        resetTransportChange(true)
-    }
+
     const onItemChange = (e: any, index: number, itemIndex: number, column: keyof TransportFeature) => {
         handleInputChange(setTransportData, transportData, index, e.target.value, setIsChanged, column, itemIndex)
         addTransportSectionChange(index)
@@ -185,7 +182,7 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
                 </div>
             }
 
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
         </div>
     )
 }

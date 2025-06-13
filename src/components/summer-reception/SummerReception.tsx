@@ -10,7 +10,7 @@ interface SummerReceptionProps extends CardProps{
     summerReception: WeekendType[]
 }
 
-const SummerReception: React.FC<SummerReceptionProps> = ({ country, summerReception, handleSave, handleCancel, handleBack, handleDelete }) => {
+const SummerReception: React.FC<SummerReceptionProps> = ({ country, summerReception, handleSave, handleCancel, handleDelete }) => {
     const [summerReceptionData, setSummerReceptionData] = useState<WeekendType[]>([]);
     const [selectedWeekend, setSelectedWeekend] = useState<WeekendType | null>(null)
     const [isEditMode, setIsEditMode] = useState(false)
@@ -53,7 +53,6 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ country, summerRecept
 
     const onSave = () => handleSave(country, summerReceptionData, "summerReception", "Summer Reception", setIsChanged)
     const onCancel = () => handleCancel(isChanged, setSummerReceptionData, summerReception, setIsChanged)
-    const onBack = () => handleBack(isChanged, setSummerReceptionData, summerReception, setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setSummerReceptionData, summerReceptionData, setIsChanged)
 
     return (
@@ -105,7 +104,7 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ country, summerRecept
                     </button>
                 </div>
             </section>
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
         </div>
     )
 }

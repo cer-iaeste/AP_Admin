@@ -8,19 +8,21 @@ import iaesteLogo from "../images/iaeste-logo.jpg"
 // interfaces
 export interface CardProps {
     country: string
+    save?: boolean
+    cancel?: boolean
+    handleChange?: (state: boolean) => void
     handleAddNewItem: (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => void
     handleSave: (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => void
     handleDelete: (index: number, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void, itemIndex?: number) => Promise<boolean>
     handleCancel: (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => Promise<boolean>
-    handleBack: (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => void
     handleInputChange: (setData: (data: any) => void, data: any, index: number, value: any, setIsChanged: (state: boolean) => void, column?: string, itemIndex?: number) => void
 }
 
 // constants
 export const componentsCards: CardType[] = [
-    { title: "Banner", icon: "fa fa-chalkboard" },
-    { title: "Social Links", icon: "fa fa-share-nodes"},
-    { title: "Emergency Numbers", icon: "fa fa-phone" },
+    { title: "Banner", icon: "fa fa-chalkboard", header: "Hero Banner Details", desc: "Manage the main banner image & country PDF settings"},
+    { title: "Social Links", icon: "fa fa-share-nodes", header: "Social Media & Contact Links", desc: "Manage links to social media and contact information"},
+    { title: "Emergency Numbers", icon: "fa fa-phone", header: "Emergency Numbers", desc: "Manage essential emergency contact numbers for the country" },
     { title: "General Information", icon: "fa fa-info-circle" },
     { title: "Cities With LCs", icon: "fa fa-city" },
     { title: "Transportation", icon: "fa fa-train" },

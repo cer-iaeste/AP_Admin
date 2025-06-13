@@ -9,7 +9,7 @@ interface OtherProps extends CardProps {
     other: OtherType[]
 }
 
-const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
+const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete, handleCancel, handleAddNewItem, handleInputChange }) => {
     const [otherData, setOtherData] = useState<OtherType[]>([])
     const [isChanged, setIsChanged] = useState(false)
 
@@ -23,7 +23,6 @@ const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete,
     const onSave = () => handleSave(country, otherData, "otherInformation", "Other information", setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setOtherData, otherData, setIsChanged)
     const onCancel = () => handleCancel(isChanged, setOtherData, otherData, setIsChanged)
-    const onBack = () => handleBack(isChanged, setOtherData, other, setIsChanged)
     const onInputChange = (e: any, index: number, column: string) => handleInputChange(setOtherData, otherData, index, e.target.value, setIsChanged, column)
 
     return (
@@ -82,7 +81,7 @@ const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete,
             </div>
 
             {/* Reusable CardFooter Component */}
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
         </div>
     )
 }

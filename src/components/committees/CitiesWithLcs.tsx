@@ -7,7 +7,7 @@ interface CitiesProps extends CardProps {
     cities: string[]
 }
 
-const CitiesWithLcs: React.FC<CitiesProps> = ({ cities, country, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
+const CitiesWithLcs: React.FC<CitiesProps> = ({ cities, country, handleSave, handleDelete, handleCancel, handleAddNewItem, handleInputChange }) => {
     const [committeesData, setCommitteesData] = useState<string[]>([])
     const [isChanged, setIsChanged] = useState(false)
 
@@ -19,7 +19,6 @@ const CitiesWithLcs: React.FC<CitiesProps> = ({ cities, country, handleSave, han
     const onSave = () => handleSave(country, committeesData, "committees", "Cities with lcs", setIsChanged)
     const onCancel = () => handleCancel(isChanged, setCommitteesData, committeesData, setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setCommitteesData, committeesData, setIsChanged)
-    const onBack = () => handleBack(isChanged, setCommitteesData, committeesData, setIsChanged)
     const onInputChange = (e: any, index: number) => handleInputChange(setCommitteesData, committeesData, index, e.target.value, setIsChanged)
 
     return (
@@ -57,7 +56,7 @@ const CitiesWithLcs: React.FC<CitiesProps> = ({ cities, country, handleSave, han
             </div>
 
 
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
         </div>
     );
 };

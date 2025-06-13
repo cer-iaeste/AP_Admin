@@ -14,7 +14,7 @@ interface CuisineMapType {
     content: OtherType[]
 }
 
-const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
+const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleDelete, handleCancel, handleAddNewItem, handleInputChange }) => {
     const [cuisineData, setCuisineData] = useState<CuisineMapType[]>([])
     const [isChanged, setIsChanged] = useState(false)
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
@@ -68,10 +68,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
         addCuisineSectionChange(index)
     }
     const onCancel = () => handleCancel(isChanged, setCuisineData, mapCuisineData(), setIsChanged).then(result => resetCuisineChange(result))
-    const onBack = () => {
-        handleBack(isChanged, setCuisineData, mapCuisineData(), setIsChanged)
-        resetCuisineChange(true)
-    }
+
     const onItemChange = (e: any, index: number, itemIndex: number, column: keyof OtherType) => {
         handleInputChange(setCuisineData, cuisineData, index, e.target.value, setIsChanged, column, itemIndex)
         addCuisineSectionChange(index)
@@ -161,7 +158,7 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
                 </div>
             }
 
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
         </div>
     )
 }

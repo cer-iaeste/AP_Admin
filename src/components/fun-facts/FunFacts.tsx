@@ -7,7 +7,7 @@ interface FunFactsProps extends CardProps {
     facts: string[]
 }
 
-const FunFacts: React.FC<FunFactsProps> = ({ country, facts, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
+const FunFacts: React.FC<FunFactsProps> = ({ country, facts, handleSave, handleDelete, handleCancel, handleAddNewItem, handleInputChange }) => {
     const [factsData, setFactsData] = useState<string[]>([])
     const [isChanged, setIsChanged] = useState(false)
 
@@ -19,7 +19,6 @@ const FunFacts: React.FC<FunFactsProps> = ({ country, facts, handleSave, handleD
     const onSave = () => handleSave(country, factsData, "facts", "Fun facts", setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setFactsData, factsData, setIsChanged)
     const onCancel = () => handleCancel(isChanged, setFactsData, facts, setIsChanged)
-    const onBack = () => handleBack(isChanged, setFactsData, facts, setIsChanged)
     const onInputChange = (e: any, index: number) => handleInputChange(setFactsData, factsData, index, e.target.value, setIsChanged)
 
     return (
@@ -58,7 +57,7 @@ const FunFacts: React.FC<FunFactsProps> = ({ country, facts, handleSave, handleD
             </div>
 
             {/* Reusable CardFooter Component */}
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
         </div>
     )
 }

@@ -20,18 +20,22 @@ import { getCard, getCountryData, confirmModalWindow, scrollToBottom } from "../
 import { toast } from "react-toastify";
 import Hero from "../hero/Hero";
 import useWindowSize from "../../hooks/useScreenSize";
+import CardFooter from "./CardFooter";
 
 const Card = () => {
-    const [isLoading, setIsLoading] = useState(true);
+    // state handlers
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [save, setSave] = useState<boolean>(false)
+    const [cardChange, setCardChange] = useState<boolean>(false)
+    const [minScreenSize, setMinScreenSize] = useState<number>(0)
+    const { height } = useWindowSize()
+    const navgation = useNavigate()
+    // country & card props
     const [selectedCountry, setSelectedCountry] = useState<CountryType>();
     const [selectedCard, setSelectedCard] = useState<CardType | undefined>();
     const [cardComponent, setCardComponent] = useState<ReactElement>()
-
+    // get params when page loads
     const { country, card } = useParams()
-    const navigate = useNavigate()
-
-    const [minScreenSize, setMinScreenSize] = useState<number>(0)
-    const { height } = useWindowSize()
 
     useEffect(() => {
         // height - header - footer - margin from footer
@@ -40,6 +44,7 @@ const Card = () => {
 
     useEffect(() => {
         getCountryData(country, setSelectedCountry, setIsLoading)
+        setSave(false)
     }, [country, card]);
 
     useEffect(() => {
@@ -54,7 +59,7 @@ const Card = () => {
             // local helper function
             const handleReset = (): void => {
                 setData(structuredClone(data)); // structuredClone is a global function, no dependency
-                setIsChanged(false);
+                setCardChange(false)
             };
 
             if (!isChanged) {
@@ -93,23 +98,11 @@ const Card = () => {
             else newData[index].content = newData[index].content.filter((_: any, i: number) => i !== itemIndex);
 
             setData(newData)
-            setIsChanged(true)
+            setCardChange(true)
             return true
         }
         return false
     }
-
-    const handleBack = useCallback(
-        async (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => {
-            // Call the handleCancel function, which should also be memoized
-            const confirmBack = await handleCancel(isChanged, setData, data, setIsChanged);
-            if (confirmBack) {
-                setSelectedCard(undefined); // Setter function from useState
-                navigate(`/countries/${country}`);    // Function from useNavigate and 'country' variable
-            }
-        },
-        [handleCancel, setSelectedCard, navigate, country]
-    )
 
     const handleAddNewItem = (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => {
         if (index === undefined) setData([...data, newItem]);
@@ -118,7 +111,7 @@ const Card = () => {
             newData[index].content = [...newData[index].content, newItem]
             setData(newData)
         }
-        setIsChanged(true)
+        setCardChange(true)
         scrollToBottom()
     }
 
@@ -130,9 +123,8 @@ const Card = () => {
         }
         else newData[index] = value
         setData(newData)
-        setIsChanged(true)
+        setCardChange(true)
     }
-
 
     useEffect(() => {
         if (!selectedCard) return; // Exit early if either value is not yet set
@@ -141,47 +133,47 @@ const Card = () => {
             // add the proper card component
             switch (selectedCard?.title) {
                 case "Emergency Numbers":
-                    setCardComponent(<EmergencyContacts emergencyContacts={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<EmergencyContacts emergencyContacts={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
                 case "Cities With LCs":
-                    setCardComponent(<CitiesWithLcs cities={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<CitiesWithLcs cities={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
                 case "General Information":
-                    setCardComponent(<GeneralInfo information={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<GeneralInfo information={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
                 case "Fun Facts":
-                    setCardComponent(<FunFacts facts={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<FunFacts facts={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
                 case "Recommended Places":
-                    setCardComponent(<Places places={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<Places places={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
                 case "Other Information":
-                    setCardComponent(<Other other={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<Other other={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
                 case "Traditional Cuisine":
-                    setCardComponent(<Cuisine cuisine={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<Cuisine cuisine={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
                 case "Transportation":
-                    setCardComponent(<Transport transport={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<Transport transport={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
                 case "Summer Reception":
-                    setCardComponent(<SummerReception summerReception={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<SummerReception summerReception={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
                 case "Gallery":
-                    setCardComponent(<Gallery images={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<Gallery images={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
                 case "Social Links":
-                    setCardComponent(<SocialLinks socialLinks={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<SocialLinks socialLinks={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} save={save} handleChange={setCardChange}/>)
                     break
                 default:
-                    setCardComponent(<Hero content={selectedCard?.content ?? ""} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleBack={handleBack} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
+                    setCardComponent(<Hero content={selectedCard?.content ?? ""} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
                     break
             }
 
             setIsLoading(false);
         }, 1100);
         return () => clearTimeout(timer);
-    }, [selectedCard, handleBack, selectedCountry?.name, handleCancel]);
+    }, [selectedCard, selectedCountry?.name, handleCancel]);
 
 
     return (
@@ -189,13 +181,11 @@ const Card = () => {
             {isLoading ? (
                 <Loader />
             ) : (
-                <section className="p-1 bg-sky-100">
+                <section className="bg-sky-100">
                     <div className="container">
-                        <div className="elements-position" style={{ minHeight: minScreenSize + "px" }}>
-                            <CardHeader country={selectedCountry?.name ?? ""} card={card} imgSrc={selectedCountry?.imageSrc} />
-
+                        <div className="elements-position px-12 text-[#1B75BB]" style={{ minHeight: minScreenSize + "px" }}>
+                            <CardHeader country={selectedCountry?.name ?? ""} card={selectedCard} />
                             {cardComponent}
-
                         </div>
                     </div>
                 </section>

@@ -32,7 +32,7 @@ const AdminPanel = () => {
     }
 
     useEffect(() => {
-        setIsSidebarOpen(width > 1024);
+        setIsSidebarOpen(width > 348);
         setIsLoading(false)
     }, [width])
 
@@ -63,7 +63,7 @@ const AdminPanel = () => {
                     <UserSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
                     : <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
                 }
-                <div className={`w-full transition-all duration-300 ${isSidebarOpen ? "lg:ml-48" : "ml-0"}`}>
+                <div className={`w-full transition-all duration-300 relative pb-20 lg:pb-0 ${isSidebarOpen ? "lg:ml-60" : "ml-0"}`}>
                     <Navbar toggleSidebar={toggleSidebar} back={back} pathname={location.pathname} isSidebarOpen={isSidebarOpen} width={width} />
                     
                     <Routes>
@@ -95,10 +95,10 @@ const AdminPanel = () => {
                         } />
                     </Routes>
                 </div>
-                {/* For mobile view*/}
-                {isSidebarOpen && width <= 1024 && (
+                {/* For mobile view
+                {isSidebarOpen && width <= 640 && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 z-10" onClick={toggleSidebar}></div>
-                )}
+                )} */}
             </section>
             : null
     );

@@ -9,7 +9,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, back, pathname, isSidebarOpen, width }) => (
-  <div className={`z-100 absolute top-0 transition-all duration-300 ${isSidebarOpen && width > 1024 ? 'left-48' : 'left-0'} flex flex-row`}>
+  <div className={`z-100 absolute top-0 transition-all duration-300 ${!isSidebarOpen && width <= 1024 ? 'left-0' : 'hidden'} flex flex-row`}>
     <button
       className="icon cursor-pointer rounded-sm px-2.5 py-1 text-[#1B75BB] hover-bg-gradient justify-start w-10"
       onClick={toggleSidebar}>

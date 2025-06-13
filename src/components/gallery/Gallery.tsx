@@ -17,7 +17,7 @@ interface UploadedImage {
     dbUrl: string
 }
 
-const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDelete, handleCancel, handleBack }) => {
+const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDelete, handleCancel }) => {
     const [imagesData, setImagesData] = useState<string[]>([])
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isChanged, setIsChanged] = useState(false)
@@ -99,7 +99,6 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
         const del = await handleDelete(index, setImagesData, imagesData, setIsChanged)
         if (del) setImagesToDelete([...imagesToDelete, url])
     }
-    const onBack = () => handleBack(isChanged, setImagesData, images, setIsChanged)
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 table-margins">
@@ -139,7 +138,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
             {/* Popup Modal for Enlarged Image */}
             {selectedImage && <ImagePopup image={selectedImage} closeModal={closeModal} />}
 
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack}/>
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
         </div>
     );
 };

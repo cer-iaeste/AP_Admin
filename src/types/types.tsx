@@ -76,6 +76,8 @@ export interface CardType {
     icon: string
     content?: any
     isSectionEmpty?: boolean
+    header?: string
+    desc?: string
 }
 
 export interface SocialLinkType {

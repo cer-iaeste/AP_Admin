@@ -13,7 +13,6 @@ const GeneralInfo: React.FC<GeneralInfoProps> = ({
     information,
     handleSave,
     handleCancel,
-    handleBack,
     handleInputChange,
 }) => {
     const [infoData, setInfoData] = useState<InformationType[]>([]);
@@ -33,8 +32,6 @@ const GeneralInfo: React.FC<GeneralInfoProps> = ({
         handleSave(country, infoData, "information", "General information", setIsChanged);
     const onCancel = () =>
         handleCancel(isChanged, setInfoData, mapInfo(information), setIsChanged);
-    const onBack = () =>
-        handleBack(isChanged, setInfoData, mapInfo(information), setIsChanged);
     const onInputChange = (e: any, index: number, column: string) =>
         handleInputChange(setInfoData, infoData, index, e.target.value, setIsChanged, column);
 
@@ -56,7 +53,7 @@ const GeneralInfo: React.FC<GeneralInfoProps> = ({
                 </div>
             ))}
 
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
+            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
         </div>
     );
 };
