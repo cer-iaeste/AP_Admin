@@ -2,8 +2,6 @@ import { CardType, CountryType, SidebarSectionType } from "../types/types";
 import { fetchCountryData } from "../service/CountryService";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import cerLogo from "../images/cer-logo.png"
-import iaesteLogo from "../images/iaeste-logo.jpg"
 
 // interfaces
 export interface CardProps {
@@ -176,6 +174,10 @@ export const confirmModalWindow = (message: string): Promise<boolean> => {
             }
         })
     })
+}
+
+export async function handleCancel () {
+    return await confirmModalWindow("All unsaved changes will be lost")
 }
 
 export const getCountryDbName = (country: string): string => {

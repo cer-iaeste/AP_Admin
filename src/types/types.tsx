@@ -6,7 +6,7 @@ export interface CountryType {
     imageAlt: string
     pdf: string
     banner?: string
-    socialLinks: SocialLinkType[]
+    socialLinks: CardFormType[]
     cities: CityType[]
     committees: string[]
     emergencyContacts: EmergencyContactsType[]
@@ -80,7 +80,7 @@ export interface CardType {
     desc?: string
 }
 
-export interface SocialLinkType {
+export interface CardFormType {
     name: string
     icon?: string
     value: string

@@ -62,7 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         <section
             // Base styles: fixed positioning, high z-index, white background, shadow
             className={`
-                fixed z-30 bg-white border-gray-200 shadow-xl px-2
+                fixed z-30 bg-stone-50 border-gray-200 shadow-xl px-2
                 ${isMobile
                     ? 'bottom-0 left-0 right-0 h-16 w-full flex flex-row items-center justify-around border-t'
                     // Desktop-specific styles: static vertical sidebar, dynamic width based on isOpen, vertical flex
