@@ -1,4 +1,4 @@
-import { useState, useEffect, ReactElement, useCallback } from "react";
+import React, { useState, useEffect, ReactElement, useCallback } from "react";
 import Loader from "../loader/Loader";
 import CardHeader from "./CardHeader";
 import "./Card.css"
@@ -13,27 +13,24 @@ import Transport from "../transport/Transport";
 import SummerReception from "../summer-reception/SummerReception";
 import Gallery from "../gallery/Gallery";
 import SocialLinks from "../social-links/SocialLinks"
-import { updateCountryField } from "../../service/CountryService";
-import { CardType, CountryType } from "../../types/types";
-import { useParams, useNavigate } from "react-router-dom";
-import { getCard, getCountryData, confirmModalWindow, scrollToBottom } from "../../global/Global";
-import { toast } from "react-toastify";
 import Hero from "../hero/Hero";
+import { updateCountryField } from "../../service/CountryService";
+import { CardType, CountryType, UploadedImageType } from "../../types/types";
+import { useParams } from "react-router-dom";
+import { getCard, getCountryData, confirmModalWindow, scrollToBottom, isList, getCountryDbName } from "../../global/Global";
+import { toast } from "react-toastify";
 import useWindowSize from "../../hooks/useScreenSize";
-import CardFooter from "./CardFooter";
+import CardContext from "./CardContext";
 
 const Card = () => {
     // state handlers
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [save, setSave] = useState<boolean>(false)
-    const [cardChange, setCardChange] = useState<boolean>(false)
     const [minScreenSize, setMinScreenSize] = useState<number>(0)
     const { height } = useWindowSize()
-    const navgation = useNavigate()
     // country & card props
     const [selectedCountry, setSelectedCountry] = useState<CountryType>();
     const [selectedCard, setSelectedCard] = useState<CardType | undefined>();
-    const [cardComponent, setCardComponent] = useState<ReactElement>()
+    const [cardComponent, setCardComponent] = useState<ReactElement | null>(null) // Initialize with null
     // get params when page loads
     const { country, card } = useParams()
 
@@ -44,7 +41,6 @@ const Card = () => {
 
     useEffect(() => {
         getCountryData(country, setSelectedCountry, setIsLoading)
-        setSave(false)
     }, [country, card]);
 
     useEffect(() => {
@@ -52,128 +48,182 @@ const Card = () => {
     }, [card, selectedCountry])
 
 
+    // Functions for handling events with cards - these will be provided via Context
+    const handleSave = useCallback(
+        (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => {
+            const updatePromise = updateCountryField(country, data, column);
+            toast.promise(updatePromise, {
+                pending: "Saving changes...",
+                success: {
+                    render() {
+                        setIsChanged(false);
+                        return `${title} updated successfully!`;
+                    }
+                },
+                error: "Document not found!"
+            });
+        }, []
+    );
 
-    // fucntions for handling events with cards
+    const handleDelete = useCallback(
+        async (index: number, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void, itemIndex?: number): Promise<boolean> => {
+            const confirmDelete = await confirmModalWindow("Are you sure you want to delete this item?");
+            if (confirmDelete) {
+                let newData = structuredClone(data);
+                if (itemIndex === undefined) newData = newData.filter((_: any, i: number) => i !== index);
+                else newData[index].content = newData[index].content.filter((_: any, i: number) => i !== itemIndex);
+                setData(newData);
+                setIsChanged(true);
+                return true;
+            }
+            return false;
+        }, []
+    );
+
+    const handleAddNewItem = useCallback(
+        (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => {
+            if (index === undefined) setData([...data, newItem]);
+            else {
+                const newData = structuredClone(data);
+                newData[index].content = [...newData[index].content, newItem];
+                setData(newData);
+            }
+            setIsChanged(true);
+            scrollToBottom();
+        }, []
+    );
+
+    const handleInputChange = useCallback(
+        (setData: (data: any) => void, data: any, originalData: any, index: number, value: any, setIsChanged: (state: boolean) => void, column?: string, originalColumn?: string, itemIndex?: number) => {
+            const newData = structuredClone(data)
+            let isChanged = false
+            if (column) {
+                if (itemIndex !== undefined) {
+                    newData[index].content[itemIndex][column] = value
+                    isChanged = value !== originalData[index].content[itemIndex][originalColumn ?? column]
+                }
+                else {
+                    newData[index][column] = value
+                    if (originalData.length > index) {
+                        isChanged = value !== originalData[index][originalColumn ?? column]
+                    } else isChanged = true
+                }
+            } else {
+                newData[index] = value
+                isChanged = value !== originalData[index]
+            }
+            setData(newData);
+            setIsChanged(isChanged);
+        }, []
+    );
+
     const handleCancel = useCallback(
         async (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void): Promise<boolean> => {
-            // local helper function
             const handleReset = (): void => {
-                setData(structuredClone(data)); // structuredClone is a global function, no dependency
-                setCardChange(false)
+                setData(structuredClone(data));
+                setIsChanged(false);
             };
-
             if (!isChanged) {
                 handleReset();
                 return true;
             }
-
             const confirmation = await confirmModalWindow("All unsaved changes will be lost");
             if (confirmation) handleReset();
             return confirmation;
         }, []
-    );
+    )
 
-    const handleSave = (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => {
 
-        const updatePromise = updateCountryField(country, data, column)
-
-        toast.promise(updatePromise, {
-            pending: "Saving changes...",
-            success: {
-                render() {
-                    setIsChanged(false);
-                    return `${title} updated successfully!`
-                }
-            },
-            error: "Document not found!"
-        })
+    const handleUpload = (event: React.ChangeEvent<HTMLInputElement>, folderName: string, data: any, setData: (data: any) => void, setDataToUpload: (data: any) => void, setIsChanged: (state: boolean) => void, setDataToDelete?: (data: any) => void) => {
+        const name = getCountryDbName(selectedCountry?.name ?? "")
+        const file = event.target.files?.[0]
+        if (file) {
+            const newFile: UploadedImageType = {
+                file,
+                url: URL.createObjectURL(file),
+                dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${name}%2F${folderName}%2F${file.name}?alt=media`
+            }
+            if (!setDataToDelete) {
+                setData([...data, newFile.url])
+                setDataToUpload([...data, newFile])
+            } else {
+                setData(newFile.url)
+                setDataToUpload(newFile)
+                setDataToDelete(data)
+            }
+            event.target.value = ''
+            setIsChanged(true)
+        } else toast.error("Error while uploading file!")
     }
 
-    const handleDelete = async (index: number, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void, itemIndex?: number): Promise<boolean> => {
-        const confirmDelete = await confirmModalWindow("Are you sure you want to delete this item?")
-        if (confirmDelete) {
-            let newData = structuredClone(data)
+    // Memoize the context value to prevent unnecessary re-renders of children
+    const contextValue = React.useMemo(() => ({
+        countryName: selectedCountry?.name ?? "",
+        selectedCardContent: selectedCard?.content, // Pass content directly
+        handleSave,
+        handleDelete,
+        handleAddNewItem,
+        handleInputChange,
+        handleCancel
+    }), [selectedCountry?.name, selectedCard?.content, handleSave, handleDelete, handleAddNewItem, handleInputChange]);
 
-            if (itemIndex === undefined) newData = newData.filter((_: any, i: number) => i !== index)
-            else newData[index].content = newData[index].content.filter((_: any, i: number) => i !== itemIndex);
-
-            setData(newData)
-            setCardChange(true)
-            return true
-        }
-        return false
-    }
-
-    const handleAddNewItem = (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => {
-        if (index === undefined) setData([...data, newItem]);
-        else {
-            const newData = structuredClone(data)
-            newData[index].content = [...newData[index].content, newItem]
-            setData(newData)
-        }
-        setCardChange(true)
-        scrollToBottom()
-    }
-
-    const handleInputChange = (setData: (data: any) => void, data: any, index: number, value: any, setIsChanged: (state: boolean) => void, column?: string, itemIndex?: number) => {
-        const newData = structuredClone(data)
-        if (column) {
-            if (itemIndex !== undefined) newData[index].content[itemIndex][column] = value
-            else newData[index][column] = value
-        }
-        else newData[index] = value
-        setData(newData)
-        setCardChange(true)
-    }
 
     useEffect(() => {
-        if (!selectedCard) return; // Exit early if either value is not yet set
+        if (!selectedCard || !selectedCountry) { // Ensure both are set before attempting to render specific card
+            setCardComponent(null); // Clear component if data is missing
+            setIsLoading(true); // Keep loading if data isn't ready
+            return;
+        }
 
         const timer = setTimeout(() => {
             // add the proper card component
-            switch (selectedCard?.title) {
+            switch (selectedCard.title) {
                 case "Emergency Numbers":
-                    setCardComponent(<EmergencyContacts emergencyContacts={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
+                    setCardComponent(<EmergencyContacts emergencyContacts={selectedCard.content} />);
+                    break;
                 case "Cities With LCs":
-                    setCardComponent(<CitiesWithLcs cities={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
+                    setCardComponent(<CitiesWithLcs cities={selectedCard.content} />);
+                    break;
                 case "General Information":
-                    setCardComponent(<GeneralInfo information={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
-                case "Fun Facts":
-                    setCardComponent(<FunFacts facts={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
-                case "Recommended Places":
-                    setCardComponent(<Places places={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
-                case "Other Information":
-                    setCardComponent(<Other other={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
-                case "Traditional Cuisine":
-                    setCardComponent(<Cuisine cuisine={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
-                case "Transportation":
-                    setCardComponent(<Transport transport={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
-                case "Summer Reception":
-                    setCardComponent(<SummerReception summerReception={selectedCard.content} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
-                case "Gallery":
-                    setCardComponent(<Gallery images={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
+                    setCardComponent(<GeneralInfo information={selectedCard.content} />);
+                    break;
                 case "Social Links":
-                    setCardComponent(<SocialLinks socialLinks={selectedCard?.content ?? []} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} save={save} handleChange={setCardChange}/>)
-                    break
+                    setCardComponent(<SocialLinks socialLinks={selectedCard.content} />);
+                    break;
+                case "Fun Facts":
+                    setCardComponent(<FunFacts facts={selectedCard.content} />);
+                    break;
+                case "Recommended Places":
+                    setCardComponent(<Places places={selectedCard.content} />);
+                    break;
+                case "Other Information":
+                    setCardComponent(<Other other={selectedCard.content} />);
+                    break; 
+                case "Gallery":
+                    setCardComponent(<Gallery images={selectedCard.content} />);
+                    break;
+                /*
+                case "Traditional Cuisine":
+                    setCardComponent(<Cuisine cuisine={selectedCard.content} />);
+                    break;
+                case "Transportation":
+                    setCardComponent(<Transport transport={selectedCard.content} />);
+                    break;
+                case "Summer Reception":
+                    setCardComponent(<SummerReception summerReception={selectedCard.content} />);
+                    break;
+                case "Gallery":
+                    setCardComponent(<Gallery images={selectedCard.content} />);
+                    break;
                 default:
-                    setCardComponent(<Hero content={selectedCard?.content ?? ""} country={selectedCountry?.name ?? ""} handleSave={handleSave} handleDelete={handleDelete} handleCancel={handleCancel} handleAddNewItem={handleAddNewItem} handleInputChange={handleInputChange} />)
-                    break
+                    setCardComponent(<Hero content={selectedCard.content} />);
+                    break;
+                    */
             }
-
             setIsLoading(false);
         }, 1100);
         return () => clearTimeout(timer);
-    }, [selectedCard, selectedCountry?.name, handleCancel]);
+    }, [selectedCard, selectedCountry]); // Removed `handleCancel` from dependencies since it's removed
 
 
     return (
@@ -184,15 +234,19 @@ const Card = () => {
                 <section className="bg-sky-100">
                     <div className="container">
                         <div className="elements-position px-12 text-[#1B75BB]" style={{ minHeight: minScreenSize + "px" }}>
+                            {/* CardHeader can remain or be refactored to use context for country name */}
                             <CardHeader country={selectedCountry?.name ?? ""} card={selectedCard} />
-                            {cardComponent}
+
+                            {/* Provide the context value to all children */}
+                            <CardContext.Provider value={contextValue}>
+                                {cardComponent}
+                            </CardContext.Provider>
                         </div>
                     </div>
                 </section>
             )}
         </section>
-    )
-
+    );
 }
 
 export default Card;

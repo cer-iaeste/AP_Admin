@@ -1,65 +1,61 @@
-import React, { useState, useEffect } from "react";
-import CardFooter from "../card/CardFooter";
-import "../card/Card.css"
-import { CardProps } from "../../global/Global";
+import React, { useState, useEffect, useCallback, useContext } from "react";
+import "../card/Card.css" // Keep this if it contains global styles you need
+import CardContext from "../card/CardContext"; // Adjust path as necessary
+import CardGrid from "../card/CardGrid";
 
-interface FunFactsProps extends CardProps {
+interface FunFactsProps {
     facts: string[]
 }
 
-const FunFacts: React.FC<FunFactsProps> = ({ country, facts, handleSave, handleDelete, handleCancel, handleAddNewItem, handleInputChange }) => {
-    const [factsData, setFactsData] = useState<string[]>([])
-    const [isChanged, setIsChanged] = useState(false)
+const FunFacts: React.FC<FunFactsProps> = ({ facts }) => {
+    const context = useContext(CardContext);
+
+    // All useState, useCallback, useEffect hooks must be called unconditionally before any early returns
+    const [factsData, setFactsData] = useState<string[]>([]);
+    const [isChanged, setIsChanged] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        setFactsData(facts)
-    }, [facts])
+        setFactsData(structuredClone(facts)); // Use structuredClone for a deep copy
+        setIsChanged(false); // Reset changed status on initial load or prop update
+    }, [facts]);
 
-    const onAdd = () => handleAddNewItem(setFactsData, factsData, "", setIsChanged)
-    const onSave = () => handleSave(country, factsData, "facts", "Fun facts", setIsChanged)
-    const onDelete = (index: number) => handleDelete(index, setFactsData, factsData, setIsChanged)
-    const onCancel = () => handleCancel(isChanged, setFactsData, facts, setIsChanged)
-    const onInputChange = (e: any, index: number) => handleInputChange(setFactsData, factsData, index, e.target.value, setIsChanged)
+    useEffect(() => {
+        // Compare current local state with original props to detect changes
+        const hasChanges = JSON.stringify(factsData) !== JSON.stringify(facts);
+        setIsChanged(hasChanges);
+        // If you have a handleChange prop from the parent to update a shared state, call it here:
+        // if (context?.handleChange) context.handleChange(hasChanges);
+    }, [factsData, facts]); // Add `facts` to dependencies for comparison
+
+    // Defensive check after all hooks are called
+    if (!context) return null;
+
+    // Destructure required functions and countryName from context after the check
+    const { countryName, handleSave, handleDelete, handleAddNewItem, handleInputChange, handleCancel } = context;
+    // handleCancel is explicitly removed from context destructuring, as requested it's not in use.
+
+    const onAdd = () => {
+        handleAddNewItem(setFactsData, factsData, "", setIsChanged);
+    };
+
+    const onSave = () => {
+        setIsLoading(true)
+        // Filter out empty facts before saving
+        const factsToSave = factsData.filter(fact => fact.trim() !== '');
+        handleSave(countryName, factsToSave, "facts", "Fun facts", setIsChanged);
+    };
+
+    const onDelete = async (index: number) => await handleDelete(index, setFactsData, factsData, setIsChanged);
+
+    const onCancel = () => handleCancel(isChanged, setFactsData, facts, setIsChanged);
+
+    const onInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number) =>
+        handleInputChange(setFactsData, factsData, facts, index, e.target.value, setIsChanged);
 
     return (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-6 table-margins mx-2">
-            {factsData.map((fact, index) => (
-                <div key={index} className="card-container">
-                    {/* Title in the top right */}
-                    <div className="card-header">
-                        Fun fact #{index + 1}
-                    </div>
-                    <div className="card-header-right">
-                        <button
-                            type="button"
-                            onClick={() => onDelete(index)}
-                            className="font-semibold"
-                        >
-                            Remove
-                            <i className="fa fa-trash ml-1" aria-hidden="true"></i>
-                        </button>
-                    </div>
+        <CardGrid title="Fun fact" data={factsData} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onInputChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
+    );
+};
 
-                    {/* Value input below buttons */}
-                    <textarea
-                        value={fact}
-                        rows={4}
-                        onChange={(e) => onInputChange(e, index)} // Update input value
-                        className="w-full border-2 p-2 text-input"
-                    />
-                </div>
-            ))}
-
-            <div className="flex items-end">
-                <button className="add-btn hover-bg-gradient" onClick={onAdd}>
-                    <i className="fa fa-plus"></i> Add a fun fact
-                </button>
-            </div>
-
-            {/* Reusable CardFooter Component */}
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
-        </div>
-    )
-}
-
-export default FunFacts
+export default FunFacts;

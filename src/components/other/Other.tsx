@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import CardFooter from "../card/CardFooter";
 import "../card/Card.css"
 import { OtherType } from "../../types/types";
 import useWindowSize from "../../hooks/useScreenSize";
-import { CardProps } from "../../global/Global";
+import CardContext from "../card/CardContext";
+import CardGrid from "../card/CardGrid";
 
-interface OtherProps extends CardProps {
+interface OtherProps {
     other: OtherType[]
 }
 
-const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete, handleCancel, handleAddNewItem, handleInputChange }) => {
+const Other: React.FC<OtherProps> = ({ other }) => {
+    const context = useContext(CardContext);
     const [otherData, setOtherData] = useState<OtherType[]>([])
     const [isChanged, setIsChanged] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
 
     const { width } = useWindowSize()
 
@@ -19,70 +22,19 @@ const Other: React.FC<OtherProps> = ({ country, other, handleSave, handleDelete,
         setOtherData(other)
     }, [other])
 
+    // Defensive check after all hooks are called
+    if (!context) return null; // Or throw an error, or render a fallback UI
+    // Destructure required functions and countryName from context after the check
+    const { countryName, handleSave, handleInputChange, handleCancel,handleAddNewItem, handleDelete } = context;
+
     const onAdd = () => handleAddNewItem(setOtherData, otherData, { title: "", description: "" }, setIsChanged)
-    const onSave = () => handleSave(country, otherData, "otherInformation", "Other information", setIsChanged)
+    const onSave = () => handleSave(countryName, otherData, "otherInformation", "Other information", setIsChanged)
     const onDelete = (index: number) => handleDelete(index, setOtherData, otherData, setIsChanged)
     const onCancel = () => handleCancel(isChanged, setOtherData, otherData, setIsChanged)
-    const onInputChange = (e: any, index: number, column: string) => handleInputChange(setOtherData, otherData, index, e.target.value, setIsChanged, column)
+    const onInputChange = (e: any, index: number, column?: string) => handleInputChange(setOtherData, otherData, other, index, e.target.value, setIsChanged, column)
 
     return (
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 table-margins mx-2">
-            {otherData.map((place, index) => (
-                <div key={index} className="card-container">
-                    <div className="card-footer-right">
-                        <button
-                            type="button"
-                            onClick={() => onDelete(index)}
-                            className="flex items-center py-1"
-                            title="Remove item"
-                        >
-                            <i className="fa fa-trash" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                    <div className="card-subcontainer">
-                        {/* Title in the top right */}
-                        <div className="card-header card-header-sub">
-                            Title
-                        </div>
-                        {/* Value input below buttons */}
-                        <textarea
-                            placeholder="Title"
-                            rows={2}
-                            value={place.title}
-                            onChange={(e) => onInputChange(e, index, "title")} // Update input value
-                            className="text-input mt-1.5"
-                            style={{ scrollbarWidth: 'thin'}}
-                        />
-                    </div>
-
-                    <div className="card-subcontainer">
-                        {/* Title in the top right */}
-                        <div className="card-header card-header-sub">
-                            Description
-                        </div>
-                        {/* Value input below buttons */}
-                        <textarea
-                            placeholder="Description"
-                            rows={width > 640 ? 8 : 4}
-                            value={place.description}
-                            onChange={(e) => onInputChange(e, index, "description")} // Update input value
-                            className="text-input mt-1.5"
-                            style={{ scrollbarWidth: 'thin'}}
-                        />
-                    </div>
-                </div>
-            ))}
-
-            <div className="flex items-end">
-                <button className="add-btn hover-bg-gradient"
-                    onClick={onAdd}>
-                    <i className="fa fa-plus"></i> Add new info
-                </button>
-            </div>
-
-            {/* Reusable CardFooter Component */}
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
-        </div>
+        <CardGrid title="Info" data={otherData} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onInputChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
     )
 }
 

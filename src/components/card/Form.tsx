@@ -1,5 +1,5 @@
 import React from "react";
-import { CardFormType } from "../types/types";
+import { CardFormType } from "../../types/types";
 import FormButtons from "./FormButtons";
 import { FormButtonsProps } from "./FormButtons";
 
@@ -8,7 +8,7 @@ interface CardFormProps extends FormButtonsProps {
     onInputChange: (e: any, index: number) => void
 }
 
-const CardForm: React.FC<CardFormProps> = ({ items, onInputChange, isChanged, isLoading, onSave }) => {
+const CardForm: React.FC<CardFormProps> = ({ items, onInputChange, isChanged, isLoading, onSave, onCancel }) => {
     return (
         < div className="bg-white px-6 py-3 rounded-xl shadow-lg border border-gray-200 flex flex-col mt-8" > {/* Main card container */}
             {
@@ -32,7 +32,7 @@ const CardForm: React.FC<CardFormProps> = ({ items, onInputChange, isChanged, is
                 )
             }
 
-            <FormButtons isChanged={isChanged} isLoading={isLoading} onSave={onSave} />
+            <FormButtons isChanged={isChanged} isLoading={isLoading} onSave={onSave} onCancel={onCancel} />
         </div >
     )
 }

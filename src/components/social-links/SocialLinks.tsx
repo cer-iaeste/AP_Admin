@@ -1,33 +1,24 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import "../summer-reception/Weekend.css"
-import { CardProps } from "../../global/Global"; 
 import { CardFormType } from "../../types/types";
-import { toast } from 'react-toastify';
-import CardForm from "../../global/Form";
+import CardForm from "../card/Form";
+import CardContext from "../card/CardContext"
+import { SOCIAL_LINKS_CONSTANTS } from "../../global/Global";
 
-interface SocialLinksProps extends CardProps {
-    socialLinks: CardFormType[]; // Initial data for social links
-    // 'save' and 'cancel' boolean props are removed as SocialLinks will manage its own save/cancel
-    handleChange: (changed: boolean) => void; // Callback to parent to update its 'cardChange' state (e.g., setCardChange)
+interface SocialLinksProps {
+    socialLinks: CardFormType[];
 }
 
-// Define the initial structure of social links for consistent mapping
-const initialLinksStructure: CardFormType[] = [
-    { name: 'Instagram', icon: 'fab fa-instagram', value: '' },
-    { name: 'Facebook', icon: 'fab fa-facebook', value: '' },
-    { name: 'Website', icon: 'fas fa-globe', value: '' },
-    { name: 'WhatsApp', icon: 'fab fa-whatsapp', value: '' },
-    { name: 'Email Address', icon: 'fas fa-envelope', value: '' },
-];
-
-const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks, country, handleSave, handleInputChange, handleChange }) => { // handleBack removed from destructuring
+const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks }) => {
+    const context = useContext(CardContext);
+    const [mappedLinks, setMappedLinks] = useState<CardFormType[]>([])
     const [isChanged, setIsChanged] = useState(false);
-    const [links, setLinks] = useState<CardFormType[]>(initialLinksStructure);
-    const [isLoading, setIsLoading] = useState(false); // New state for loading indicator on save/cancel
+    const [links, setLinks] = useState<CardFormType[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const mapLinks = useCallback(
         (currentSocialLinks: CardFormType[]): CardFormType[] => {
-            return initialLinksStructure.map(link => ({
+            return SOCIAL_LINKS_CONSTANTS.map(link => ({
                 ...link,
                 value: currentSocialLinks?.find(sl => sl.name === link.name)?.value ?? ''
             }));
@@ -35,12 +26,14 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks, country, handleS
         []
     );
 
-    // Effect to initialize links state when socialLinks prop changes
     useEffect(() => {
-        setLinks(mapLinks(socialLinks));
-        if (handleChange) handleChange(false); // Reset parent's change indicator
-        setIsChanged(false); // Reset component's own change indicator
-    }, [socialLinks, mapLinks, handleChange]);
+        setLinks(mappedLinks)
+    }, [mappedLinks])
+
+    useEffect(() => {
+        setMappedLinks(mapLinks(socialLinks));
+        setIsChanged(false);
+    }, [socialLinks, mapLinks]);
 
     // Effect to check if changes have been made to enable the save button
     useEffect(() => {
@@ -49,14 +42,14 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks, country, handleS
             return originalLink ? originalLink.value !== link.value : link.value !== '';
         });
         setIsChanged(hasChanges);
-        // Also update parent's cardChange state
-        if (handleChange) {
-            handleChange(hasChanges);
-        }
-    }, [links, socialLinks, handleChange]);
+    }, [links, socialLinks]);
 
+    // Defensive check: ensure context is available
+    if (!context) return null
+    // Destructure required functions and countryName from context
+    const { countryName, handleSave, handleInputChange, handleCancel } = context;
 
-    // Handler for saving changes to social links - Directly triggered by button
+    // Handlers
     const onSave = () => {
         setIsLoading(true); // Start loading
         const socialLinksToSave = links.filter(link => link.value !== '').map(link => ({
@@ -65,24 +58,22 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks, country, handleS
         }));
 
         try {
-            handleSave(country, socialLinksToSave, "socialLinks", "Social links", setIsChanged);
-            toast.success("Social links saved successfully!");
-            // `setIsChanged(false)` and `handleChange(false)` will be handled by the useEffect watching `links` and `socialLinks`.
+            handleSave(countryName, socialLinksToSave, "socialLinks", "Social links", setIsChanged);
         } catch (error) {
             console.error("Error saving social links:", error);
-            toast.error("Failed to save social links.");
         } finally {
-            setIsLoading(false); // End loading
+            setIsLoading(false);
         }
     };
 
-    // Handler for input changes in individual social link fields
+    const onCancel = () => handleCancel(isChanged, setLinks, mappedLinks, setIsChanged)
+
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        handleInputChange(setLinks, links, index, e.target.value, setIsChanged, 'value');
+        handleInputChange(setLinks, links, socialLinks, index, e.target.value, setIsChanged, 'value');
     };
 
     return (
-        <CardForm items={links} onInputChange={onInputChange} isLoading={isLoading} isChanged={isChanged} onSave={onSave} />
+        <CardForm items={links} onInputChange={onInputChange} isLoading={isLoading} isChanged={isChanged} onSave={onSave} onCancel={onCancel} />
     );
 };
 

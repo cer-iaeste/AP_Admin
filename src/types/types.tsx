@@ -37,7 +37,8 @@ export interface CuisineType {
 }
 
 export interface EmergencyContactsType {
-    [key: string] : string
+    title: string
+    number: string
 }
 
 export interface InformationType {
@@ -90,4 +91,15 @@ export interface SidebarSectionType {
     name: string,
     link: string,
     icon?: string
+}
+
+export interface CardTempType {
+    name: string
+    icon: string
+}
+
+export interface UploadedImageType {
+    file: File
+    url: string
+    dbUrl: string
 }

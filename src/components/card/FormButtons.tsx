@@ -1,25 +1,13 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { handleCancel } from "./Global";
-import { toast } from 'react-toastify';
 
 export interface FormButtonsProps {
     isChanged: boolean
     isLoading: boolean
     onSave: () => void
+    onCancel: () => void
 }
 
-const FormButtons: React.FC<FormButtonsProps> = ({ isChanged, isLoading, onSave }) => {
-    const navigate = useNavigate()
-    // Handler for canceling changes - Directly triggered by button
-    const onCancel = async () => {
-        const confirmation = await handleCancel()
-        if (confirmation) {
-            toast.info("Changes discarded.");
-            navigate(-1)
-        } 
-    };
-
+const FormButtons: React.FC<FormButtonsProps> = ({ isChanged, isLoading, onSave, onCancel }) => {
     return (
         <div className="flex justify-end space-x-4 pt-4">
             {/* Cancel Button */}

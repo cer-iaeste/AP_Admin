@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { ref, uploadBytes, deleteObject } from "firebase/storage"; // Import deleteObject and ref if using Firebase storage
 import { storage } from "../../firebase"; // Update with your Firebase config path
 import CardFooter from "../card/CardFooter";
 import "../summer-reception/Weekend.css"
-import { CardProps, getCountryDbName } from "../../global/Global";
+import { getCountryDbName } from "../../global/Global";
 import { toast } from 'react-toastify';
 import ImagePopup from "../../global/ImagePopup";
+import CardContext from "../card/CardContext";
+import FormButtons from "../card/FormButtons";
 
-interface GalleryProps extends CardProps{
+interface GalleryProps {
     images: string[]; // Array of image objects with unique id and URL
 }
 
@@ -17,10 +19,12 @@ interface UploadedImage {
     dbUrl: string
 }
 
-const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDelete, handleCancel }) => {
+const Gallery: React.FC<GalleryProps> = ({ images }) => {
+    const context = useContext(CardContext);
     const [imagesData, setImagesData] = useState<string[]>([])
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isChanged, setIsChanged] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [imagesToUpload, setImagesToUpload] = useState<UploadedImage[]>([])
     const [imagesToDelete, setImagesToDelete] = useState<string[]>([])
 
@@ -36,14 +40,18 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
         setSelectedImage(null);
     };
 
+    if (!context) return null
+    // Destructure required functions and countryName from context after the check
+    const { countryName, handleSave, handleInputChange, handleCancel, handleAddNewItem, handleDelete } = context;
+
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const countryName = getCountryDbName(country)
+        const name = getCountryDbName(countryName)
         const file = event.target.files?.[0]
         if (file) {
             const newImage: UploadedImage = {
                 file,
                 url: URL.createObjectURL(file),
-                dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${countryName}%2Fgallery%2F${file.name}?alt=media`
+                dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${name}%2Fgallery%2F${file.name}?alt=media`
             }
             setImagesData([...imagesData, newImage.url])
             setImagesToUpload([...imagesToUpload, newImage])
@@ -53,9 +61,9 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
 
     const uploadImagesToStorage = async () => {
         try {
-            const countryName = getCountryDbName(country)
+            const name = getCountryDbName(countryName)
             imagesToUpload.forEach(async (image: UploadedImage) => {
-                const storageRef = ref(storage, `${countryName}/gallery/${image.file.name}`);
+                const storageRef = ref(storage, `${name}/gallery/${image.file.name}`);
                 // Upload to storage
                 await uploadBytes(storageRef, image.file);
             })
@@ -71,7 +79,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
                 const fileRef = ref(storage, image)
                 await deleteObject(fileRef)
             })
-        } catch(error) {
+        } catch (error) {
             toast.error("Error removing files from storage! " + error)
             return null
         }
@@ -86,7 +94,7 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
         })
         // delete files from storage
         await removeImagesFromStorage()
-        handleSave(country, newGallery, "gallery", "Gallery", setIsChanged)
+        handleSave(countryName, newGallery, "gallery", "Gallery", setIsChanged)
     }
     const onCancel = async () => {
         const confimation = await handleCancel(isChanged, setImagesData, images, setIsChanged)
@@ -101,45 +109,74 @@ const Gallery: React.FC<GalleryProps> = ({ images, country, handleSave, handleDe
     }
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 table-margins">
-            {imagesData.map((image, index) => (
-                <div key={index} className="relative group max-h-72 border-2 border-[#1B75BB] rounded-md">
-                    <img
-                        src={image}
-                        alt="Gallery item"
-                        className="w-full h-full object-cover transition duration-300 ease-in-out transform group-hover:opacity-60"
-
-                    />
-                    <button
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300 z-10"
-                        onClick={() => onDelete(index, image)}
+        <section>
+            {/* Grid for Gallery Images and Upload Card */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-8">
+                {/* Map through existing images (including newly added blob URLs) */}
+                {imagesData.map((image, index) => (
+                    <div
+                        key={index}
+                        className="
+                                group relative w-full h-64 sm:h-72 lg:h-80 rounded-2xl overflow-hidden
+                                bg-white shadow-xl border border-gray-200
+                                transition-all duration-300 transform hover:scale-103 hover:shadow-2xl
+                            "
                     >
-                        <i className="fa-solid fa-trash-can text-red-400 hover:text-red-500 text-2xl" />
-                    </button>
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
-                        onClick={() => handleImageClick(image)}>
-                        <i className="fa fa-eye text-white text-4xl" />
+                        <img
+                            src={image}
+                            alt={`Gallery item ${index + 1}`}
+                            className="w-full h-full object-cover transition duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-75"
+                        />
+
+                        {/* Overlay for View and Delete buttons */}
+                        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center space-x-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            {/* View Button (Eye icon) */}
+                            <button
+                                className="py-3 px-4 rounded-full bg-sky-50 text-blue-600 shadow-md hover:bg-blue-600 hover:text-white transition-all duration-200"
+                                onClick={() => handleImageClick(image)}
+                                title="View image"
+                            >
+                                <i className="fa fa-eye text-xl" />
+                            </button>
+                            {/* Delete Button (Trash icon) */}
+                            <button
+                                className="py-3 px-4 rounded-full bg-sky-50 text-red-600 shadow-md hover:bg-red-600 hover:text-white transition-all duration-200"
+                                onClick={() => onDelete(index, image)}
+                                title="Delete image"
+                            >
+                                <i className="fa fa-trash-can text-xl" />
+                            </button>
+                        </div>
+                    </div>
+                ))}
+
+                {/* Upload Button Card - Styled like other image cards */}
+                <div className="
+                        group relative w-full h-64 sm:h-72 lg:h-80 rounded-2xl overflow-hidden
+                        bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-dashed border-blue-300
+                        flex items-center justify-center cursor-pointer
+                        transition-all duration-300 transform hover:scale-103 hover:shadow-2xl hover:border-blue-500
+                    ">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleUpload}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                        title="Upload new image"
+                    />
+                    <div className="flex flex-col items-center justify-center text-blue-500 group-hover:text-blue-700 transition-colors duration-200">
+                        <i className="fa-solid fa-plus text-5xl mb-3"></i>
+                        <span className="text-lg font-semibold">Add New Image</span>
                     </div>
                 </div>
-            ))}
-            
-            {/* Upload Button Card */}
-            <div className="relative group flex items-center justify-center border-dashed border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 h-72">
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleUpload}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                    title="Upload image"
-                />
-                <i className="fa-solid fa-plus text-gray-400 text-4xl group-hover:text-blue-400"></i>
             </div>
 
             {/* Popup Modal for Enlarged Image */}
             {selectedImage && <ImagePopup image={selectedImage} closeModal={closeModal} />}
 
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
-        </div>
+            {/* Reusable CardFooter Component */}
+            <FormButtons isChanged={isChanged} isLoading={isLoading} onCancel={onCancel} onSave={onSave} />
+        </section>
     );
 };
 
