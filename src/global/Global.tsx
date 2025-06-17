@@ -2,6 +2,10 @@ import { CardTempType, CardType, CountryType, SidebarSectionType } from "../type
 import { fetchCountryData } from "../service/CountryService";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { UploadedFileType } from "../types/types"
+import { storage } from "../firebase"; 
+import { ref, uploadBytes, deleteObject } from "firebase/storage";
+import { toast } from "react-toastify";
 
 // interfaces
 export interface CardProps {
@@ -21,10 +25,10 @@ export const componentsCards: CardType[] = [
     { title: "Emergency Numbers", icon: "fa fa-phone", header: "Emergency Numbers", desc: "Manage essential emergency contact numbers for the country" },
     { title: "General Information", icon: "fa fa-info-circle", header: "General Information", desc: "Manage general facts and descriptions for the country" },
     { title: "Cities With LCs", icon: "fa fa-city", header: "Cities with Local Committees", desc: "Manage cities where local committees are active" },
-    { title: "Transportation", icon: "fa fa-train" },
+    { title: "Transportation", icon: "fa fa-train", desc: "Manage the country's transport - airports, international & national transport, public transport and discounts" },
     { title: "Recommended Places", icon: "fa fa-location-dot", desc:"Add and manage recommended places for the country" },
-    { title: "Summer Reception", icon: "fa fa-umbrella-beach" },
-    { title: "Traditional Cuisine", icon: "fa fa-utensils" },
+    { title: "Summer Reception", icon: "fa fa-umbrella-beach", desc: "Manage details for summer reception events and weekends" },
+    { title: "Traditional Cuisine", icon: "fa fa-utensils", desc: "Explore and manage the country's traditional food and drinks"},
     { title: "Fun Facts", icon: "fa fa-brain", desc: "Add interesting and unique facts about the country" },
     { title: "Other Information", icon: "fa fa-file-circle-plus", desc: "Manage other interesting info about the country" },
     { title: "Gallery", icon: "fa fa-images", desc: "Showcase beautiful images of the country"},
@@ -107,9 +111,11 @@ export const getCardContent = (country: CountryType | null | undefined, title: s
             }
         default:
             return {
+                name: country?.name ?? "",
+                flag: country?.imageSrc ?? "",
                 banner: country?.banner ?? "",
                 pdf: country?.pdf ?? "",
-                // socialLinks: country?.socialLinks ?? []
+                region: country?.region ?? ""
             }
     }
 }
@@ -119,7 +125,7 @@ export const mapCountryCards = (country: CountryType | null | undefined): CardTy
     const checkIfSectionIsEmpty = (content: any): boolean => {
         if (!content?.hasOwnProperty("food") && !content?.hasOwnProperty("banner")) return !content.length
         if (content?.hasOwnProperty("food")) return !content.food.length && !content.drinks.length
-        return content.banner === "" && content.pdf === "" && !content.socialLinks.length
+        return content.banner === "" && content.pdf === ""
     }
 
     return country ?
@@ -215,3 +221,22 @@ export const scrollToBottom = () => {
 }
 
 export const isList = (item: any) => Array.isArray(item)
+
+export const uploadFileToStorage = async (countryName: string, uploadFile: UploadedFileType, folder: string) => {
+    try {
+        const storageRef = ref(storage, `${countryName}/${folder}/${uploadFile.file.name}`)
+        await uploadBytes(storageRef, uploadFile.file)
+        return uploadFile.dbUrl
+    } catch (error) {
+        toast.error("Error uploading files: " + error)
+        return null
+    }
+}
+
+export const removeFileFromStorage = async (file: string) => {
+    try {
+        await deleteObject(ref(storage, file))
+    } catch(error) {
+         toast.error("Error removing files from storage: " + error)
+    }
+}

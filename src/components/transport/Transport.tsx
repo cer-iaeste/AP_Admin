@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import CardFooter from "../card/CardFooter";
 import "../card/Card.css"
 import { TransportType, TransportFeature } from "../../types/types";
-import { CardProps, TRANSPORT_CONSTANTS } from "../../global/Global";
+import { TRANSPORT_CONSTANTS } from "../../global/Global";
+import CardContext from "../card/CardContext"
+import CardGrid from "../card/CardGrid";
 
-interface TransportProps extends CardProps {
+interface TransportProps {
     transport: TransportType[]
 }
 
@@ -15,14 +17,16 @@ interface TransportMapType {
     content: TransportFeature[]
 }
 
-const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, handleDelete, handleCancel, handleAddNewItem, handleInputChange }) => {
+const Transport: React.FC<TransportProps> = ({ transport }) => {
+    const context = useContext(CardContext);
+    const [mappedData, setMappedData] = useState<TransportMapType[]>([])
     const [transportData, setTransportData] = useState<TransportMapType[]>([])
-    const [isChanged, setIsChanged] = useState(false)
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
     const [transportSectionChange, setTransportSectionChange] = useState<boolean[]>([false, false, false, false])
+    const [gridHeight, setGridHeight] = useState("0px");
+    const contentRef = useRef<HTMLDivElement>(null);
 
-    const mapTransportData = (initialtransport: TransportType[]) => {
-
+    const mapTransportData = useCallback((initialtransport: TransportType[]) => {
         const initialData: TransportMapType[] = [
             {
                 id: TRANSPORT_CONSTANTS.AIRPORTS,
@@ -32,13 +36,13 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
             },
             {
                 id: TRANSPORT_CONSTANTS.NATIONAL_AND_INTERNATIONAL_TRANSPORT,
-                title: "National & International transport",
+                title: "(Inter) National",
                 icon: "fa fa-train-subway",
                 content: []
             },
             {
                 id: TRANSPORT_CONSTANTS.PUBLIC_TRANSPORT,
-                title: "Public transport",
+                title: "Public",
                 icon: "fa fa-bus",
                 content: []
             },
@@ -54,11 +58,35 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
             data.content = initialtransport.find(t => t.id === data.id)?.features ?? []
             return data
         })
-    }
+    }, [])
 
     useEffect(() => {
-        setTransportData(mapTransportData(transport))
-    }, [transport])
+        setMappedData(mapTransportData(transport))
+        setOpenIndex(-1);
+        setGridHeight("0px");
+    }, [transport, mapTransportData])
+
+    useEffect(() => {
+        setTransportData(mappedData)
+    }, [mappedData])
+
+    // Effect to handle animation when openIndex changes
+    useEffect(() => {
+        // Only run if a section is open and the ref is available
+        if (openIndex !== -1 && contentRef.current) {
+            // Set a small delay to allow content to render before calculating height
+            setTimeout(() => {
+                setGridHeight(`${contentRef.current?.scrollHeight ?? 0}px`);
+            }, 100); // Small delay to allow content to render and fill its space
+        } else {
+            setGridHeight("0px"); // Collapse when no section is open
+        }
+    }, [openIndex, transportData]);
+
+
+    if (!context) return null
+    // Destructure required functions and countryName from context after the check
+    const { countryName, handleInputChange, handleSave, handleAddNewItem, handleDelete, handleCancel, isChanged, isLoading } = context;
 
     const hasLinks = (feature: TransportFeature) => feature?.hasOwnProperty("link");
 
@@ -74,115 +102,71 @@ const Transport: React.FC<TransportProps> = ({ country, transport, handleSave, h
         }
     }
 
-    const onAdd = (index: number, transportId: number) => {
+    const onAdd = () => {
+        const transportId = transportData[openIndex].id
         const newItem: TransportFeature = { name: "" }
         if (transportId !== 1) newItem.link = ""
-        handleAddNewItem(setTransportData, transportData, newItem, setIsChanged, index)
-        addTransportSectionChange(index)
+        handleAddNewItem(setTransportData, transportData, newItem, openIndex)
+        addTransportSectionChange(openIndex)
     }
     const onSave = () => {
         const result: TransportType[] = transportData.map(t => ({
             id: t.id,
             features: t.content
         }))
-        handleSave(country, result, "transport", "Transport", setIsChanged)
+        handleSave(countryName, result, "transport", "Transport")
         resetTransportChange(true)
     }
-    const onDelete = (index: number, itemIndex: number) => {
-        handleDelete(index, setTransportData, transportData, setIsChanged, itemIndex)
-        addTransportSectionChange(index)
+    const onDelete = (itemIndex: number) => {
+        handleDelete(openIndex, setTransportData, transportData, itemIndex)
+        addTransportSectionChange(openIndex)
     }
-    const onCancel = () => handleCancel(isChanged, setTransportData, mapTransportData(transport), setIsChanged).then(result => resetTransportChange(result))
+    const onCancel = () => handleCancel(setTransportData, mappedData).then(result => resetTransportChange(result))
 
-    const onItemChange = (e: any, index: number, itemIndex: number, column: keyof TransportFeature) => {
-        handleInputChange(setTransportData, transportData, index, e.target.value, setIsChanged, column, itemIndex)
-        addTransportSectionChange(index)
+    const onItemChange = (e: any, itemIndex: number, column?: string) => {
+        handleInputChange(setTransportData, transportData, mappedData, openIndex, e.target.value, column, column, itemIndex)
+        addTransportSectionChange(openIndex)
+    }
+
+    const handleSectionClick = (index: number) => {
+        setGridHeight("0px")
+        if (index === openIndex) setOpenIndex(-1)
+        else setTimeout(() => {
+            setOpenIndex(index)
+        }, 700)
     }
 
 
     return (
         <div className="mt-5">
-            <div className="grid grid-cols-4 gap-4">
-                {transportData.map((transport, index) =>
-                    <div key={transport.id} onClick={() => setOpenIndex(index)}
-                        className={`border border-[#1B75BB] ${openIndex !== index ? 'bg-[#1B75BB]' : 'bg-gradient'} relative justify-center rounded-md p-2 font-semibold text-white text-lg hover-bg-gradient cursor-pointer flex flex-row items-center`}>
-                        <i className={transport.icon}></i>
-                        <h1 className="ml-2 hidden md:block">{transport.title}</h1>
-                        {!!transportSectionChange[index] &&
-                            <div className="absolute -top-1 -left-1 rounded-lg bg-red-500 text-white w-5 sm:w-8">
-                                <i className="fa-solid fa-exclamation"></i>
-                            </div>
-                        }
+            <div className="grid grid-cols-4 gap-4 items-center">
+                {transportData.map((data, index) =>
+                    <div
+                        key={data.title}
+                        onClick={() => handleSectionClick(index)}
+                        className={`
+                                bg-white p-3 rounded-2xl shadow-lg border border-gray-200
+                                flex flex-col items-center justify-center h-[80px] md:h-auto // Ensure consistent height for selectors
+                                transition-all duration-300 transform hover:scale-103 hover:shadow-xl cursor-pointer
+                                ${openIndex === index
+                                ? 'bg-blue-600 text-white border-blue-700 shadow-2xl scale-102' // Active state
+                                : 'bg-gradient-to-br from-white to-green-50 hover:bg-blue-50 hover:border-blue-300' // Inactive hover state
+                            }
+                            `}
+                    >
+                        <i className={`${data.icon} text-3xl md:text-4xl ${openIndex === index ? 'text-white' : 'text-gray-600'}`}></i>
+                        <h1 className={`hidden md:block text-xl font-bold mt-3 ${openIndex === index ? 'text-white' : 'text-gray-800'}`}>
+                            {data.title}
+                        </h1>
                     </div>
                 )}
             </div>
 
             {openIndex !== -1 &&
-                <div className="mt-4 border border-[#1B75BB] rounded-md bg-sky-200 p-4">
-                    <div className="flex flex-row items-center justify-between border-b border-[#1B75BB] pb-2">
-                        <div className="flex flex-row items-center text-2xl sm:text-4xl font-semibold text-[#1B75BB]">
-                            <i className={transportData[openIndex].icon}></i>
-                            <h1 className="ml-2">{transportData[openIndex].title}</h1>
-                        </div>
-                        <div className="flex items-end">
-                            <button className="add-btn hover-bg-gradient"
-                                onClick={() => onAdd(openIndex, transportData[openIndex].id)}>
-                                <i className="fa fa-plus"></i>
-                                <span className="hidden sm:block">Add new item</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 mx-2 mb-12">
-                        {transportData[openIndex].content.map((feature, featureIndex) =>
-                            <div key={openIndex + "_" + featureIndex} className="card-container bg-sky-100">
-                                <div className="card-footer-right">
-                                    <button
-                                        type="button"
-                                        onClick={() => onDelete(openIndex, featureIndex)}
-                                        className="flex items-center py-1"
-                                        title="Remove item"
-                                    >
-                                        <i className="fa fa-trash" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                                <div className="card-subcontainer">
-                                    {/* Title in the top right */}
-                                    <div className="card-header card-header-sub">
-                                        Name
-                                    </div>
-                                    {/* Value input below buttons */}
-                                    <textarea
-                                        placeholder="Name"
-                                        value={feature.name}
-                                        rows={3}
-                                        onChange={(e) => onItemChange(e, openIndex, featureIndex, "name")}
-                                        className="text-input mt-1.5"
-                                        style={{ scrollbarWidth: 'thin' }}
-                                    />
-                                </div>
-                                {hasLinks(feature) &&
-                                    <div className="card-subcontainer">
-                                        {/* Title in the top right */}
-                                        <div className="card-header card-header-sub">
-                                            Link
-                                        </div>
-                                        {/* Value input below buttons */}
-                                        <input
-                                            placeholder="Link (optional)"
-                                            value={feature.link}
-                                            onChange={(e) => onItemChange(e, openIndex, featureIndex, "link")} // Update input value
-                                            className="text-input mt-1.5 underline text-sky-700"
-                                        />
-                                    </div>
-                                }
-                            </div>
-                        )}
-                    </div>
+                <div ref={contentRef} className="md:bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-xl border border-green-100 my-4 transition-all duration-700 ease-in-out overflow-hidden" style={{ maxHeight: gridHeight }}>
+                    <CardGrid title={transportData[openIndex].title} data={transportData[openIndex].content} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onItemChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
                 </div>
             }
-
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
         </div>
     )
 }

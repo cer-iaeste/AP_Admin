@@ -11,10 +11,7 @@ interface CitiesProps {
 const CitiesWithLcs: React.FC<CitiesProps> = ({ cities }) => {
     // Consume context to get shared functions and countryName
     const context = useContext(CardContext);
-
     const [committeesData, setCommitteesData] = useState<string[]>([]);
-    const [isChanged, setIsChanged] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const [newCityName, setNewCityName] = useState(""); // State for the new city input field
 
     // Initialize committeesData when the 'cities' prop changes
@@ -34,7 +31,7 @@ const CitiesWithLcs: React.FC<CitiesProps> = ({ cities }) => {
         return null; // Or throw an error, or render a fallback UI
     }
     // Destructure required functions and countryName from context
-    const { countryName, handleSave, handleCancel, handleAddNewItem, handleDelete } = context;
+    const { countryName, handleSave, handleCancel, handleAddNewItem, handleDelete, isChanged, setIsChanged, isLoading } = context;
 
     // Handler to add a new city from the input field
     const onAddNewCity = () => {
@@ -46,17 +43,17 @@ const CitiesWithLcs: React.FC<CitiesProps> = ({ cities }) => {
         }
 
         // Use handleAddNewItem if it correctly adds to the array state
-        handleAddNewItem(setCommitteesData, committeesData, newCityName.trim(), setIsChanged);
+        handleAddNewItem(setCommitteesData, committeesData, newCityName.trim());
         setNewCityName("")
     };
 
     // Handler to save all changes
-    const onSave = () => handleSave(countryName, committeesData, "committees", "Cities with LCs", setIsChanged);
+    const onSave = () => handleSave(countryName, committeesData, "committees", "Cities with LCs");
 
-    const onCancel = () => handleCancel(isChanged, setCommitteesData, cities, setIsChanged)
+    const onCancel = () => handleCancel(setCommitteesData, cities)
 
     // Handler to delete a specific city by index
-    const onDelete = (index: number) => handleDelete(index, setCommitteesData, committeesData, setIsChanged);
+    const onDelete = (index: number) => handleDelete(index, setCommitteesData, committeesData);
 
     return (
         <div className="bg-white p-8 rounded-2xl shadow-xl border border-blue-100 flex flex-col space-y-8  mt-8">

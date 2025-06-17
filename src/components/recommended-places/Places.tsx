@@ -12,7 +12,6 @@ interface PlacesProps {
 const Places: React.FC<PlacesProps> = ({ places }) => {
     const context = useContext(CardContext);
     const [placesData, setPlacesData] = useState<CityType[]>([])
-    const [isChanged, setIsChanged] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
 
     // Effect to initialize placesData state when 'places' prop changes
@@ -31,23 +30,23 @@ const Places: React.FC<PlacesProps> = ({ places }) => {
 
     if (!context) return null
     // Destructure required functions and countryName from context after the check
-    const { countryName, handleSave, handleInputChange, handleCancel, handleAddNewItem, handleDelete } = context;
+    const { countryName, handleSave, handleInputChange, handleCancel, handleAddNewItem, handleDelete, isChanged, setIsChanged } = context;
 
     // Handler to add a new empty place item
-    const onAdd = () => handleAddNewItem(setPlacesData, placesData, { name: "", description: "" }, setIsChanged)
+    const onAdd = () => handleAddNewItem(setPlacesData, placesData, { name: "", description: "" })
 
     // Handler to save all changes
-    const onSave = () => handleSave(countryName, placesData, "cities", "Recommended places", setIsChanged)
+    const onSave = () => handleSave(countryName, placesData, "cities", "Recommended places")
 
     // Handler to delete a specific place item by index
-    const onDelete = (index: number) => handleDelete(index, setPlacesData, placesData, setIsChanged)
+    const onDelete = (index: number) => handleDelete(index, setPlacesData, placesData)
 
     // Handler to cancel all unsaved changes
-    const onCancel = () => handleCancel(isChanged, setPlacesData, places, setIsChanged)
+    const onCancel = () => handleCancel(setPlacesData, places)
 
     // Handler for input changes in individual place fields
     const onInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number, column?: string) => { // Use React.ChangeEvent<HTMLTextAreaElement> for textareas
-        handleInputChange(setPlacesData, placesData, places, index, e.target.value, setIsChanged, column)
+        handleInputChange(setPlacesData, placesData, places, index, e.target.value, column)
     }
 
     return (

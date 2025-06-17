@@ -10,11 +10,9 @@ interface GeneralInfoProps {
 }
 
 const GeneralInfo: React.FC<GeneralInfoProps> = ({ information }) => {
-    const context = useContext(CardContext);
+    const context = useContext(CardContext)
     const [mappedInfoData, setMappedInfoData] = useState<CardFormType[]>([])
-    const [infoData, setInfoData] = useState<CardFormType[]>([]);
-    const [isChanged, setIsChanged] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [infoData, setInfoData] = useState<CardFormType[]>([])
 
     // Memoize the mapping function to avoid unnecessary re-renders
     const mapInfo = useCallback(
@@ -48,26 +46,19 @@ const GeneralInfo: React.FC<GeneralInfoProps> = ({ information }) => {
 
     if (!context) return null
     // Destructure required functions and countryName from context after the check
-    const { countryName, handleSave, handleInputChange, handleCancel } = context;
+    const { countryName, handleSave, handleInputChange, handleCancel, isChanged, setIsChanged, isLoading } = context;
 
     // Handlers
     const onSave = () => {
-        setIsLoading(true)
         const dataToSave = infoData.map(({ name, value }) => ({ name, role: value })); // Ensure icon is not saved
-
-        try {
-            handleSave(countryName, dataToSave, "information", "General information", setIsChanged);
-        } catch (error) {
-            console.error("Error saving general information:", error);
-        } finally {
-            setIsLoading(false)
-        }
+        handleSave(countryName, dataToSave, "information", "General information");
+  
     };
 
-    const onCancel = () => handleCancel(isChanged, setInfoData, mappedInfoData, setIsChanged)
+    const onCancel = () => handleCancel(setInfoData, mappedInfoData)
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) =>
-        handleInputChange(setInfoData, infoData, information, index, e.target.value, setIsChanged, 'value', 'role');
+        handleInputChange(setInfoData, infoData, information, index, e.target.value, 'value', 'role');
 
     return (
         <CardForm items={infoData} onInputChange={onInputChange} isLoading={isLoading} isChanged={isChanged} onSave={onSave} onCancel={onCancel} />

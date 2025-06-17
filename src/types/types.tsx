@@ -55,6 +55,7 @@ export interface WeekendType {
     link: string
     limit: number
     description: string
+    date?: string
 }
 
 export interface GalleryImageType {
@@ -98,7 +99,7 @@ export interface CardTempType {
     icon: string
 }
 
-export interface UploadedImageType {
+export interface UploadedFileType {
     file: File
     url: string
     dbUrl: string

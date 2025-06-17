@@ -12,7 +12,6 @@ interface SocialLinksProps {
 const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks }) => {
     const context = useContext(CardContext);
     const [mappedLinks, setMappedLinks] = useState<CardFormType[]>([])
-    const [isChanged, setIsChanged] = useState(false);
     const [links, setLinks] = useState<CardFormType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -47,7 +46,7 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks }) => {
     // Defensive check: ensure context is available
     if (!context) return null
     // Destructure required functions and countryName from context
-    const { countryName, handleSave, handleInputChange, handleCancel } = context;
+    const { countryName, handleSave, handleInputChange, handleCancel, isChanged, setIsChanged } = context;
 
     // Handlers
     const onSave = () => {
@@ -58,7 +57,7 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks }) => {
         }));
 
         try {
-            handleSave(countryName, socialLinksToSave, "socialLinks", "Social links", setIsChanged);
+            handleSave(countryName, socialLinksToSave, "socialLinks", "Social links");
         } catch (error) {
             console.error("Error saving social links:", error);
         } finally {
@@ -66,10 +65,10 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks }) => {
         }
     };
 
-    const onCancel = () => handleCancel(isChanged, setLinks, mappedLinks, setIsChanged)
+    const onCancel = () => handleCancel(setLinks, mappedLinks)
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        handleInputChange(setLinks, links, socialLinks, index, e.target.value, setIsChanged, 'value');
+        handleInputChange(setLinks, links, socialLinks, index, e.target.value, 'value');
     };
 
     return (

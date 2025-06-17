@@ -60,7 +60,7 @@ const Country: React.FC = () => {
                         ">
                             {/* Back Button - Using the external Back component */}
                             <div className="absolute top-2 left-2 z-20">
-                                <Back />
+                                <Back banner={true}/>
                             </div>
 
                             {/* Abstract Pattern Overlay (example: a subtle grid or wave) */}

@@ -1,110 +1,66 @@
-import React, { useState, useEffect, useContext } from "react";
-import { ref, uploadBytes, deleteObject } from "firebase/storage"; // Import deleteObject and ref if using Firebase storage
-import { storage } from "../../firebase"; // Update with your Firebase config path
-import CardFooter from "../card/CardFooter";
+import React, { useState, useEffect, useContext } from "react"
 import "../summer-reception/Weekend.css"
-import { getCountryDbName } from "../../global/Global";
-import { toast } from 'react-toastify';
-import ImagePopup from "../../global/ImagePopup";
-import CardContext from "../card/CardContext";
-import FormButtons from "../card/FormButtons";
+import { getCountryDbName, removeFileFromStorage, uploadFileToStorage } from "../../global/Global"
+import ImagePopup from "../../global/ImagePopup"
+import CardContext from "../card/CardContext"
+import FormButtons from "../card/FormButtons"
+import { UploadedFileType } from "../../types/types"
 
 interface GalleryProps {
-    images: string[]; // Array of image objects with unique id and URL
-}
-
-interface UploadedImage {
-    file: File
-    url: string
-    dbUrl: string
+    images: string[]
 }
 
 const Gallery: React.FC<GalleryProps> = ({ images }) => {
     const context = useContext(CardContext);
     const [imagesData, setImagesData] = useState<string[]>([])
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [isChanged, setIsChanged] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
-    const [imagesToUpload, setImagesToUpload] = useState<UploadedImage[]>([])
+    const [imagesToUpload, setImagesToUpload] = useState<UploadedFileType[]>([])
     const [imagesToDelete, setImagesToDelete] = useState<string[]>([])
 
     useEffect(() => {
         setImagesData(images)
     }, [images])
 
-    const handleImageClick = (url: string) => {
-        setSelectedImage(url);
-    };
+    const handleImageClick = (url: string) => setSelectedImage(url);
 
-    const closeModal = () => {
-        setSelectedImage(null);
-    };
+    const closeModal = () => setSelectedImage(null);
 
     if (!context) return null
     // Destructure required functions and countryName from context after the check
-    const { countryName, handleSave, handleInputChange, handleCancel, handleAddNewItem, handleDelete } = context;
+    const { countryName, handleSave, handleUpload, handleCancel, handleDelete, isChanged, isLoading } = context;
 
-    const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const uploadImagesToStorage = () => {
         const name = getCountryDbName(countryName)
-        const file = event.target.files?.[0]
-        if (file) {
-            const newImage: UploadedImage = {
-                file,
-                url: URL.createObjectURL(file),
-                dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${name}%2Fgallery%2F${file.name}?alt=media`
-            }
-            setImagesData([...imagesData, newImage.url])
-            setImagesToUpload([...imagesToUpload, newImage])
-            setIsChanged(true)
-        } else toast.error("Error while uploading file!")
-    };
-
-    const uploadImagesToStorage = async () => {
-        try {
-            const name = getCountryDbName(countryName)
-            imagesToUpload.forEach(async (image: UploadedImage) => {
-                const storageRef = ref(storage, `${name}/gallery/${image.file.name}`);
-                // Upload to storage
-                await uploadBytes(storageRef, image.file);
-            })
-        } catch (error) {
-            toast.error("Error uploading files! " + error)
-            return null
-        }
+        imagesToUpload.forEach(async (image: UploadedFileType) => await uploadFileToStorage(name, image, "gallery"))
     }
 
-    const removeImagesFromStorage = async () => {
-        try {
-            imagesToDelete.forEach(async (image: string) => {
-                const fileRef = ref(storage, image)
-                await deleteObject(fileRef)
-            })
-        } catch (error) {
-            toast.error("Error removing files from storage! " + error)
-            return null
-        }
+    const removeImagesFromStorage = () => {
+        imagesToDelete.forEach(async (image: string) => await removeFileFromStorage(image))
     }
 
-    const onSave = async () => {
+    const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => 
+        handleUpload(e, "gallery", imagesData, setImagesData, setImagesToUpload)
+
+    const onSave = () => {
         // upload files to storage
-        await uploadImagesToStorage()
+        uploadImagesToStorage()
         const newGallery = imagesData.map((image: string) => {
             const newImageExists = imagesToUpload.find(newImage => newImage.url === image)
             return newImageExists?.dbUrl ?? image
         })
         // delete files from storage
-        await removeImagesFromStorage()
-        handleSave(countryName, newGallery, "gallery", "Gallery", setIsChanged)
+        removeImagesFromStorage()
+        handleSave(countryName, newGallery, "gallery", "Gallery")
     }
     const onCancel = async () => {
-        const confimation = await handleCancel(isChanged, setImagesData, images, setIsChanged)
+        const confimation = await handleCancel(setImagesData, images)
         if (confimation) {
             setImagesToDelete([])
             setImagesToUpload([])
         }
     }
     const onDelete = async (index: number, url: string) => {
-        const del = await handleDelete(index, setImagesData, imagesData, setIsChanged)
+        const del = await handleDelete(index, setImagesData, imagesData)
         if (del) setImagesToDelete([...imagesToDelete, url])
     }
 
@@ -160,7 +116,7 @@ const Gallery: React.FC<GalleryProps> = ({ images }) => {
                     <input
                         type="file"
                         accept="image/*"
-                        onChange={handleUpload}
+                        onChange={onUpload}
                         className="absolute inset-0 opacity-0 cursor-pointer z-10"
                         title="Upload new image"
                     />

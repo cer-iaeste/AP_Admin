@@ -15,7 +15,7 @@ import Gallery from "../gallery/Gallery";
 import SocialLinks from "../social-links/SocialLinks"
 import Hero from "../hero/Hero";
 import { updateCountryField } from "../../service/CountryService";
-import { CardType, CountryType, UploadedImageType } from "../../types/types";
+import { CardType, CountryType, UploadedFileType } from "../../types/types";
 import { useParams } from "react-router-dom";
 import { getCard, getCountryData, confirmModalWindow, scrollToBottom, isList, getCountryDbName } from "../../global/Global";
 import { toast } from "react-toastify";
@@ -25,12 +25,13 @@ import CardContext from "./CardContext";
 const Card = () => {
     // state handlers
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isChanged, setIsChanged] = useState<boolean>(false);
     const [minScreenSize, setMinScreenSize] = useState<number>(0)
     const { height } = useWindowSize()
     // country & card props
     const [selectedCountry, setSelectedCountry] = useState<CountryType>();
     const [selectedCard, setSelectedCard] = useState<CardType | undefined>();
-    const [cardComponent, setCardComponent] = useState<ReactElement | null>(null) // Initialize with null
+    const [cardComponent, setCardComponent] = useState<ReactElement | null>(null)
     // get params when page loads
     const { country, card } = useParams()
 
@@ -50,8 +51,9 @@ const Card = () => {
 
     // Functions for handling events with cards - these will be provided via Context
     const handleSave = useCallback(
-        (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => {
-            const updatePromise = updateCountryField(country, data, column);
+        (country: string, data: any, column: keyof CountryType, title: string) => {
+            setIsLoading(true)
+            const updatePromise = updateCountryField(country, data, column)
             toast.promise(updatePromise, {
                 pending: "Saving changes...",
                 success: {
@@ -61,27 +63,29 @@ const Card = () => {
                     }
                 },
                 error: "Document not found!"
-            });
+            })
+            setIsLoading(false)
         }, []
     );
 
     const handleDelete = useCallback(
-        async (index: number, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void, itemIndex?: number): Promise<boolean> => {
+        async (index: number, setData: (data: any) => void, data: any, itemIndex?: number): Promise<boolean> => {
             const confirmDelete = await confirmModalWindow("Are you sure you want to delete this item?");
-            if (confirmDelete) {
+            if (!confirmDelete) return false
+            if (!data) setData("")
+            else {
                 let newData = structuredClone(data);
                 if (itemIndex === undefined) newData = newData.filter((_: any, i: number) => i !== index);
                 else newData[index].content = newData[index].content.filter((_: any, i: number) => i !== itemIndex);
                 setData(newData);
-                setIsChanged(true);
-                return true;
             }
-            return false;
+            setIsChanged(true);
+            return true;
         }, []
     );
 
     const handleAddNewItem = useCallback(
-        (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => {
+        (setData: (data: any) => void, data: any, newItem: any, index?: number) => {
             if (index === undefined) setData([...data, newItem]);
             else {
                 const newData = structuredClone(data);
@@ -94,31 +98,31 @@ const Card = () => {
     );
 
     const handleInputChange = useCallback(
-        (setData: (data: any) => void, data: any, originalData: any, index: number, value: any, setIsChanged: (state: boolean) => void, column?: string, originalColumn?: string, itemIndex?: number) => {
+        (setData: (data: any) => void, data: any, originalData: any, index: number, value: any, column?: string, originalColumn?: string, itemIndex?: number) => {
             const newData = structuredClone(data)
-            let isChanged = false
+            let change = false
             if (column) {
                 if (itemIndex !== undefined) {
                     newData[index].content[itemIndex][column] = value
-                    isChanged = value !== originalData[index].content[itemIndex][originalColumn ?? column]
+                    change = value !== originalData[index].content[itemIndex][originalColumn ?? column]
                 }
                 else {
                     newData[index][column] = value
                     if (originalData.length > index) {
-                        isChanged = value !== originalData[index][originalColumn ?? column]
-                    } else isChanged = true
+                        change = value !== originalData[index][originalColumn ?? column]
+                    } else change = true
                 }
             } else {
                 newData[index] = value
-                isChanged = value !== originalData[index]
+                change = value !== originalData[index]
             }
             setData(newData);
-            setIsChanged(isChanged);
+            setIsChanged(change);
         }, []
     );
 
     const handleCancel = useCallback(
-        async (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void): Promise<boolean> => {
+        async (setData: (data: any) => void, data: any): Promise<boolean> => {
             const handleReset = (): void => {
                 setData(structuredClone(data));
                 setIsChanged(false);
@@ -134,11 +138,11 @@ const Card = () => {
     )
 
 
-    const handleUpload = (event: React.ChangeEvent<HTMLInputElement>, folderName: string, data: any, setData: (data: any) => void, setDataToUpload: (data: any) => void, setIsChanged: (state: boolean) => void, setDataToDelete?: (data: any) => void) => {
+    const handleUpload = (event: React.ChangeEvent<HTMLInputElement>, folderName: string, data: any, setData: (data: any) => void, setDataToUpload: (data: any) => void, setDataToDelete?: (data: any) => void) => {
         const name = getCountryDbName(selectedCountry?.name ?? "")
         const file = event.target.files?.[0]
         if (file) {
-            const newFile: UploadedImageType = {
+            const newFile: UploadedFileType = {
                 file,
                 url: URL.createObjectURL(file),
                 dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${name}%2F${folderName}%2F${file.name}?alt=media`
@@ -159,13 +163,16 @@ const Card = () => {
     // Memoize the context value to prevent unnecessary re-renders of children
     const contextValue = React.useMemo(() => ({
         countryName: selectedCountry?.name ?? "",
-        selectedCardContent: selectedCard?.content, // Pass content directly
         handleSave,
         handleDelete,
         handleAddNewItem,
         handleInputChange,
-        handleCancel
-    }), [selectedCountry?.name, selectedCard?.content, handleSave, handleDelete, handleAddNewItem, handleInputChange]);
+        handleCancel,
+        handleUpload,
+        isChanged,
+        setIsChanged,
+        isLoading
+    }), [selectedCountry?.name, handleSave, handleDelete, handleAddNewItem, handleInputChange, handleCancel, handleUpload, isChanged, setIsChanged, isLoading]);
 
 
     useEffect(() => {
@@ -198,11 +205,10 @@ const Card = () => {
                     break;
                 case "Other Information":
                     setCardComponent(<Other other={selectedCard.content} />);
-                    break; 
+                    break;
                 case "Gallery":
                     setCardComponent(<Gallery images={selectedCard.content} />);
                     break;
-                /*
                 case "Traditional Cuisine":
                     setCardComponent(<Cuisine cuisine={selectedCard.content} />);
                     break;
@@ -212,13 +218,9 @@ const Card = () => {
                 case "Summer Reception":
                     setCardComponent(<SummerReception summerReception={selectedCard.content} />);
                     break;
-                case "Gallery":
-                    setCardComponent(<Gallery images={selectedCard.content} />);
-                    break;
                 default:
                     setCardComponent(<Hero content={selectedCard.content} />);
                     break;
-                    */
             }
             setIsLoading(false);
         }, 1100);
@@ -232,17 +234,15 @@ const Card = () => {
                 <Loader />
             ) : (
                 <section className="bg-sky-100">
-                    <div className="container">
-                        <div className="elements-position px-12 text-[#1B75BB]" style={{ minHeight: minScreenSize + "px" }}>
+                    <div className="elements-position px-4 md:px-12 text-[#1B75BB]" style={{ minHeight: minScreenSize + "px" }}>
                             {/* CardHeader can remain or be refactored to use context for country name */}
-                            <CardHeader country={selectedCountry?.name ?? ""} card={selectedCard} />
+                            <CardHeader isChanged={isChanged} country={selectedCountry?.name ?? ""} card={selectedCard} />
 
                             {/* Provide the context value to all children */}
                             <CardContext.Provider value={contextValue}>
                                 {cardComponent}
                             </CardContext.Provider>
                         </div>
-                    </div>
                 </section>
             )}
         </section>

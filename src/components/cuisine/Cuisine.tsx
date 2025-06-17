@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
-import CardFooter from "../card/CardFooter";
+import React, { useState, useEffect, useCallback, useContext, useRef } from "react";
 import "../card/Card.css"
 import { CuisineType, OtherType } from "../../types/types";
-import { CardProps } from "../../global/Global";
+import CardContext from "../card/CardContext"
+import CardGrid from "../card/CardGrid";
 
-interface CuisineProps extends CardProps {
+interface CuisineProps {
     cuisine: CuisineType
 }
 
@@ -14,11 +14,14 @@ interface CuisineMapType {
     content: OtherType[]
 }
 
-const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleDelete, handleCancel, handleAddNewItem, handleInputChange }) => {
+const Cuisine: React.FC<CuisineProps> = ({ cuisine }) => {
+    const context = useContext(CardContext);
+    const [mappedData, setMappedData] = useState<CuisineMapType[]>([])
     const [cuisineData, setCuisineData] = useState<CuisineMapType[]>([])
-    const [isChanged, setIsChanged] = useState(false)
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
     const [cuisineSectionChange, setCuisineSectionChange] = useState<boolean[]>([false, false])
+    const [gridHeight, setGridHeight] = useState("0px");
+    const contentRef = useRef<HTMLDivElement>(null); 
 
     // const { width } = useWindowSize()
     const mapCuisineData = useCallback(() => {
@@ -37,128 +40,109 @@ const Cuisine: React.FC<CuisineProps> = ({ country, cuisine, handleSave, handleD
     }, [cuisine])
 
     useEffect(() => {
-        setCuisineData(mapCuisineData())
+        setMappedData(mapCuisineData())
+        setOpenIndex(-1);
+        setGridHeight("0px");
     }, [cuisine, mapCuisineData])
+
+    useEffect(() => {
+        setCuisineData(mappedData)
+    }, [mappedData])
+
+    // Effect to handle animation when openIndex changes
+    useEffect(() => {
+        // Only run if a section is open and the ref is available
+        if (openIndex !== -1 && contentRef.current) {
+            // Set a small delay to allow content to render before calculating height
+            setTimeout(() => {
+                setGridHeight(`${contentRef.current?.scrollHeight ?? 0}px`);
+            }, 100); // Small delay to allow content to render and fill its space
+        } else {
+            setGridHeight("0px"); // Collapse when no section is open
+        }
+    }, [openIndex, cuisineData]); 
+
+    if (!context) return null
+    // Destructure required functions and countryName from context after the check
+    const { countryName, handleInputChange, handleSave, handleAddNewItem, handleDelete, handleCancel, isChanged, isLoading } = context;
 
     const resetCuisineChange = (promiseResult: boolean) => {
         if (promiseResult) setCuisineSectionChange([false, false])
     }
 
     const addCuisineSectionChange = (index: number) => {
-        if (!cuisineSectionChange[index]) {
+        if (isChanged && !cuisineSectionChange[index]) {
             const cuisineChange = structuredClone(cuisineSectionChange)
             cuisineChange[index] = true
+            setCuisineSectionChange(cuisineChange)
+        } else if (!isChanged && cuisineSectionChange[index]) {
+            const cuisineChange = structuredClone(cuisineSectionChange)
+            cuisineChange[index] = false
             setCuisineSectionChange(cuisineChange)
         }
     }
 
-    const onAdd = (index: number) => {
-        handleAddNewItem(setCuisineData, cuisineData, { title: "", description: "" }, setIsChanged, index)
-        addCuisineSectionChange(index)
+    const onAdd = () => {
+        handleAddNewItem(setCuisineData, cuisineData, { title: "", description: "" }, openIndex)
+        addCuisineSectionChange(openIndex)
     }
     const onSave = () => {
         const foodData = cuisineData[0].content
         const drinksData = cuisineData[1].content
-        handleSave(country, foodData, "food", "Food", setIsChanged)
-        handleSave(country, drinksData, "drinks", "Drinks", setIsChanged)
+        handleSave(countryName, foodData, "food", "Food")
+        handleSave(countryName, drinksData, "drinks", "Drinks")
         resetCuisineChange(true)
     }
-    const onDelete = (index: number, itemIndex: number) => {
-        handleDelete(index, setCuisineData, cuisineData, setIsChanged, itemIndex)
-        addCuisineSectionChange(index)
+    const onDelete = (itemIndex: number) => {
+        handleDelete(openIndex, setCuisineData, cuisineData, itemIndex)
+        addCuisineSectionChange(openIndex)
     }
-    const onCancel = () => handleCancel(isChanged, setCuisineData, mapCuisineData(), setIsChanged).then(result => resetCuisineChange(result))
+    const onCancel = () => handleCancel(setCuisineData, mappedData).then(result => resetCuisineChange(result))
 
-    const onItemChange = (e: any, index: number, itemIndex: number, column: keyof OtherType) => {
-        handleInputChange(setCuisineData, cuisineData, index, e.target.value, setIsChanged, column, itemIndex)
-        addCuisineSectionChange(index)
+    const onItemChange = (e: any, itemIndex: number, column?: string) => {
+        handleInputChange(setCuisineData, cuisineData, mappedData, openIndex, e.target.value, column, column, itemIndex)
+        addCuisineSectionChange(openIndex)
+    }
+
+    const handleSectionClick = (index: number) => {
+        setGridHeight("0px")
+        if (index === openIndex) setOpenIndex(-1)
+        else setTimeout(() => {
+            setOpenIndex(index)
+        }, 700)
     }
 
 
     return (
         <div className="mt-5">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="hidden md:block"></div>
+            <div className="flex flex-row space-x-10">
                 {cuisineData.map((data, index) =>
-                    <div key={data.title} onClick={() => setOpenIndex(index)}
-                        className={`border border-[#1B75BB] ${openIndex !== index ? 'bg-[#1B75BB]' : 'bg-gradient'} relative justify-center rounded-md p-2 font-semibold text-white text-lg hover-bg-gradient cursor-pointer flex flex-row items-center`}>
-                        <i className={data.icon}></i>
-                        <h1 className="ml-2">{data.title}</h1>
-                        {!!cuisineSectionChange[index] &&
-                            <div className="absolute -top-1 -left-1 rounded-lg bg-red-500 text-white w-5 sm:w-8">
-                                <i className="fa-solid fa-exclamation"></i>
-                            </div>
-                        }
-                    </div>
+                    <div
+                            key={data.title}
+                            onClick={() => handleSectionClick(index)}
+                            className={`
+                                bg-white p-6 rounded-2xl shadow-lg border border-gray-200 w-44
+                                flex flex-col items-center justify-center h-[80px] md:h-auto md:min-mh-[140px] // Ensure consistent height for selectors
+                                transition-all duration-300 transform hover:scale-103 hover:shadow-xl cursor-pointer
+                                ${openIndex === index
+                                    ? 'bg-blue-600 text-white border-blue-700 shadow-2xl scale-102' // Active state
+                                    : 'bg-gradient-to-br from-white to-green-50 hover:bg-blue-50 hover:border-blue-300' // Inactive hover state
+                                }
+                            `}
+                        >
+                            <i className={`${data.icon} text-3xl md:text-4xl mb-3 ${openIndex === index ? 'text-white' : 'text-gray-600'}`}></i>
+                            <h1 className={`hidden md:block text-2xl font-bold ${openIndex === index ? 'text-white' : 'text-gray-800'}`}>
+                                {data.title}
+                            </h1>
+                        </div>
                 )}
             </div>
 
             {openIndex !== -1 &&
-                <div className="mt-4 border border-[#1B75BB] rounded-md bg-sky-200 p-4">
-                    <div className="flex flex-row items-center justify-between border-b border-[#1B75BB] pb-2">
-                        <div className="flex flex-row items-center text-2xl sm:text-4xl font-semibold text-[#1B75BB]">
-                            <i className={cuisineData[openIndex].icon}></i>
-                            <h1 className="ml-2">{cuisineData[openIndex].title}</h1>
-                        </div>
-                        <div className="flex items-end">
-                            <button className="add-btn hover-bg-gradient"
-                                onClick={() => onAdd(openIndex)}>
-                                <i className="fa fa-plus"></i>
-                                <span className="hidden sm:block">Add new item</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-6 mx-2 mb-12">
-                        {cuisineData[openIndex].content.map((item, itemIndex) =>
-                            <div key={openIndex + "_" + itemIndex} className="card-container bg-sky-100">
-                                <div className="card-footer-right">
-                                    <button
-                                        type="button"
-                                        onClick={() => onDelete(openIndex, itemIndex)}
-                                        className="flex items-center py-1"
-                                        title="Remove item"
-                                    >
-                                        <i className="fa fa-trash" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                                <div className="card-subcontainer">
-                                    {/* Title in the top right */}
-                                    <div className="card-header card-header-sub">
-                                        Title
-                                    </div>
-                                    {/* Value input below buttons */}
-                                    <textarea
-                                        placeholder="Name"
-                                        value={item.title}
-                                        rows={2}
-                                        onChange={(e) => onItemChange(e, openIndex, itemIndex, "title")}
-                                        className="text-input mt-1.5"
-                                        style={{ scrollbarWidth: 'thin' }}
-                                    />
-                                </div>
-                                <div className="card-subcontainer">
-                                    {/* Title in the top right */}
-                                    <div className="card-header card-header-sub">
-                                        Description
-                                    </div>
-                                    {/* Value input below buttons */}
-                                    <textarea
-                                        placeholder="Description (optional)"
-                                        value={item.description}
-                                        rows={4}
-                                        onChange={(e) => onItemChange(e, openIndex, itemIndex, "description")} // Update input value
-                                        className="text-input mt-1.5"
-                                        style={{ scrollbarWidth: 'thin' }}
-                                    />
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                <div ref={contentRef} className="md:bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-xl border border-green-100 my-4 transition-all duration-700 ease-in-out overflow-hidden" style={{ maxHeight: gridHeight }}>
+                    <CardGrid title={cuisineData[openIndex].title} data={cuisineData[openIndex].content} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onItemChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
                 </div>
             }
-
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} />
         </div>
     )
 }

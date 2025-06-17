@@ -9,7 +9,7 @@ export interface FormButtonsProps {
 
 const FormButtons: React.FC<FormButtonsProps> = ({ isChanged, isLoading, onSave, onCancel }) => {
     return (
-        <div className="flex justify-end space-x-4 pt-4">
+        <div className="flex justify-end space-x-4 p-4">
             {/* Cancel Button */}
             <button
                 type="button"

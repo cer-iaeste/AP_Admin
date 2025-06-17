@@ -9,10 +9,12 @@ interface CardTempProps {
 }
 
 const CardComplex: React.FC<CardTempProps> = ({ title, index, item, onDelete, onInputChange }) => {
+    const mainCol = item.hasOwnProperty("name") ? "name" : "title"
+    const hasLinks = item.hasOwnProperty("link")
     return (
         <div
             key={index}
-            className="bg-gradient-to-br from-white to-blue-50 p-6 rounded-2xl shadow-xl border border-blue-100
+            className="bg-gradient-to-br from-white to-blue-50 p-4 rounded-2xl shadow-xl border border-blue-100
                 flex flex-col h-auto min-h-[300px] // Dynamic height but ensures a minimum
                 transition-all duration-300 transform hover:scale-103 hover:shadow-2xl
             "
@@ -47,9 +49,9 @@ const CardComplex: React.FC<CardTempProps> = ({ title, index, item, onDelete, on
                     <textarea
                         id={`place-name-${index}`}
                         placeholder={`Enter ${title} name`}
-                        rows={1}
-                        value={item.name}
-                        onChange={(e) => onInputChange(e, index, "name")}
+                        rows={2}
+                        value={item[mainCol]}
+                        onChange={(e) => onInputChange(e, index, mainCol)}
                         className=" text-lg font-semibold
                                             w-full p-3 border border-gray-300 rounded-lg bg-white
                                             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
@@ -63,14 +65,14 @@ const CardComplex: React.FC<CardTempProps> = ({ title, index, item, onDelete, on
                 {/* Description Input Section */}
                 <div className="flex flex-col flex-1"> {/* flex-1 and flex-col for description to fill space */}
                     <div className="text-lg font-semibold text-gray-700 flex items-center gap-x-2 mb-1">
-                        <i className="fa-solid fa-file-lines text-blue-600"></i> Description:
+                        <i className="fa-solid fa-file-lines text-blue-600"></i> {!hasLinks ? "Description" : "Link"}:
                     </div>
                     <textarea
                         id={`place-description-${index}`}
                         placeholder={`Enter ${title} description`}
-                        rows={4} // Initial rows, but flex-1 will manage height
-                        value={item.description}
-                        onChange={(e) => onInputChange(e, index, "description")}
+                        rows={!hasLinks ? 4 : 1} // Initial rows, but flex-1 will manage height
+                        value={!hasLinks ? item.description : item.link}
+                        onChange={(e) => onInputChange(e, index, !hasLinks ? "description" : "link")}
                         className="
                                             flex-1 w-full p-3 border border-gray-300 rounded-lg bg-white
                                             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500

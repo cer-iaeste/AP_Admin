@@ -3,20 +3,21 @@ import React from "react";
 interface CardTempProps {
     title: string
     index: number
-    item: string
+    item: string | any
     onDelete: (index: number) => void
     onInputChange: (e: any, index: number) => void
 }
 
 const CardBasic: React.FC<CardTempProps> = ({ title, index, item, onDelete, onInputChange }) => {
+    const isObject = item.hasOwnProperty("name")
     return (
         <div
             key={index}
-            className="
+            className={`
                                 bg-gradient-to-br from-white to-blue-50 p-4 rounded-2xl shadow-xl border border-blue-100
-                                flex flex-col h-72 // Fixed height for visual consistency
+                                flex flex-col ${!isObject ? "h-72" : "h-44"} // Fixed height for visual consistency
                                 transition-all duration-300 transform hover:scale-103 hover:shadow-2xl
-                            "
+                        `}
         >
             <div className="
                                 flex justify-between items-center pb-2 mb-2 border-b-2 border-blue-200
@@ -40,8 +41,8 @@ const CardBasic: React.FC<CardTempProps> = ({ title, index, item, onDelete, onIn
             {/* Fact Content Textarea - Takes up remaining space */}
             <textarea
                 placeholder="Enter a fun fact"
-                rows={4} // Initial rows, but flex-1 will control actual height
-                value={item}
+                rows={!isObject ? 4 : 2} // Initial rows, but flex-1 will control actual height
+                value={!isObject? item : item.name}
                 onChange={(e) => onInputChange(e, index)}
                 className="
                                     flex-1 w-full p-3 border border-gray-300 rounded-md bg-white

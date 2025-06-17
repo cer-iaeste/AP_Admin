@@ -4,13 +4,16 @@ import { CountryType } from "../../types/types";
 
 // Define the shape of the context's value
 interface CardContextType {
-    countryName: string;
-    selectedCardContent: any; // Type 'any' for flexibility, as content varies
-    handleSave: (country: string, data: any, column: keyof CountryType, title: string, setIsChanged: (state: boolean) => void) => void;
-    handleDelete: (index: number, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void, itemIndex?: number) => Promise<boolean>;
-    handleAddNewItem: (setData: (data: any) => void, data: any, newItem: any, setIsChanged: (state: boolean) => void, index?: number) => void;
-    handleInputChange: (setData: (data: any) => void, data: any, originalData: any, index: number, value: any, setIsChanged: (state: boolean) => void, column?: string, originalColumn?: string, itemIndex?: number) => void;
-    handleCancel: (isChanged: boolean, setData: (data: any) => void, data: any, setIsChanged: (state: boolean) => void) => Promise<boolean>;
+    countryName: string
+    handleSave: (country: string, data: any, column: keyof CountryType, title: string) => void
+    handleDelete: (index: number, setData: (data: any) => void, data: any, itemIndex?: number) => Promise<boolean>
+    handleAddNewItem: (setData: (data: any) => void, data: any, newItem: any, index?: number) => void
+    handleInputChange: (setData: (data: any) => void, data: any, originalData: any, index: number, value: any, column?: string, originalColumn?: string, itemIndex?: number) => void
+    handleCancel: (setData: (data: any) => void, data: any) => Promise<boolean>
+    handleUpload: (event: React.ChangeEvent<HTMLInputElement>, folderName: string, data: any, setData: (data: any) => void, setDataToUpload: (data: any) => void, setDataToDelete?: (data: any) => void) => void
+    isChanged: boolean
+    setIsChanged: (state: boolean) => void
+    isLoading: boolean
 }
 
 // Create the context with an undefined default value

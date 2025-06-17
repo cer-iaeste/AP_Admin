@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState, useEffect} from "react";
 import FormButtons from "./FormButtons";
 import CardBasic from "./CardBasic";
 import CardComplex from "./CardComplex";
+import AddBtn from "./Add";
 
 interface CardGridProps {
     data: any[]
     title: string
     isChanged: boolean,
     isLoading: boolean,
+    icon?: string
     onDelete: (index: number) => void
     onInputChange: (e: any, index: number, column?: string) => void
     onSave: () => void
@@ -16,29 +18,22 @@ interface CardGridProps {
 }
 
 const CardGrid: React.FC<CardGridProps> = ({ title, data, isChanged, isLoading, onDelete, onInputChange, onSave, onAdd, onCancel }) => {
+    const [isObject, setIsObject] = useState<boolean>(false)
+    
+    useEffect(() => {
+        setIsObject(!data[0].hasOwnProperty("link"))
+    }, [data])
+
     return (
         <div className="flex flex-col">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  gap-6 mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:m-8">
                 {data.map((item, index) => {
-                    return item.hasOwnProperty("name") ?
+                    return item.hasOwnProperty("name") && !item.hasOwnProperty("link") ?
                         <CardBasic title={title} index={index} item={item} onDelete={onDelete} onInputChange={onInputChange} />
                         : <CardComplex title={title} index={index} item={item} onDelete={onDelete} onInputChange={onInputChange} />
                 })}
 
-                <div className="flex items-end">
-                    <button
-                        className="
-                                w-full bg-sky-100 text-blue-300 h-72 border-2 border-dashed border-blue-300
-                                py-4 px-6 rounded-xl shadow-lg
-                                hover:from-blue-700 hover:to-blue-800 transition-all duration-300
-                                flex items-center justify-center gap-2 text-lg font-semibold
-                                focus:outline-none focus:ring-2 focus:ring-blue-400 transform hover:scale-105
-                            "
-                        onClick={onAdd}
-                    >
-                        <i className="fa fa-plus text-xl"></i> Add a new {title}
-                    </button>
-                </div>
+                <AddBtn onAdd={onAdd} isObject={isObject} />
             </div>
             <FormButtons isChanged={isChanged} isLoading={isLoading} onSave={onSave} onCancel={onCancel} />
         </div>
