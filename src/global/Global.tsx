@@ -3,9 +3,11 @@ import { fetchCountryData } from "../service/CountryService";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { UploadedFileType } from "../types/types"
-import { storage } from "../firebase"; 
+import { storage } from "../firebase";
 import { ref, uploadBytes, deleteObject } from "firebase/storage";
 import { toast } from "react-toastify";
+import AuthService from "../service/AuthService";
+import { useLocation } from "react-router-dom";
 
 // interfaces
 export interface CardProps {
@@ -20,18 +22,18 @@ export interface CardProps {
 
 // constants
 export const componentsCards: CardType[] = [
-    { title: "Banner", icon: "fa fa-chalkboard", header: "Hero Banner Details", desc: "Manage the main banner image & country PDF settings"},
-    { title: "Social Links", icon: "fa fa-share-nodes", header: "Social Media & Contact Links", desc: "Manage links to social media and contact information"},
-    { title: "Emergency Numbers", icon: "fa fa-phone", header: "Emergency Numbers", desc: "Manage essential emergency contact numbers for the country" },
-    { title: "General Information", icon: "fa fa-info-circle", header: "General Information", desc: "Manage general facts and descriptions for the country" },
+    { title: "Banner", icon: "fa fa-chalkboard", header: "Hero Banner Details", desc: "Manage the main banner image & country PDF settings" },
+    { title: "Social Links", icon: "fa fa-share-nodes", header: "Social Media & Contact Links", desc: "Manage links to social media and contact information" },
+    { title: "Emergency Numbers", icon: "fa fa-phone", header: "Emergency Numbers", desc: "Manage essential emergency contact numbers for the country", sidebarTitle: "Emergency no." },
+    { title: "General Information", icon: "fa fa-info-circle", header: "General Information", desc: "Manage general facts and descriptions for the country", sidebarTitle: "General info" },
     { title: "Cities With LCs", icon: "fa fa-city", header: "Cities with Local Committees", desc: "Manage cities where local committees are active" },
-    { title: "Transportation", icon: "fa fa-train", desc: "Manage the country's transport - airports, international & national transport, public transport and discounts" },
-    { title: "Recommended Places", icon: "fa fa-location-dot", desc:"Add and manage recommended places for the country" },
+    { title: "Transportation", icon: "fa fa-train", desc: "Manage the country's transport - airports, international & national transport, public transport and discounts", sidebarTitle: "Transport" },
+    { title: "Recommended Places", icon: "fa fa-location-dot", desc: "Add and manage recommended places for the country", sidebarTitle: "Places" },
     { title: "Summer Reception", icon: "fa fa-umbrella-beach", desc: "Manage details for summer reception events and weekends" },
-    { title: "Traditional Cuisine", icon: "fa fa-utensils", desc: "Explore and manage the country's traditional food and drinks"},
+    { title: "Traditional Cuisine", icon: "fa fa-utensils", desc: "Explore and manage the country's traditional food and drinks" },
     { title: "Fun Facts", icon: "fa fa-brain", desc: "Add interesting and unique facts about the country" },
-    { title: "Other Information", icon: "fa fa-file-circle-plus", desc: "Manage other interesting info about the country" },
-    { title: "Gallery", icon: "fa fa-images", desc: "Showcase beautiful images of the country"},
+    { title: "Other Information", icon: "fa fa-file-circle-plus", desc: "Manage other interesting info about the country", sidebarTitle: "Other info" },
+    { title: "Gallery", icon: "fa fa-images", desc: "Showcase beautiful images of the country" },
 ]
 
 export const TRANSPORT_CONSTANTS = {
@@ -41,16 +43,16 @@ export const TRANSPORT_CONSTANTS = {
     DISCOUNTS: 4
 }
 
-export const GENERAL_INFO_CONSTANTS: CardTempType[] = [ 
-    {name: "Capital city", icon: "fa-solid fa-city"},
-    {name: "Language", icon: "fa-solid fa-language"},
-    {name: "Time zone", icon: "fa-solid fa-globe"},
-    {name: "Currency", icon: "fa-solid fa-dollar-sign"},
-    {name: "Voltage", icon: "fa-solid fa-bolt"},
-    {name: "Dialing code", icon: "fa-solid fa-phone"},
-    {name: "SIM providers", icon: "fa-solid fa-sim-card"},
-    {name: "Population", icon: "fa-solid fa-users"},
-    {name: "Climate", icon: "fa-solid fa-sun"},
+export const GENERAL_INFO_CONSTANTS: CardTempType[] = [
+    { name: "Capital city", icon: "fa-solid fa-city" },
+    { name: "Language", icon: "fa-solid fa-language" },
+    { name: "Time zone", icon: "fa-solid fa-globe" },
+    { name: "Currency", icon: "fa-solid fa-dollar-sign" },
+    { name: "Voltage", icon: "fa-solid fa-bolt" },
+    { name: "Dialing code", icon: "fa-solid fa-phone" },
+    { name: "SIM providers", icon: "fa-solid fa-sim-card" },
+    { name: "Population", icon: "fa-solid fa-users" },
+    { name: "Climate", icon: "fa-solid fa-sun" },
 ]
 
 export const EMERGENCY_CONTACTS_CONSTANTS: CardTempType[] = [
@@ -61,16 +63,16 @@ export const EMERGENCY_CONTACTS_CONSTANTS: CardTempType[] = [
 ];
 
 export const SOCIAL_LINKS_CONSTANTS: CardTempType[] = [
-    { name: 'Instagram', icon: 'fab fa-instagram'},
-    { name: 'Facebook', icon: 'fab fa-facebook'},
-    { name: 'Website', icon: 'fas fa-globe'},
-    { name: 'WhatsApp', icon: 'fab fa-whatsapp'},
-    { name: 'Email Address', icon: 'fas fa-envelope'},
+    { name: 'Instagram', icon: 'fab fa-instagram' },
+    { name: 'Facebook', icon: 'fab fa-facebook' },
+    { name: 'Website', icon: 'fas fa-globe' },
+    { name: 'WhatsApp', icon: 'fab fa-whatsapp' },
+    { name: 'Email Address', icon: 'fas fa-envelope' },
 ];
 
 export const SIDEBAR_SECTIONS: SidebarSectionType[] = [
-    {name: "Admin Panel", icon: "fa-solid fa-home", link:"/"},
-    {name: "AP Countries", icon: "fa-solid fa-earth-europe", link: "/countries"},
+    { name: "Admin Panel", icon: "fa-solid fa-home", link: "/" },
+    { name: "AP Countries", icon: "fa-solid fa-earth-europe", link: "/countries" },
 ]
 
 //functions
@@ -195,7 +197,7 @@ export const confirmModalWindow = (message: string): Promise<boolean> => {
     })
 }
 
-export async function handleCancel () {
+export async function handleCancel() {
     return await confirmModalWindow("All unsaved changes will be lost")
 }
 
@@ -217,7 +219,8 @@ export const scrollToBottom = () => {
         window.scrollTo({
             top: document.body.scrollHeight,
             behavior: "smooth",
-    })}, 150)
+        })
+    }, 150)
 }
 
 export const isList = (item: any) => Array.isArray(item)
@@ -236,7 +239,27 @@ export const uploadFileToStorage = async (countryName: string, uploadFile: Uploa
 export const removeFileFromStorage = async (file: string) => {
     try {
         await deleteObject(ref(storage, file))
-    } catch(error) {
-         toast.error("Error removing files from storage: " + error)
+    } catch (error) {
+        toast.error("Error removing files from storage: " + error)
     }
 }
+
+export const handleLogout = async () => {
+    try {
+        await AuthService.logout();
+        window.location.href = "/login"; // Full page reload to clear state and redirect to login
+        toast.success("Logout successful!");
+    } catch (error: any) {
+        console.error("Error logging out:", error);
+        toast.error("Error logging out! Please try again.");
+    }
+};
+
+export const handleSelectCard = (countryName: string, cardTitle?: string) => {
+    let link = "/countries"
+    if (countryName) {
+        link += `/${countryName}`
+        if (cardTitle) link += `/${cardTitle.replace(" ", "%20")}`
+    }
+    return link
+};

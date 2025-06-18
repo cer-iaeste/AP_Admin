@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { confirmModalWindow } from "./Global"
 
 interface BackProps {
@@ -11,11 +11,19 @@ interface BackProps {
 
 const Back: React.FC<BackProps> = ({ confirmationNeeded, banner, isMobile, countryName }) => {
     const navigate = useNavigate();
+    const location = useLocation()
 
     const handleBack = async () => {
         const goBack = () => {
+            const pathSegments = location.pathname.split("/").filter(Boolean)
+            let newPath = "/"
+            if (pathSegments.length > 0) {
+                const slicedPath = pathSegments.slice(0, pathSegments.length - 1)
+                newPath = "/" + slicedPath.join("/")   
+            }
+
             window.scrollTo({ top: 0, left: 0 })
-            navigate(-1)
+            navigate(newPath)
         }
         if (!confirmationNeeded) goBack()
         else {

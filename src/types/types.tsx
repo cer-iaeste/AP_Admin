@@ -80,6 +80,7 @@ export interface CardType {
     isSectionEmpty?: boolean
     header?: string
     desc?: string
+    sidebarTitle?: string
 }
 
 export interface CardFormType {

@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { loadingTimer, mapCountryCards, getCountryData } from "../../global/Global"; // Assuming these functions exist
+import { loadingTimer, mapCountryCards, getCountryData, handleSelectCard } from "../../global/Global"; // Assuming these functions exist
 import Plane from "../plane/Plane"; // Assuming Plane component exists for loading state
 import { CardType, CountryType } from "../../types/types"; // Ensure CardType and CountryType are defined
-import { useParams, useNavigate } from "react-router-dom";
-import Back from "../../global/Back"; // Assuming Back component exists
+import { useParams } from "react-router-dom";
+import Back from "../../global/Back"
+import { useNavigate } from "react-router-dom";
 
-const Country: React.FC = () => {
+
+interface CountryProps {
+    role: "admin" | "user"
+}
+
+const Country: React.FC<CountryProps> = ({ role }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCountry, setSelectedCountry] = useState<CountryType | undefined>(undefined);
     const [cards, setCards] = useState<CardType[]>([]);
-    const { country } = useParams(); // Get country name from URL params
-    const navigate = useNavigate();
+    const { country } = useParams();
+    const navigate = useNavigate()
 
     // Effect to fetch country data when the 'country' param changes
     useEffect(() => {
@@ -25,22 +31,15 @@ const Country: React.FC = () => {
     useEffect(() => {
         if (selectedCountry) {
             setCards(mapCountryCards(selectedCountry));
-            loadingTimer(setIsLoading); // Assuming loadingTimer handles setting isLoading to false after a delay
-        } else if (country && !isLoading) {
-            // If country is in URL but selectedCountry is null/undefined after loading,
-            // it means country was not found. We can keep isLoading false and show 'not found' UI.
-            // No action needed here, handled by the render logic.
+            loadingTimer(setIsLoading)
         }
-    }, [selectedCountry, country, isLoading]); // Add isLoading to deps for clarity, though it might not strictly be needed if loadingTimer sets it.
+    }, [selectedCountry]);
 
-    // Handler for clicking a card, navigates to its detailed page
-    const handleSelectCard = (cardTitle: string) => {
-        // Ensure country name is available before navigating
-        if (selectedCountry?.name) {
-            navigate(`/countries/${selectedCountry.name}/${cardTitle}`);
-            window.scrollTo({top: 0, left: 0})
-        }
-    };
+    const onSelectCard = (card: string) => {
+        const link = handleSelectCard(country ?? "", card);
+        navigate(link)
+        window.scrollTo({ top: 0, left: 0 })
+    }
 
     return (
         <section className="bg-sky-100 min-h-screen text-[#1B75BB]">
@@ -58,9 +57,12 @@ const Country: React.FC = () => {
                             flex flex-col items-center justify-center text-center
                         ">
                             {/* Back Button - Using the external Back component */}
-                            <div className="absolute top-2 left-2 z-20">
-                                <Back banner={true}/>
-                            </div>
+                            {role === "admin" &&
+                                <div className="absolute top-2 left-2 z-20">
+                                    <Back banner={true} />
+                                </div>
+                            }
+
 
                             {/* Abstract Pattern Overlay (example: a subtle grid or wave) */}
                             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url(https://www.transparenttextures.com/patterns/cubes.png)' }}></div>
@@ -94,11 +96,11 @@ const Country: React.FC = () => {
                                         text-center text-[#1B75BB] cursor-pointer
                                         border border-blue-200 // Subtle blue border
                                         transition-all duration-200 transform hover:scale-105 hover:bg-blue-100 hover:border-blue-400 hover:shadow-xl // Enhanced hover effects
-                                        min-h-[160px] sm:min-h-[180px]
+                                        min-h-[160px]
                                         flex flex-col justify-center items-center
                                     `}
                                 >
-                                    <button onClick={() => handleSelectCard(card.title)} className="grid grid-rows-2 h-full w-full items-center">
+                                    <button onClick={() => onSelectCard(card.title)} className="grid grid-rows-2 h-full w-full items-center">
                                         {/* Conditional ribbon when card.isEmpty is true */}
                                         {card.isSectionEmpty &&
                                             <div className="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-br-xl rounded-tl-xl z-10 shadow-md">

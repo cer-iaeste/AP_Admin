@@ -22,7 +22,7 @@ const Login: React.FC = () => {
             success: {
                 render({ data }) {
                     if (data) {
-                        if (data.role === "user" && data.country) navigate(`/${data.country}`);
+                        if (data.role === "user" && data.country) navigate(`/countries/${data.country}`);
                         else navigate("/");
                     }
                     return "Login successful!";

@@ -4,16 +4,10 @@ import cerLogoSmall from "../../images/logo-small.jpg";
 import "../../App.css" // Keep this if it contains global styles you need
 import { useNavigate, useParams } from "react-router-dom";
 import { SIDEBAR_SECTIONS } from "../../global/Global"; // Assuming SIDEBAR_SECTIONS structure
-import AuthService from "../../service/AuthService"; // Assuming AuthService exists
-import { toast } from 'react-toastify';
 import useWindowSize from "../../hooks/useScreenSize" // Assuming useWindowSize hook exists
+import Logout from "./Logout";
 
-interface SidebarProps {
-    isOpen: boolean,
-    toggleSidebar: () => void // This prop primarily controls the desktop sidebar's open/close state
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
+const Sidebar = () => {
     const [selectedSection, setSelectedSection] = useState<number>(-1);
     const navigate = useNavigate();
     const params = useParams();
@@ -23,10 +17,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
     const handleSelectSection = (link: string, index: number): void => {
         setSelectedSection(index);
-        // If not on mobile, and the sidebar is designed to toggle on click, call toggleSidebar
-        if (!isMobile && isOpen) {
-            // toggleSidebar(); // Uncomment if clicking a desktop sidebar item should close the sidebar
-        }
         navigate(link);
     };
 
@@ -45,29 +35,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         setSelectedSection(foundIndex !== -1 ? foundIndex : -1);
     }, [params]); // Depend on params to react to URL changes
 
-    /**
-     * Handles user logout.
-     */
-    const handleLogout = async () => {
-        try {
-            await AuthService.logout();
-            window.location.href = "/login"; // Full page reload to clear state and redirect to login
-            toast.success("Logout successful!");
-        } catch (error: any) {
-            console.error("Error logging out:", error);
-            toast.error("Error logging out! Please try again.");
-        }
-    };
-
     return (
         <section
-            // Base styles: fixed positioning, high z-index, white background, shadow
             className={`
                 fixed z-30 bg-stone-50 border-gray-200 shadow-xl 
                 ${isMobile
                     ? 'bottom-0 left-0 right-0 h-10 w-full flex flex-row items-center justify-around'
                     // Desktop-specific styles: static vertical sidebar, dynamic width based on isOpen, vertical flex
-                    : `top-0 left-0 h-screen ${isOpen ? "w-60 translate-x-0" : "w-16 -translate-x-full lg:translate-x-0"} flex-col justify-start border-r rounded-r-xl px-2`
+                    : `top-0 left-0 h-screen w-60 translate-x-0 flex-col justify-start border-r rounded-r-xl px-2`
                 }
                 transition-all duration-300 ease-in-out // Smooth transitions for desktop sidebar sliding
             `}
@@ -81,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         title="Go to Dashboard"
                     >
                         {/* Use full logo when sidebar is open, small logo when collapsed */}
-                        <img alt="CER Summer App" className="h-16 w-auto" src={isOpen ? cerLogo : cerLogoSmall} />
+                        <img alt="CER Summer App" className="h-16 w-auto" src={cerLogo} />
                     </button>
                 </div>
             )}
@@ -112,29 +87,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                     >
                         <i className={`${section.icon} text-xl ${isMobile ? 'mb-1' : ''}`} /> {/* Icon styling */}
                         {/* Section name - hidden on mobile, inline on desktop (with optional collapse) */}
-                        <span className={`${isMobile ? 'hidden' : 'inline'} ${!isOpen ? 'hidden lg:inline' : 'ml-3 font-semibold'}`}>
+                        <span className={`${isMobile ? 'hidden' : 'inline'} ml-3 font-semibold`}>
                             {section.name}
                         </span>
                     </li>
                 )}
-                {/* Log Out Button (integrated into the navigation list for consistent layout) */}
-                <li
-                    onClick={handleLogout}
-                    className={`
-                        flex items-center cursor-pointer rounded-lg transition-colors duration-200 ease-in-out
-                        ${isMobile
-                            ? 'flex-col py-1 px-1 text-xs justify-center flex-1' // Mobile item
-                            : 'flex-row py-3 px-4 text-lg justify-center sm:justify-start mt-auto' // Desktop item, mt-auto pushes it to bottom
-                        }
-                        text-gray-700 hover:text-blue-800 border border-transparent hover:border-blue-800 bg-white
-                    `}
-                    title="Log out"
-                >
-                    <i className="fa-solid fa-right-from-bracket text-xl" /> {/* Icon styling */}
-                    <span className={`${isMobile ? 'hidden' : 'inline'} ${!isOpen ? 'hidden lg:inline' : 'ml-3 font-semibold'}`}>
-                        Log Out
-                    </span>
-                </li>
+
+                <Logout isMobile={isMobile} />
             </ul>
         </section>
     );

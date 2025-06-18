@@ -13,13 +13,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     if (!auth || auth.loading) return <Loader />
 
     const pathSegments = location.pathname.split("/").filter(Boolean);
-    const country = pathSegments[0] || "";
+    const country = pathSegments[1] || "";
     const countryFromPath = country.replace(/%20/g, " ")
 
     if (auth.role === "admin") return children
 
     if (auth.role === "user" && countryFromPath !== auth.country)
-        return <Navigate to={`/${auth.country}`} />;
+        return <Navigate to={`/countries/${auth.country}`} />;
     
     return children
 }

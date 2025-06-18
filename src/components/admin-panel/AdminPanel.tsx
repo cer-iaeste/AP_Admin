@@ -14,7 +14,7 @@ import ProtectedRoute from "../../service/ProtectedRoute";
 import Countries from "../countries/Countries";
 import AddCountry from "../add-country/AddCountry";
 import { useNavigate, useLocation } from "react-router-dom";
-import Navbar from "../navbar/Navbar";
+import useCountryFromUrl from "../../hooks/useCountryFromUrl";
 
 const AdminPanel = () => {
     const { width } = useWindowSize()
@@ -24,12 +24,8 @@ const AdminPanel = () => {
     const [countries, setCountries] = useState<CountryType[]>([])
     const navigate = useNavigate();
     const location = useLocation();
-
-    const toggleSidebar = (): void => setIsSidebarOpen(!isSidebarOpen)
-
-    const back = (): void => {
-        if (location.pathname !== "/") navigate(-1)
-    }
+    const [selectedCountry, setSelectedCountry] = useState<string>()
+    const countryName = useCountryFromUrl()
 
     useEffect(() => {
         setIsSidebarOpen(width > 348);
@@ -60,12 +56,10 @@ const AdminPanel = () => {
         !isLoading
             ? <section className="flex flex-row bg-sky-100 min-h-screen">
                 {role === "user" ?
-                    <UserSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-                    : <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+                    <UserSidebar />
+                    : <Sidebar />
                 }
                 <div className={`w-full transition-all duration-300 relative pb-20 lg:pb-0 ${isSidebarOpen ? "lg:ml-60" : "ml-0"}`}>
-                    <Navbar toggleSidebar={toggleSidebar} back={back} pathname={location.pathname} isSidebarOpen={isSidebarOpen} width={width} />
-                    
                     <Routes>
                         <Route path="/" element={
                             <ProtectedRoute>
@@ -80,12 +74,12 @@ const AdminPanel = () => {
                         } />
                         <Route path="/countries/new" element={
                             <ProtectedRoute>
-                                <AddCountry  />
+                                <AddCountry />
                             </ProtectedRoute>
                         } />
                         <Route path="/countries/:country" element={
                             <ProtectedRoute>
-                                <Country />
+                                <Country role={role} />
                             </ProtectedRoute>
                         } />
                         <Route path="/countries/:country/:card" element={
