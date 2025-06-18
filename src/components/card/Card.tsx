@@ -26,8 +26,9 @@ const Card = () => {
     // state handlers
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isChanged, setIsChanged] = useState<boolean>(false);
+    const [isMobile, setIsMobile] = useState<boolean>(false)
     const [minScreenSize, setMinScreenSize] = useState<number>(0)
-    const { height } = useWindowSize()
+    const { width, height } = useWindowSize()
     // country & card props
     const [selectedCountry, setSelectedCountry] = useState<CountryType>();
     const [selectedCard, setSelectedCard] = useState<CardType | undefined>();
@@ -39,6 +40,10 @@ const Card = () => {
         // height - header - footer - margin from footer
         setMinScreenSize(height - 40 - 40 - 50)
     }, [height])
+
+    useEffect(() => {
+        setIsMobile(width <= 768)
+    }, [width])
 
     useEffect(() => {
         getCountryData(country, setSelectedCountry, setIsLoading)
@@ -171,8 +176,9 @@ const Card = () => {
         handleUpload,
         isChanged,
         setIsChanged,
-        isLoading
-    }), [selectedCountry?.name, handleSave, handleDelete, handleAddNewItem, handleInputChange, handleCancel, handleUpload, isChanged, setIsChanged, isLoading]);
+        isLoading,
+        isMobile
+    }), [selectedCountry?.name, handleSave, handleDelete, handleAddNewItem, handleInputChange, handleCancel, handleUpload, isChanged, setIsChanged, isLoading, isMobile]);
 
 
     useEffect(() => {
@@ -234,7 +240,7 @@ const Card = () => {
                 <Loader />
             ) : (
                 <section className="bg-sky-100">
-                    <div className="elements-position px-4 md:px-12 text-[#1B75BB]" style={{ minHeight: minScreenSize + "px" }}>
+                    <div className="md:elements-position px-4 md:px-12 text-[#1B75BB]" style={{ minHeight: minScreenSize + "px" }}>
                             {/* CardHeader can remain or be refactored to use context for country name */}
                             <CardHeader isChanged={isChanged} country={selectedCountry?.name ?? ""} card={selectedCard} />
 

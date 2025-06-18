@@ -15,7 +15,7 @@ export interface CountryType {
     drinks: CuisineType[]
     information: InformationType[]
     summerReception: WeekendType[]
-    otherInformation: CuisineType[]
+    otherInformation: OtherType[]
     gallery: GalleryImageType[]
     transport: TransportType[]
     region: string

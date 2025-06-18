@@ -40,7 +40,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         // Get the wildcard parameter from the URL (e.g., "/countries" -> "countries")
         const currentPathSegment = params['*'];
         // Find the index of the section whose link matches the current path segment (after stripping leading slash)
-        const foundIndex = SIDEBAR_SECTIONS.findIndex(ss => ss.link.replace(/^\//, '') === currentPathSegment);
+        const mainLink = currentPathSegment?.split("/")[0] ?? -1
+        const foundIndex = SIDEBAR_SECTIONS.findIndex(ss => ss.link.replace(/^\//, '') === mainLink);
         setSelectedSection(foundIndex !== -1 ? foundIndex : -1);
     }, [params]); // Depend on params to react to URL changes
 
@@ -62,11 +63,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         <section
             // Base styles: fixed positioning, high z-index, white background, shadow
             className={`
-                fixed z-30 bg-stone-50 border-gray-200 shadow-xl px-2
+                fixed z-30 bg-stone-50 border-gray-200 shadow-xl 
                 ${isMobile
-                    ? 'bottom-0 left-0 right-0 h-16 w-full flex flex-row items-center justify-around border-t'
+                    ? 'bottom-0 left-0 right-0 h-10 w-full flex flex-row items-center justify-around'
                     // Desktop-specific styles: static vertical sidebar, dynamic width based on isOpen, vertical flex
-                    : `top-0 left-0 h-screen ${isOpen ? "w-60 translate-x-0" : "w-16 -translate-x-full lg:translate-x-0"} flex-col justify-start border-r rounded-r-xl`
+                    : `top-0 left-0 h-screen ${isOpen ? "w-60 translate-x-0" : "w-16 -translate-x-full lg:translate-x-0"} flex-col justify-start border-r rounded-r-xl px-2`
                 }
                 transition-all duration-300 ease-in-out // Smooth transitions for desktop sidebar sliding
             `}
@@ -87,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
             {/* Navigation List */}
             <ul className={`
-                flex-1 w-full space-x-10 md:space-x-0
+                flex-1 w-full
                 ${isMobile
                     ? 'flex flex-row justify-around' // Mobile: horizontal, space-around
                     : 'flex flex-col pt-2 space-y-4 px-2' // Desktop: vertical, spaced
@@ -98,14 +99,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         key={index}
                         onClick={() => handleSelectSection(section.link, index)}
                         className={`
-                            flex items-center cursor-pointer rounded-lg transition-colors duration-200 ease-in-out
+                            flex items-center cursor-pointer transition-colors duration-200 ease-in-out bg-white border-t-4
                             ${isMobile
-                                ? 'flex-col py-1 px-1 text-xs justify-center flex-1' // Mobile item: column, small text, even distribution
-                                : 'flex-row py-3 px-4 text-lg justify-center sm:justify-start' // Desktop item: row, larger text
+                                ? 'flex-col py-1 px-1 text-xs justify-center flex-1'
+                                : 'flex-row py-3 px-4 text-lg justify-center sm:justify-start rounded-lg'
                             }
                             ${selectedSection === index
-                                ? 'bg-blue-100 text-blue-800 border-blue-400' // Active state: light blue background, darker blue text/border
-                                : 'text-gray-700 hover:text-blue-800 border border-transparent hover:border-blue-800 bg-white' // Inactive state: white background, gray text, subtle hover
+                                ? 'border-blue-400'
+                                : 'text-gray-700 hover:text-blue-800 border border-transparent hover:border-blue-800'
                             }
                         `}
                     >

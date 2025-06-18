@@ -36,13 +36,13 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
             },
             {
                 id: TRANSPORT_CONSTANTS.NATIONAL_AND_INTERNATIONAL_TRANSPORT,
-                title: "(Inter) National",
+                title: "International & National transport",
                 icon: "fa fa-train-subway",
                 content: []
             },
             {
                 id: TRANSPORT_CONSTANTS.PUBLIC_TRANSPORT,
-                title: "Public",
+                title: "Public transport",
                 icon: "fa fa-bus",
                 content: []
             },
@@ -145,8 +145,8 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
                         key={data.title}
                         onClick={() => handleSectionClick(index)}
                         className={`
-                                bg-white p-3 rounded-2xl shadow-lg border border-gray-200
-                                flex flex-col items-center justify-center h-[80px] md:h-auto // Ensure consistent height for selectors
+                                p-3 rounded-2xl shadow-lg border border-gray-200 gap-4
+                                flex flex-row items-center justify-center md:h-[100px] // Ensure consistent height for selectors
                                 transition-all duration-300 transform hover:scale-103 hover:shadow-xl cursor-pointer
                                 ${openIndex === index
                                 ? 'bg-blue-600 text-white border-blue-700 shadow-2xl scale-102' // Active state
@@ -155,7 +155,7 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
                             `}
                     >
                         <i className={`${data.icon} text-3xl md:text-4xl ${openIndex === index ? 'text-white' : 'text-gray-600'}`}></i>
-                        <h1 className={`hidden md:block text-xl font-bold mt-3 ${openIndex === index ? 'text-white' : 'text-gray-800'}`}>
+                        <h1 className={`hidden md:block text-2xl font-bold ${openIndex === index ? 'text-white' : 'text-gray-800'}`}>
                             {data.title}
                         </h1>
                     </div>
@@ -163,7 +163,7 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
             </div>
 
             {openIndex !== -1 &&
-                <div ref={contentRef} className="md:bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-xl border border-green-100 my-4 transition-all duration-700 ease-in-out overflow-hidden" style={{ maxHeight: gridHeight }}>
+                <div ref={contentRef} className="md:bg-gradient-to-br from-white to-green-50 rounded-2xl md:shadow-xl border border-green-100 my-4 transition-all duration-700 ease-in-out overflow-hidden" style={{ maxHeight: gridHeight }}>
                     <CardGrid title={transportData[openIndex].title} data={transportData[openIndex].content} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onItemChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
                 </div>
             }

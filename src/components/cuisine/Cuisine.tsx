@@ -21,7 +21,7 @@ const Cuisine: React.FC<CuisineProps> = ({ cuisine }) => {
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
     const [cuisineSectionChange, setCuisineSectionChange] = useState<boolean[]>([false, false])
     const [gridHeight, setGridHeight] = useState("0px");
-    const contentRef = useRef<HTMLDivElement>(null); 
+    const contentRef = useRef<HTMLDivElement>(null);
 
     // const { width } = useWindowSize()
     const mapCuisineData = useCallback(() => {
@@ -60,11 +60,11 @@ const Cuisine: React.FC<CuisineProps> = ({ cuisine }) => {
         } else {
             setGridHeight("0px"); // Collapse when no section is open
         }
-    }, [openIndex, cuisineData]); 
+    }, [openIndex, cuisineData]);
 
     if (!context) return null
     // Destructure required functions and countryName from context after the check
-    const { countryName, handleInputChange, handleSave, handleAddNewItem, handleDelete, handleCancel, isChanged, isLoading } = context;
+    const { countryName, handleInputChange, handleSave, handleAddNewItem, handleDelete, handleCancel, isChanged, isLoading, isMobile } = context;
 
     const resetCuisineChange = (promiseResult: boolean) => {
         if (promiseResult) setCuisineSectionChange([false, false])
@@ -109,20 +109,40 @@ const Cuisine: React.FC<CuisineProps> = ({ cuisine }) => {
         if (index === openIndex) setOpenIndex(-1)
         else setTimeout(() => {
             setOpenIndex(index)
-        }, 700)
+        }, 500)
     }
 
 
     return (
         <div className="mt-5">
-            <div className="flex flex-row space-x-10">
-                {cuisineData.map((data, index) =>
-                    <div
+            {isMobile ? (
+                <div className=" rounded-xl w-full grid grid-cols-2 justify-between gap-1">
+                    {cuisineData.map((data, index) => 
+                        <div key={index} onClick={() => handleSectionClick(index)}
+                            className={`
+                                flex flex-row items-center justify-center py-2 gap-2 text-xl font-semibold text-white
+                                ${openIndex === index
+                                    ? 'bg-blue-600  border-blue-700 shadow-2xl scale-102' // Active state
+                                    : 'bg-gradient-to-br from-white to-green-50' // Inactive hover state
+                                }
+                            `}
+                        >
+                            <i className={`${data.icon} ${openIndex === index ? 'text-white' : 'text-gray-600'}`}></i>
+                            <h1 className={`${openIndex === index ? 'text-white' : 'text-gray-800'}`}>
+                                {data.title}
+                            </h1>
+                        </div>
+                    )}
+                </div>
+            ) : (
+                <div className="flex flex-row space-x-10">
+                    {cuisineData.map((data, index) =>
+                        <div
                             key={data.title}
                             onClick={() => handleSectionClick(index)}
                             className={`
-                                bg-white p-6 rounded-2xl shadow-lg border border-gray-200 w-44
-                                flex flex-col items-center justify-center h-[80px] md:h-auto md:min-mh-[140px] // Ensure consistent height for selectors
+                                p-6 rounded-2xl shadow-lg border border-gray-200 w-44 gap-2
+                                flex flex-row items-center justify-center h-[80px] md:h-auto md:min-mh-[140px] // Ensure consistent height for selectors
                                 transition-all duration-300 transform hover:scale-103 hover:shadow-xl cursor-pointer
                                 ${openIndex === index
                                     ? 'bg-blue-600 text-white border-blue-700 shadow-2xl scale-102' // Active state
@@ -130,16 +150,18 @@ const Cuisine: React.FC<CuisineProps> = ({ cuisine }) => {
                                 }
                             `}
                         >
-                            <i className={`${data.icon} text-3xl md:text-4xl mb-3 ${openIndex === index ? 'text-white' : 'text-gray-600'}`}></i>
-                            <h1 className={`hidden md:block text-2xl font-bold ${openIndex === index ? 'text-white' : 'text-gray-800'}`}>
+                            <i className={`${data.icon} text-3xl md:text-4xl mb-1 ${openIndex === index ? 'text-white' : 'text-gray-600'}`}></i>
+                            <h1 className={`text-2xl font-bold ${openIndex === index ? 'text-white' : 'text-gray-800'}`}>
                                 {data.title}
                             </h1>
                         </div>
-                )}
-            </div>
+                    )}
+                </div>
+            )}
+
 
             {openIndex !== -1 &&
-                <div ref={contentRef} className="md:bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-xl border border-green-100 my-4 transition-all duration-700 ease-in-out overflow-hidden" style={{ maxHeight: gridHeight }}>
+                <div ref={contentRef} className="md:bg-gradient-to-br from-white to-green-50 rounded-2xl md:shadow-xl border border-green-100 my-4 transition-all duration-700 ease-in-out overflow-hidden" style={{ maxHeight: gridHeight }}>
                     <CardGrid title={cuisineData[openIndex].title} data={cuisineData[openIndex].content} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onItemChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
                 </div>
             }

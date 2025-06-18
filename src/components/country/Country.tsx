@@ -38,15 +38,14 @@ const Country: React.FC = () => {
         // Ensure country name is available before navigating
         if (selectedCountry?.name) {
             navigate(`/countries/${selectedCountry.name}/${cardTitle}`);
+            window.scrollTo({top: 0, left: 0})
         }
     };
 
     return (
-        // Main section container for consistent background and padding
         <section className="bg-sky-100 min-h-screen text-[#1B75BB]">
             {isLoading ? (
-                // Display loading Plane component
-                <Plane country={selectedCountry?.name ?? ""}></Plane>
+                <Plane country={selectedCountry?.name ?? ""} />
             ) : (
                 // Conditional rendering based on whether a country was found
                 !!selectedCountry ? (

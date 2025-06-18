@@ -14,6 +14,7 @@ interface CardContextType {
     isChanged: boolean
     setIsChanged: (state: boolean) => void
     isLoading: boolean
+    isMobile: boolean
 }
 
 // Create the context with an undefined default value
