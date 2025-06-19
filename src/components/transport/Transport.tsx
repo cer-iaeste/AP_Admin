@@ -154,8 +154,8 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
                             }
                             `}
                     >
-                        <i className={`${data.icon} text-3xl md:text-4xl ${openIndex === index ? 'text-white' : 'text-gray-600'}`}></i>
-                        <h1 className={`hidden md:block text-2xl font-bold ${openIndex === index ? 'text-white' : 'text-gray-800'}`}>
+                        <i className={`${data.icon} text-xl md:text-2xl ${openIndex === index ? 'text-white' : 'text-gray-600'}`}></i>
+                        <h1 className={`hidden md:block text-lg md:text-xl font-bold ${openIndex === index ? 'text-white' : 'text-gray-800'}`}>
                             {data.title}
                         </h1>
                     </div>
@@ -163,7 +163,7 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
             </div>
 
             {openIndex !== -1 &&
-                <div ref={contentRef} className="md:bg-gradient-to-br from-white to-green-50 rounded-2xl md:shadow-xl border border-green-100 my-4 transition-all duration-700 ease-in-out overflow-hidden" style={{ maxHeight: gridHeight }}>
+                <div ref={contentRef} className="lg:bg-gradient-to-br from-white to-green-50 rounded-2xl lg:shadow-xl lg:border lg:border-green-100 my-4 transition-all duration-700 ease-in-out overflow-hidden" style={{ maxHeight: gridHeight }}>
                     <CardGrid title={transportData[openIndex].title} data={transportData[openIndex].content} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onItemChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
                 </div>
             }

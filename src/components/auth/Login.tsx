@@ -116,7 +116,7 @@ const Login: React.FC = () => {
                         disabled={!email || !password || loginLoading}
                         type="submit"
                         className={`
-                            w-full py-4 px-8 rounded-xl font-semibold text-xl // Bigger padding, more rounded, larger text
+                            w-full py-4 px-8 rounded-xl font-semibold text-xl
                             transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500
                             ${!email || !password || loginLoading
                                 ? 'bg-gray-300 text-gray-600 cursor-not-allowed'

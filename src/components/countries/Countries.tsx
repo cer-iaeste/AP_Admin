@@ -17,7 +17,7 @@ const Countries: React.FC<LandingProps> = ({ countries }) => {
         const countryName = event.currentTarget.dataset.name;
         if (countryName) {
             navigate(`/countries/${countryName}`);
-            window.scrollTo({top: 0, left: 0})
+            window.scrollTo({ top: 0, left: 0 })
         }
     };
 
@@ -70,9 +70,12 @@ const Countries: React.FC<LandingProps> = ({ countries }) => {
                 <div className="bg-blue-50 p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200">
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                         {/* Title */}
-                        <span className="font-semibold text-2xl md:text-3xl lg:text-4xl text-gray-800 flex-shrink-0">
-                            AP Countries
-                        </span>
+                        <div className="flex flex-row items-center gap-4 font-semibold text-2xl md:text-3xl lg:text-4xl text-gray-800">
+                            <i className="fa-solid fa-earth-europe"></i>
+                            <span className=" flex-shrink-0">
+                                AP Countries
+                            </span>
+                        </div>
 
                         {/* Right section: Search, Filter Toggle, Add New Country */}
                         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
@@ -155,7 +158,7 @@ const Countries: React.FC<LandingProps> = ({ countries }) => {
                                 onClick={handleSelectCountry}
                                 className={`
                                     flex flex-col items-center p-4 rounded-xl shadow-lg border border-gray-200
-                                    bg-blue-50 hover:bg-blue-100 hover:border-blue-300 cursor-pointer
+                                    bg-blue-50 hover:bg-[#a3ffe0] hover:border-blue-300 cursor-pointer
                                     transition-all duration-200 transform hover:scale-105
                                 `}
                             >

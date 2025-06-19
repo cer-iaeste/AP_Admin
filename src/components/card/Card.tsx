@@ -17,7 +17,7 @@ import Hero from "../hero/Hero";
 import { updateCountryField } from "../../service/CountryService";
 import { CardType, CountryType, UploadedFileType } from "../../types/types";
 import { useParams } from "react-router-dom";
-import { getCard, getCountryData, confirmModalWindow, scrollToBottom, isList, getCountryDbName } from "../../global/Global";
+import { getCard, getCountryData, confirmModalWindow, scrollToBottom, isList, getCountryDbName, createUploadFile } from "../../global/Global";
 import { toast } from "react-toastify";
 import useWindowSize from "../../hooks/useScreenSize";
 import CardContext from "./CardContext";
@@ -147,11 +147,7 @@ const Card = () => {
         const name = getCountryDbName(selectedCountry?.name ?? "")
         const file = event.target.files?.[0]
         if (file) {
-            const newFile: UploadedFileType = {
-                file,
-                url: URL.createObjectURL(file),
-                dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${name}%2F${folderName}%2F${file.name}?alt=media`
-            }
+            const newFile: UploadedFileType = createUploadFile(file, name, folderName)
             if (!setDataToDelete) {
                 setData([...data, newFile.url])
                 setDataToUpload([...data, newFile])

@@ -106,7 +106,7 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ summerReception }) =>
 
     return (
         <section className="my-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {summerReceptionData.map((weekend, index) => (
                         <div
                             key={index}
@@ -178,7 +178,7 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ summerReception }) =>
                         </div>
                     ))}
 
-                    <AddBtn onAdd={() => handlePopupModel(newWeekendTemplate, false)} isObject={false} />
+                    <AddBtn onAdd={() => handlePopupModel(newWeekendTemplate, false)} />
                 </div>
 
                 <FormButtons isChanged={isChanged} isLoading={isLoading} onCancel={onCancel} onSave={onSave} />

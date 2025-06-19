@@ -4,9 +4,10 @@ import CardBasic from "./CardBasic";
 import CardComplex from "./CardComplex";
 import AddBtn from "./Add";
 import { isList } from "../../global/Global";
+import { CityType, OtherType, TransportFeature } from "../../types/types";
 
 interface CardGridProps {
-    data: any[]
+    data: string[] | OtherType[] | CityType[] | TransportFeature[]
     title: string
     isChanged: boolean,
     isLoading: boolean,
@@ -20,7 +21,7 @@ interface CardGridProps {
 
 const CardGrid: React.FC<CardGridProps> = ({ title, data, isChanged, isLoading, onDelete, onInputChange, onSave, onAdd, onCancel }) => {
     const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false)
-    const [isObject, setIsObject] = useState<boolean>(false)
+    const [isBasic, setisBasic] = useState<boolean>(false)
 
     useEffect(() => {
         setIsDataLoaded(isList(data))
@@ -28,22 +29,21 @@ const CardGrid: React.FC<CardGridProps> = ({ title, data, isChanged, isLoading, 
 
     useEffect(() => {
         if (isDataLoaded) {
-            const item = data[0]
-            setIsObject(typeof item === "string" || (item?.hasOwnProperty("name") && !item?.hasOwnProperty("link")))
+            setisBasic(["Fun fact", "Airports"].includes(title))
         }
     },[isDataLoaded, data])
 
     return (
         isDataLoaded ? (
-            <div className="flex flex-col">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:m-8">
+            <div className="flex flex-col bg-transparent">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 lg:m-8">
                     {data.map((item, index) => {
-                        return isObject ?
+                        return isBasic ?
                             <CardBasic title={title} index={index} item={item} onDelete={onDelete} onInputChange={onInputChange} />
                             : <CardComplex title={title} index={index} item={item} onDelete={onDelete} onInputChange={onInputChange} />
                     })}
 
-                    <AddBtn onAdd={onAdd} isObject={isObject} />
+                    <AddBtn onAdd={onAdd} isBasic={isBasic} />
                 </div>
                 <FormButtons isChanged={isChanged} isLoading={isLoading} onSave={onSave} onCancel={onCancel} />
             </div>

@@ -162,62 +162,151 @@ const Hero: React.FC<HeroBannerProps> = ({ content }) => {
 
     return (
         <section className="text-[#1B75BB]">
-            {/* Input Fields Grid */}
             <div className="grid grid-cols-1 gap-6 my-8"> {/* Main grid for sections */}
-                    {/* Row 1: Country Name & Region */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Country Name Card */}
-                        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 flex flex-col space-y-4 min-h-[180px] justify-center">
-                            <div className="text-xl font-semibold text-gray-700 pb-2 border-b-2 border-blue-200 w-full text-center">
-                                <i className="fa-solid fa-flag mr-2 text-blue-600"></i> Country Name
-                            </div>
-                            <input
-                                type="text"
-                                value={countryName}
-                                onChange={(e) => setCountryName(e.target.value)}
-                                placeholder="Enter Country Name"
-                                className="w-full p-3 border border-gray-300 rounded-lg bg-white
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                    text-gray-800 text-lg shadow-sm"
-                            />
+                {/* Row 1: Banner & PDF */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Banner Upload Card */}
+                    <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 flex flex-col items-center justify-center min-h-[180px]">
+                        <div className="text-xl font-semibold text-gray-700 pb-2 mb-4 border-b-2 border-blue-200 w-full text-center">
+                            <i className="fa-solid fa-panorama mr-2 text-blue-600"></i> Hero Banner
                         </div>
+                        {image ? (
+                            <div className="flex flex-col flex-grow items-center justify-center w-full p-3 space-y-4">
+                                <img src={image} alt="Hero Banner Preview" className="h-24 w-auto object-contain rounded-md shadow-md border border-gray-200" />
+                                <span className="text-md font-medium text-gray-700 truncate w-full text-center">
+                                    {imageToUpload?.file.name || image.split('/').pop()?.split('?')[0] || "Current Banner"}
+                                </span>
+                                <div className="flex items-center gap-4 mt-2">
+                                    <button
+                                        className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        onClick={() => setViewImage(image)}
+                                        title="View banner"
+                                    >
+                                        <i className="fa fa-eye text-xl" />
+                                    </button>
+                                    <button
+                                        className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                        onClick={onDeleteImage}
+                                        title="Delete banner"
+                                    >
+                                        <i className="fa fa-trash text-xl" />
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <label
+                                htmlFor="banner-upload"
+                                className="flex flex-col flex-grow items-center justify-center w-full h-full p-6 bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-100 transition-all duration-300 group"
+                            >
+                                <input
+                                    id="banner-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => onUploadFile(e, 'banner')}
+                                    className="hidden"
+                                />
+                                <div className="text-center text-blue-500 group-hover:text-blue-700 transition-colors duration-300 flex flex-col items-center">
+                                    <i className="fa fa-image text-4xl mb-2"></i>
+                                    <p className="text-lg font-medium">Upload Banner</p>
+                                </div>
+                            </label>
+                        )}
+                    </div>
 
-                        {/* Region Select Card */}
-                        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 flex flex-col space-y-4 min-h-[180px] justify-center">
+                    {/* PDF Upload Card */}
+                    <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 flex flex-col items-center justify-center min-h-[220px]">
+                        <div className="text-xl font-semibold text-gray-700 pb-2 mb-4 border-b-2 border-blue-200 w-full text-center">
+                            <i className="fa-solid fa-file-pdf mr-2 text-blue-600"></i> Country PDF
+                        </div>
+                        {pdf ? (
+                            <div className="flex flex-col flex-grow items-center justify-center w-full p-3 space-y-4">
+                                <i className="fa-solid fa-file-pdf text-6xl text-red-600 mb-2"></i>
+                                <span className="text-md font-medium text-gray-700 truncate w-full text-center">
+                                    {pdfToUpload?.file.name || pdf.split('/').pop()?.split('?')[0] || "Current PDF"}
+                                </span>
+                                <div className="flex items-center gap-4 mt-2">
+                                    <a
+                                        className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200 transform hover:scale-110"
+                                        href={pdf} target="_blank" rel="noreferrer"
+                                        title="View PDF"
+                                    >
+                                        <i className="fa fa-eye text-xl" />
+                                    </a>
+                                    <button
+                                        className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-200 transform hover:scale-110"
+                                        onClick={onDeletePdf}
+                                        title="Delete PDF"
+                                    >
+                                        <i className="fa fa-trash text-xl" />
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <label
+                                htmlFor="pdf-upload"
+                                className="flex flex-col flex-grow items-center justify-center w-full h-full p-6 bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-100 transition-all duration-300 group"
+                            >
+                                <input
+                                    id="pdf-upload"
+                                    type="file"
+                                    accept=".pdf"
+                                    onChange={(e) => onUploadFile(e, 'pdf')}
+                                    className="hidden"
+                                />
+                                <div className="text-center text-blue-500 group-hover:text-blue-700 transition-colors duration-300 flex flex-col items-center">
+                                    <i className="fa fa-file-pdf text-4xl mb-2"></i>
+                                    <p className="text-lg font-medium">Upload Country PDF</p>
+                                </div>
+                            </label>
+                        )}
+                    </div>
+                </div>
+                {/* Row 2: Flag, Name, Region */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+                    {/* Country Name Card */}
+                    <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 flex flex-col space-y-4 min-h-[180px] justify-center">
+                        <div className="text-xl font-semibold text-gray-700 pb-2 border-b-2 border-blue-200 w-full text-center">
+                            <i className="fa-solid fa-flag mr-2 text-blue-600"></i> IAESTE Country Name
+                        </div>
+                        <input
+                            type="text"
+                            value={countryName}
+                            onChange={(e) => setCountryName(e.target.value)}
+                            placeholder="Enter Country Name"
+                            className="text-input"
+                        />
+                    </div>
+
+                    {/* Region Select Card */}
+                        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 flex flex-col  space-y-4 min-h-[180px] justify-center">
                             <div className="text-xl font-semibold text-gray-700 pb-2 border-b-2 border-blue-200 w-full text-center">
                                 <i className="fa-solid fa-globe mr-2 text-blue-600"></i> IAESTE Region
                             </div>
-                            <select
+                            <div className="flex flex-grow justify-center">
+                                <select
                                 value={region}
                                 onChange={handleOnRegionSelectChange}
-                                className="
-                                    block w-full p-3 text-lg font-semibold
-                                    text-gray-700 bg-white border border-gray-300 rounded-lg
-                                    shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                    appearance-none pr-8 cursor-pointer
-                                    hover:border-gray-400 transition duration-150 ease-in-out
-                                "
+                                className="text-input "
                             >
                                 <option value="">Select a Region</option> 
                                 <option value="cer">CER</option>
                                 <option value="core">CoRe</option>
                                 <option value="other">Other</option>
                             </select>
+                            </div>
+                            
                         </div>
-                    </div>
 
-                    {/* Row 2: Flag, Banner, PDF Uploads */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Flag Upload Card */}
+                    {/* Flag Upload Card */}
                         <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 flex flex-col items-center justify-center min-h-[220px]">
                             <div className="text-xl font-semibold text-gray-700 pb-2 mb-4 border-b-2 border-blue-200 w-full text-center">
                                 <i className="fa-solid fa-flag-usa mr-2 text-blue-600"></i> Country Flag
                             </div>
                             {flagImage ? (
-                                <div className="flex flex-col items-center w-full p-3 space-y-4">
+                                <div className="flex flex-col flex-grow justify-center items-center w-full p-3 space-y-4">
                                     <img src={flagImage} alt="Flag Preview" className="h-24 w-auto object-contain rounded-md shadow-md border border-gray-200" />
                                     <span className="text-md font-medium text-gray-700 truncate w-full text-center">
-                                        {flagToUpload?.file.name || flagImage.split('/').pop()?.split('?')[0] || "Current Flag"}
+                                        Flag.jpg
                                     </span>
                                     <div className="flex items-center gap-4 mt-2">
                                         <button
@@ -239,7 +328,7 @@ const Hero: React.FC<HeroBannerProps> = ({ content }) => {
                             ) : (
                                 <label
                                     htmlFor="flag-upload"
-                                    className="flex flex-col items-center justify-center w-full h-full p-6 bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-100 transition-all duration-300 group"
+                                    className="flex flex-col flex-grow items-center justify-center w-full h-full p-6 bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-100 transition-all duration-300 group"
                                 >
                                     <input
                                         id="flag-upload"
@@ -256,102 +345,8 @@ const Hero: React.FC<HeroBannerProps> = ({ content }) => {
                             )}
                         </div>
 
-                        {/* Banner Upload Card */}
-                        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 flex flex-col items-center justify-center min-h-[220px]">
-                            <div className="text-xl font-semibold text-gray-700 pb-2 mb-4 border-b-2 border-blue-200 w-full text-center">
-                                <i className="fa-solid fa-panorama mr-2 text-blue-600"></i> Hero Banner
-                            </div>
-                            {image ? (
-                                <div className="flex flex-col items-center w-full p-3 space-y-4">
-                                    <img src={image} alt="Hero Banner Preview" className="h-24 w-auto object-contain rounded-md shadow-md border border-gray-200" />
-                                    <span className="text-md font-medium text-gray-700 truncate w-full text-center">
-                                        {imageToUpload?.file.name || image.split('/').pop()?.split('?')[0] || "Current Banner"}
-                                    </span>
-                                    <div className="flex items-center gap-4 mt-2">
-                                        <button
-                                            className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            onClick={() => setViewImage(image)}
-                                            title="View banner"
-                                        >
-                                            <i className="fa fa-eye text-xl" />
-                                        </button>
-                                        <button
-                                            className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500"
-                                            onClick={onDeleteImage}
-                                            title="Delete banner"
-                                        >
-                                            <i className="fa fa-trash text-xl" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <label
-                                    htmlFor="banner-upload"
-                                    className="flex flex-col items-center justify-center w-full h-full p-6 bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-100 transition-all duration-300 group"
-                                >
-                                    <input
-                                        id="banner-upload"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => onUploadFile(e, 'banner')}
-                                        className="hidden"
-                                    />
-                                    <div className="text-center text-blue-500 group-hover:text-blue-700 transition-colors duration-300 flex flex-col items-center">
-                                        <i className="fa fa-image text-4xl mb-2"></i>
-                                        <p className="text-lg font-medium">Upload Banner</p>
-                                    </div>
-                                </label>
-                            )}
-                        </div>
 
-                        {/* PDF Upload Card */}
-                        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 flex flex-col items-center justify-center min-h-[220px]">
-                            <div className="text-xl font-semibold text-gray-700 pb-2 mb-4 border-b-2 border-blue-200 w-full text-center">
-                                <i className="fa-solid fa-file-pdf mr-2 text-blue-600"></i> Country PDF
-                            </div>
-                            {pdf ? (
-                                <div className="flex flex-col items-center w-full p-3 space-y-4">
-                                    <i className="fa-solid fa-file-pdf text-6xl text-red-600 mb-2"></i>
-                                    <span className="text-md font-medium text-gray-700 truncate w-full text-center">
-                                        {pdfToUpload?.file.name || pdf.split('/').pop()?.split('?')[0] || "Current PDF"}
-                                    </span>
-                                    <div className="flex items-center gap-4 mt-2">
-                                        <a
-                                            className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200 transform hover:scale-110"
-                                            href={pdf} target="_blank" rel="noreferrer"
-                                            title="View PDF"
-                                        >
-                                            <i className="fa fa-eye text-xl" />
-                                        </a>
-                                        <button
-                                            className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-200 transform hover:scale-110"
-                                            onClick={onDeletePdf}
-                                            title="Delete PDF"
-                                        >
-                                            <i className="fa fa-trash text-xl" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <label
-                                    htmlFor="pdf-upload"
-                                    className="flex flex-col items-center justify-center w-full h-full p-6 bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-100 transition-all duration-300 group"
-                                >
-                                    <input
-                                        id="pdf-upload"
-                                        type="file"
-                                        accept=".pdf"
-                                        onChange={(e) => onUploadFile(e, 'pdf')}
-                                        className="hidden"
-                                    />
-                                    <div className="text-center text-blue-500 group-hover:text-blue-700 transition-colors duration-300 flex flex-col items-center">
-                                        <i className="fa fa-file-pdf text-4xl mb-2"></i>
-                                        <p className="text-lg font-medium">Upload Country PDF</p>
-                                    </div>
-                                </label>
-                            )}
-                        </div>
-                    </div>
+                </div>
             </div>
 
             {viewImage && <ImagePopup image={viewImage} closeModal={closeModal} />}

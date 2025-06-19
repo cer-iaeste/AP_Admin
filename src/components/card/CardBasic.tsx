@@ -15,7 +15,7 @@ const CardBasic: React.FC<CardTempProps> = ({ title, index, item, onDelete, onIn
             key={index}
             className={`
                                 bg-gradient-to-br from-white to-blue-50 p-4 rounded-2xl shadow-xl border border-blue-100
-                                flex flex-col h-72 // Fixed height for visual consistency
+                                flex flex-col h-56 // Fixed height for visual consistency
                                 transition-all duration-300 transform hover:scale-103 hover:shadow-2xl
                         `}
         >
@@ -40,8 +40,7 @@ const CardBasic: React.FC<CardTempProps> = ({ title, index, item, onDelete, onIn
 
             {/* Fact Content Textarea - Takes up remaining space */}
             <textarea
-                placeholder="Enter a fun fact"
-                rows={4}
+                placeholder="Enter text"
                 value={!isObject? item : item.name}
                 onChange={(e) => onInputChange(e, index)}
                 className="

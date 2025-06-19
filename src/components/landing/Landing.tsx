@@ -3,7 +3,7 @@ import cerLogo from "../../images/cer-logo.png"
 
 const Landing: React.FC = () => {
     return (
-        <section className="bg-sky-100 text-[#1B75BB] flex flex-col items-center py-8 min-h-screen">
+        <section className="bg-sky-100 text-[#1B75BB] flex flex-col items-center py-8 min-h-screen p-4">
             {/* Main content card: Logo, Welcome, and Description */}
             <div className="
                 max-w-4xl mx-auto w-full // Max width and centering

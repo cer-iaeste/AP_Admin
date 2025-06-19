@@ -9,7 +9,7 @@ export interface FormButtonsProps {
 
 const FormButtons: React.FC<FormButtonsProps> = ({ isChanged, isLoading, onSave, onCancel }) => {
     return (
-        <div className="flex justify-end space-x-4 p-4">
+        <div className="flex justify-end space-x-4 pt-3 px-1">
             {/* Cancel Button */}
             <button
                 type="button"
@@ -25,9 +25,9 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isChanged, isLoading, onSave,
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 ) : (
-                    <i className={`fa fa-ban mr-2`} aria-hidden="true"></i>
+                    <i className={`fa fa-ban`} aria-hidden="true"></i>
                 )}
-                <span>Cancel</span>
+                <span className="hidden md:block ml-2">Cancel</span>
             </button>
 
             {/* Save Button */}
@@ -45,9 +45,9 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isChanged, isLoading, onSave,
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 ) : (
-                    <i className={`fa fa-save mr-2`} aria-hidden="true"></i>
+                    <i className={`fa fa-save`} aria-hidden="true"></i>
                 )}
-                <span>Save</span>
+                <span className="hidden md:block ml-2">Save</span>
             </button>
         </div>
     )

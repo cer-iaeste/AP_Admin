@@ -263,3 +263,9 @@ export const handleSelectCard = (countryName: string, cardTitle?: string) => {
     }
     return link
 };
+
+export const createUploadFile = (file: File, countryName: string, folder: string): UploadedFileType => ({
+    file: file,
+    url: URL.createObjectURL(file),
+    dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${countryName}%2F${folder}%2F${file.name}?alt=media`
+})

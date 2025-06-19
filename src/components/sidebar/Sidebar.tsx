@@ -38,18 +38,17 @@ const Sidebar = () => {
     return (
         <section
             className={`
-                fixed z-30 bg-stone-50 border-gray-200 shadow-xl 
+                fixed z-30 bg-white border-gray-200 shadow-xl 
                 ${isMobile
                     ? 'bottom-0 left-0 right-0 h-10 w-full flex flex-row items-center justify-around'
                     // Desktop-specific styles: static vertical sidebar, dynamic width based on isOpen, vertical flex
                     : `top-0 left-0 h-screen w-60 translate-x-0 flex-col justify-start border-r rounded-r-xl px-2`
                 }
-                transition-all duration-300 ease-in-out // Smooth transitions for desktop sidebar sliding
             `}
         >
             {/* Logo Section - only visible on desktop */}
             {!isMobile && (
-                <div key="admin-logo" className="bg-white m-2 rounded-xl border hover:border-blue-800flex items-center justify-center">
+                <div key="admin-logo" className="bg-blue-50 m-2 rounded-xl border hover:border-blue-800flex items-center justify-center">
                     <button
                         onClick={resetSidebar}
                         className="p-2 rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-sky-500"
@@ -65,7 +64,7 @@ const Sidebar = () => {
             <ul className={`
                 flex-1 w-full
                 ${isMobile
-                    ? 'flex flex-row justify-around' // Mobile: horizontal, space-around
+                    ? 'grid grid-cols-3 h-10' // Mobile: horizontal, space-around
                     : 'flex flex-col pt-2 space-y-4 px-2' // Desktop: vertical, spaced
                 }
             `}>
@@ -73,21 +72,11 @@ const Sidebar = () => {
                     <li
                         key={index}
                         onClick={() => handleSelectSection(section.link, index)}
-                        className={`
-                            flex items-center cursor-pointer transition-colors duration-200 ease-in-out bg-white border-t-4
-                            ${isMobile
-                                ? 'flex-col py-1 px-1 text-xs justify-center flex-1'
-                                : 'flex-row py-3 px-4 text-lg justify-center sm:justify-start rounded-lg'
-                            }
-                            ${selectedSection === index
-                                ? 'border-blue-400'
-                                : 'text-gray-700 hover:text-blue-800 border border-transparent hover:border-blue-800'
-                            }
-                        `}
+                        className={`sidebarBtn ${selectedSection !== index ? "sidebarBtnNotSelected" : "sidebarBtnSelected"}`}
                     >
-                        <i className={`${section.icon} text-xl ${isMobile ? 'mb-1' : ''}`} /> {/* Icon styling */}
+                        <i className={`${section.icon} text-xl  text-blue-600`} /> {/* Icon styling */}
                         {/* Section name - hidden on mobile, inline on desktop (with optional collapse) */}
-                        <span className={`${isMobile ? 'hidden' : 'inline'} ml-3 font-semibold`}>
+                        <span className={`${isMobile ? 'hidden' : 'inline'} ml-3 font-semibold text-sm sm:text-base text-blue-800`}>
                             {section.name}
                         </span>
                     </li>

@@ -95,7 +95,7 @@ const Country: React.FC<CountryProps> = ({ role }) => {
                                         relative bg-blue-50 shadow-md space-y-2 rounded-xl p-4 // Card background, softer shadow
                                         text-center text-[#1B75BB] cursor-pointer
                                         border border-blue-200 // Subtle blue border
-                                        transition-all duration-200 transform hover:scale-105 hover:bg-blue-100 hover:border-blue-400 hover:shadow-xl // Enhanced hover effects
+                                        transition-all duration-200 transform hover:scale-105 hover:bg-[#a3ffe0] hover:border-blue-400 hover:shadow-xl // Enhanced hover effects
                                         min-h-[160px]
                                         flex flex-col justify-center items-center
                                     `}
