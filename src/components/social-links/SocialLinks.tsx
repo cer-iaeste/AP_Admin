@@ -1,76 +1,78 @@
-import React, { useState, useEffect } from "react";
-import CardFooter from "../card/CardFooter";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import "../summer-reception/Weekend.css"
-import { CardProps } from "../../global/Global";
-import { SocialLinkType } from "../../types/types";
+import { CardFormType } from "../../types/types";
+import CardForm from "../card/Form";
+import CardContext from "../card/CardContext"
+import { SOCIAL_LINKS_CONSTANTS } from "../../global/Global";
 
-interface SocialLinksProps extends CardProps {
-    socialLinks: SocialLinkType[]
+interface SocialLinksProps {
+    socialLinks: CardFormType[];
 }
 
-const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks, country, handleSave, handleCancel, handleBack, handleInputChange }) => {
-    const [isChanged, setIsChanged] = useState(false)
-    // links
-    const [links, setLinks] = useState<SocialLinkType[]>([
-        { name: 'Instagram', icon: 'fab fa-instagram', value: '' },
-        { name: 'Facebook', icon: 'fab fa-facebook', value: '' },
-        { name: 'Website', icon: 'fas fa-globe', value: '' },
-        { name: 'WhatsApp', icon: 'fab fa-whatsapp', value: '' },
-        { name: 'Email Address', icon: 'fas fa-envelope', value: '' },
-    ])
+const SocialLinks: React.FC<SocialLinksProps> = ({ socialLinks }) => {
+    const context = useContext(CardContext);
+    const [mappedLinks, setMappedLinks] = useState<CardFormType[]>([])
+    const [links, setLinks] = useState<CardFormType[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const mapLinks = (socialLinks: SocialLinkType[]): SocialLinkType[] =>
-        links.map(link => ({
-            ...link,
-            value: socialLinks?.find(sl => sl.name === link.name)?.value ?? ''
-        }))
+    const mapLinks = useCallback(
+        (currentSocialLinks: CardFormType[]): CardFormType[] => {
+            return SOCIAL_LINKS_CONSTANTS.map(link => ({
+                ...link,
+                value: currentSocialLinks?.find(sl => sl.name === link.name)?.value ?? ''
+            }));
+        },
+        []
+    );
 
     useEffect(() => {
-        setLinks(mapLinks(socialLinks))
-    }, [socialLinks])
+        setLinks(mappedLinks)
+    }, [mappedLinks])
 
-    const onSave = async () => {
-        // map social links
-        const socialLinks = links.map(link => ({
+    useEffect(() => {
+        setMappedLinks(mapLinks(socialLinks));
+        setIsChanged(false);
+    }, [socialLinks, mapLinks]);
+
+    // Effect to check if changes have been made to enable the save button
+    useEffect(() => {
+        const hasChanges = links.some(link => {
+            const originalLink = socialLinks.find(sl => sl.name === link.name);
+            return originalLink ? originalLink.value !== link.value : link.value !== '';
+        });
+        setIsChanged(hasChanges);
+    }, [links, socialLinks]);
+
+    // Defensive check: ensure context is available
+    if (!context) return null
+    // Destructure required functions and countryName from context
+    const { countryName, handleSave, handleInputChange, handleCancel, isChanged, setIsChanged } = context;
+
+    // Handlers
+    const onSave = () => {
+        setIsLoading(true); // Start loading
+        const socialLinksToSave = links.filter(link => link.value !== '').map(link => ({
             name: link.name,
             value: link.value
-        }))
-        // save changes 
-        handleSave(country, socialLinks, "socialLinks", "Social links", setIsChanged)   
-    }
+        }));
 
-    const onCancel = async () => {
-        const confirmation = await handleCancel(isChanged, setLinks, socialLinks, setIsChanged)
-        if (confirmation) setLinks(mapLinks(socialLinks))
-    }
+        try {
+            handleSave(countryName, socialLinksToSave, "socialLinks", "Social links");
+        } catch (error) {
+            console.error("Error saving social links:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-    const onBack = () => handleBack(isChanged, setLinks, socialLinks, setIsChanged)
-    const onInputChange = (e: any, index: number) => handleInputChange(setLinks, links, index, e.target.value, setIsChanged, 'value')
+    const onCancel = () => handleCancel(setLinks, mappedLinks)
+
+    const onInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        handleInputChange(setLinks, links, socialLinks, index, e.target.value, 'value');
+    };
 
     return (
-        <section>
-            <div className="mt-6 table-margins mx-2 space-y-8">
-                {/* Links */}
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {links.map((link, index) =>
-                        <div key={index} className="card-container">
-                            <div className="card-header">
-                                <i className={`${link.icon} mr-1`} />
-                                {link.name}
-                            </div>
-                            <input
-                                placeholder="Link"
-                                value={link?.value}
-                                onChange={(e) => onInputChange(e, index)}
-                                className="card-textarea underline text-sky-700"
-                            />
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
-        </section>
+        <CardForm items={links} onInputChange={onInputChange} isLoading={isLoading} isChanged={isChanged} onSave={onSave} onCancel={onCancel} />
     );
 };
 

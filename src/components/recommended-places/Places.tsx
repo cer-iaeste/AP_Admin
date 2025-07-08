@@ -1,88 +1,56 @@
-import React, { useState, useEffect } from "react";
-import CardFooter from "../card/CardFooter";
+import React, { useState, useEffect, useContext } from "react";
 import "../card/Card.css"
 import { CityType } from "../../types/types";
-import useWindowSize from "../../hooks/useScreenSize";
-import { CardProps } from "../../global/Global";
+import CardContext from "../card/CardContext";
+import FormButtons from "../card/FormButtons";
+import CardGrid from "../card/CardGrid";
 
-interface PlacesProps extends CardProps {
+interface PlacesProps {
     places: CityType[]
 }
 
-const Places: React.FC<PlacesProps> = ({ country, places, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
+const Places: React.FC<PlacesProps> = ({ places }) => {
+    const context = useContext(CardContext);
     const [placesData, setPlacesData] = useState<CityType[]>([])
-    const [isChanged, setIsChanged] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
 
-    const { width } = useWindowSize()
-
+    // Effect to initialize placesData state when 'places' prop changes
     useEffect(() => {
         setPlacesData(places)
+        setIsChanged(false); // Reset changed status on initial load or prop update
     }, [places])
 
-    const onAdd = () => handleAddNewItem(setPlacesData, placesData, { name: "", description: "" }, setIsChanged)
-    const onSave = () => handleSave(country, placesData, "cities", "Recommended places", setIsChanged)
-    const onDelete = (index: number) => handleDelete(index, setPlacesData, placesData, setIsChanged)
-    const onCancel = () => handleCancel(isChanged, setPlacesData, places, setIsChanged)
-    const onBack = () => handleBack(isChanged, setPlacesData, places, setIsChanged)
-    const onInputChange = (e: any, index: number, column: string) => handleInputChange(setPlacesData, placesData, index, e.target.value, setIsChanged, column)
+    // Effect to check if changes have been made to enable the save button
+    useEffect(() => {
+        const hasChanges = JSON.stringify(placesData) !== JSON.stringify(places);
+        setIsChanged(hasChanges);
+        // If you have a handleChange prop from the parent to update a shared state, call it here:
+        // if (handleChange) handleChange(hasChanges);
+    }, [placesData, places]); // Depend on both states to detect changes
+
+    if (!context) return null
+    // Destructure required functions and countryName from context after the check
+    const { countryName, handleSave, handleInputChange, handleCancel, handleAddNewItem, handleDelete, isChanged, setIsChanged } = context;
+
+    // Handler to add a new empty place item
+    const onAdd = () => handleAddNewItem(setPlacesData, placesData, { name: "", description: "" })
+
+    // Handler to save all changes
+    const onSave = () => handleSave(countryName, placesData, "cities", "Recommended places")
+
+    // Handler to delete a specific place item by index
+    const onDelete = (index: number) => handleDelete(index, setPlacesData, placesData)
+
+    // Handler to cancel all unsaved changes
+    const onCancel = () => handleCancel(setPlacesData, places)
+
+    // Handler for input changes in individual place fields
+    const onInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number, column?: string) => { // Use React.ChangeEvent<HTMLTextAreaElement> for textareas
+        handleInputChange(setPlacesData, placesData, places, index, e.target.value, column)
+    }
 
     return (
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 table-margins mx-2">
-            {placesData.map((city, index) => (
-                <div key={index} className="card-container">
-                    <div className="card-footer-right">
-                            <button
-                                type="button"
-                                onClick={() => onDelete(index)}
-                                className="flex items-center py-1"
-                                title="Remove place"
-                            >
-                                <i className="fa fa-trash" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    <div className="card-subcontainer">
-                        {/* Title in the top right */}
-                        <div className="card-header card-header-sub">
-                            Name
-                        </div>
-                        {/* Value input below buttons */}
-                        <textarea
-                            placeholder="Place name"
-                            rows={2}
-                            value={city.name}
-                            onChange={(e) => onInputChange(e, index, "name")} // Update input value
-                            className="card-textarea mt-1.5"
-                            style={{ scrollbarWidth: 'thin'}}
-                        />
-                    </div>
-
-                    <div className="card-subcontainer">
-                        {/* Title in the top right */}
-                        <div className="card-header card-header-sub">
-                            Description
-                        </div>
-                        {/* Value input below buttons */}
-                        <textarea
-                            placeholder="Description"
-                            rows={width > 640 ? 8 : 4}
-                            value={city.description}
-                            onChange={(e) => onInputChange(e, index, "description")} // Update input value
-                            className="card-textarea mt-1.5"
-                            style={{ scrollbarWidth: 'thin'}}
-                        />
-                    </div>
-                </div>
-            ))}
-
-            <div className="flex items-end">
-                <button className="add-btn hover-bg-gradient" onClick={onAdd}>
-                    <i className="fa fa-plus"></i> Add a new place
-                </button>
-            </div>
-
-            {/* Reusable CardFooter Component */}
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
-        </div>
+        <CardGrid title="Place" data={placesData} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onInputChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
     )
 }
 

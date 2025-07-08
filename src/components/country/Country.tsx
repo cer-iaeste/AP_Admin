@@ -1,102 +1,148 @@
-import { useState, useEffect } from "react";
-import { loadingTimer, mapCountryCards, getCountryData } from "../../global/Global";
-import Plane from "../plane/Plane";
-import { CardType, CountryType } from "../../types/types";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { loadingTimer, mapCountryCards, getCountryData, handleSelectCard } from "../../global/Global"; // Assuming these functions exist
+import Plane from "../plane/Plane"; // Assuming Plane component exists for loading state
+import { CardType, CountryType } from "../../types/types"; // Ensure CardType and CountryType are defined
+import { useParams } from "react-router-dom";
+import Back from "../../global/Back"
+import { useNavigate } from "react-router-dom";
 
-const Country = () => {
+
+interface CountryProps {
+    role: "admin" | "user"
+}
+
+const Country: React.FC<CountryProps> = ({ role }) => {
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedCountry, setSelectedCountry] = useState<CountryType>()
-    const [cards, setCards] = useState<CardType[]>([])
-    const { country } = useParams()
-    const navigate = useNavigate();
+    const [selectedCountry, setSelectedCountry] = useState<CountryType | undefined>(undefined);
+    const [cards, setCards] = useState<CardType[]>([]);
+    const { country } = useParams();
+    const navigate = useNavigate()
 
+    // Effect to fetch country data when the 'country' param changes
     useEffect(() => {
-        getCountryData(country, setSelectedCountry, setIsLoading)
-    }, [country]);
+        // Ensure 'country' param exists before fetching data
+        if (country) {
+            setIsLoading(true); // Set loading true before fetching new data
+            getCountryData(country, setSelectedCountry, setIsLoading);
+        }
+    }, [country]); // Dependency array: re-run when URL 'country' param changes
 
+    // Effect to map country data to cards and manage loading state
     useEffect(() => {
-        setCards(mapCountryCards(selectedCountry))
-        loadingTimer(setIsLoading)
-    }, [selectedCountry])
+        if (selectedCountry) {
+            setCards(mapCountryCards(selectedCountry));
+            loadingTimer(setIsLoading)
+        }
+    }, [selectedCountry]);
 
-    const handleSelectCard = (card: string) => {
-        navigate(`/${selectedCountry?.name}/${card}`)
+    const onSelectCard = (card: string) => {
+        const link = handleSelectCard(country ?? "", card);
+        navigate(link)
+        window.scrollTo({ top: 0, left: 0 })
     }
 
     return (
-        <section className="relative w-full">
+        <section className="bg-sky-100 min-h-screen text-[#1B75BB]">
             {isLoading ? (
-                <Plane country={selectedCountry?.name ?? ""}></Plane>
+                <Plane country={selectedCountry?.name ?? ""} />
             ) : (
+                // Conditional rendering based on whether a country was found
                 !!selectedCountry ? (
-                    <section className="p-2 bg-sky-100 h-full min-h-[95.5vh]">
-                        <div className="max-w-7xl mx-auto">
-                            <div className="flex flex-col my-4">
-                                <div className="flex items-center justify-center w-full ">
-                                    <img src={selectedCountry.imageSrc} alt={selectedCountry.imageAlt} className="rounded-full h-20 w-20 sm:h-32 sm:w-32 border" />
-                                    <div className="flex flex-col ml-5 font-bold text-[#1B75BB] text-left">
-                                        <span className="text=xl sm:text-3xl">IAESTE</span>
-                                        <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{selectedCountry.name}</span>
-                                    </div>
+                    <div className="max-w-7xl mx-auto space-y-8 p-4">
+                        {/* Country Header Section (Flag and Name) - REVERTED TO PREVIOUS SUBTLE DESIGN */}
+                        <div className="
+                            relative overflow-hidden
+                            bg-gradient mix-blend-multiply // More subtle gradient
+                            p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 // Softer shadow and border
+                            flex flex-col items-center justify-center text-center
+                        ">
+                            {/* Back Button - Using the external Back component */}
+                            {role === "admin" &&
+                                <div className="absolute top-2 left-2 z-20">
+                                    <Back banner={true} />
+                                </div>
+                            }
+
+
+                            {/* Abstract Pattern Overlay (example: a subtle grid or wave) */}
+                            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url(https://www.transparenttextures.com/patterns/cubes.png)' }}></div>
+
+                            <div className="flex flex-col sm:flex-row items-center justify-center w-full z-10">
+                                <img
+                                    src={selectedCountry.imageSrc}
+                                    alt={selectedCountry.imageAlt}
+                                    className="rounded-full h-24 w-24 sm:h-32 sm:w-32 object-cover border-2 border-gray-300 shadow-md flex-shrink-0" // Reverted flag size and border
+                                />
+                                <div className="flex flex-col ml-0 sm:ml-6 mt-4 sm:mt-0 font-bold text-white text-center sm:text-left">
+                                    <span className="text-xl sm:text-3xl">IAESTE</span> {/* Reverted text size */}
+                                    <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl break-words leading-tight">{selectedCountry.name}</span> {/* Reverted text size and color */}
+                                    {/* Region information as a prominent tag */}
+                                    {selectedCountry.region && (
+                                        <span className="bg-white text-blue-500 px-4 py-1 rounded-full text-base sm:text-lg font-bold mt-2 shadow-md inline-block self-center sm:self-start">
+                                            {selectedCountry.region.toUpperCase()} Member
+                                        </span>
+                                    )}
                                 </div>
                             </div>
-                            <ul className="mt-8 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {/* <li className={`bg-[#1B75BB] shadow-xl space-y-2 rounded-lg p-2 py-6 sm:p-6 text-center text-white cursor-pointer hover:${bgGradient}`}>
-                                    <a href={country.href} target="_blank" rel="noreferrer">
-                                        <div className="flex flex items-center justify-center h-1/2">
-                                            <i className="fa fa-eye text-4xl aria-hidden='true'" />
+                        </div>
+
+                        {/* Country Cards List - UPDATED DESIGN */}
+                        <ul className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {cards.map((card, index) =>
+                                <li
+                                    key={index}
+                                    className={`
+                                        relative bg-blue-50 shadow-md space-y-2 rounded-xl p-4 // Card background, softer shadow
+                                        text-center text-[#1B75BB] cursor-pointer
+                                        border border-blue-200 // Subtle blue border
+                                        transition-all duration-200 transform hover:scale-105 hover:bg-[#a3ffe0] hover:border-blue-400 hover:shadow-xl // Enhanced hover effects
+                                        min-h-[160px]
+                                        flex flex-col justify-center items-center
+                                    `}
+                                >
+                                    <button onClick={() => onSelectCard(card.title)} className="grid grid-rows-2 h-full w-full items-center">
+                                        {/* Conditional ribbon when card.isEmpty is true */}
+                                        {card.isSectionEmpty &&
+                                            <div className="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-br-xl rounded-tl-xl z-10 shadow-md">
+                                                Section empty
+                                            </div>
+                                        }
+                                        {/* Top half with the icon */}
+                                        <div className="flex items-center justify-center flex-1">
+                                            <i className={`${card.icon} text-4xl sm:text-5xl text-blue-600`} aria-hidden="true" /> {/* Vibrant blue icon */}
                                         </div>
-                                        <div className="flex grow items-center justify-center h-1/2">
-                                            <h3 className="text-xl sm:text-2xl font-bold">
-                                                Preview page
+
+                                        {/* Bottom half with the title */}
+                                        <div className="flex items-center justify-center flex-1">
+                                            <h3 className="text-xl sm:text-2xl font-bold text-blue-800 break-words"> {/* Darker blue title */}
+                                                {card.title}
                                             </h3>
                                         </div>
-                                    </a>
-                                </li> */}
-
-                                {cards.map((card, index) =>
-                                    <li key={index}
-                                        className={`relative bg-gray-100 shadow-xl space-y-2 rounded-lg p-2 py-6 sm:p-6 text-center text-[#1B75BB] cursor-pointer hover-bg-gradient 105 h-32 sm:h-44`}>
-                                        <button onClick={() => handleSelectCard(card.title)} className="grid grid-rows-2 h-full w-full items-center">
-                                            {/* Conditional ribbon when card.isEmpty is true */}
-                                            {card.isSectionEmpty &&
-                                                <div className="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-br-lg z-10">
-                                                    Section empty
-                                                </div>
-                                            }
-                                            {/* Top half with the icon */}
-                                            <div className="flex flex items-center justify-center h-1/2">
-                                                <i className={`${card.icon} text-4xl aria-hidden="true`} />
-                                            </div>
-
-                                            {/* Bottom half with the title */}
-                                            <div className="flex items-center justify-center h-1/2">
-                                                <h3 className="text-xl sm:text-2xl font-bold">
-                                                    {card.title}
-                                                </h3>
-                                            </div>
-
-                                        </button>
-                                    </li>
-                                )}
-                            </ul>
-                        </div>
-                    </section>
+                                    </button>
+                                </li>
+                            )}
+                        </ul>
+                    </div>
                 ) : (
-                    <section className="px-4 py-2 bg-sky-100 h-screen text-[#1B75BB]">
-                        <div className="my-4 text-center font-bold flex flex-col space-y-4 items-center">
-                            <i className="fa fa-triangle-exclamation text-5xl"></i>
-                            <h1 className="text-5xl">Country not found</h1>
-                            <div className="pt-2 font-bold items-center text-lg">
-                                <i className="fa fa-circle-info mr-3"></i>Start by selecting a country from the sidebar to access the country menu
+                    // Display "Country not found" message
+                    <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
+                        <div
+                            className="bg-red-50 border border-red-200 text-red-700 px-8 py-6 rounded-xl shadow-md flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-3 text-lg sm:text-xl text-center"
+                            role="alert" aria-live="polite"
+                        >
+                            <i className="fa-solid fa-triangle-exclamation mr-2 text-3xl sm:text-4xl"></i>{" "}
+                            <div className="flex flex-col items-center sm:items-start">
+                                <h1 className="text-2xl sm:text-3xl font-bold">Country not found</h1>
+                                <span className="pt-2 font-bold text-base sm:text-lg text-gray-700">
+                                    <i className="fa fa-circle-info mr-2"></i>Start by selecting a section from the sidebar
+                                </span>
                             </div>
                         </div>
-                    </section>
+                    </div>
                 )
             )}
         </section>
-    )
-}
+    );
+};
 
 export default Country;

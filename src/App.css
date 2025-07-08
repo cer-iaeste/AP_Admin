@@ -54,3 +54,116 @@
   background: linear-gradient(to right, #1B75BB, #27A9E1, #49C0B5);
   color: white;
 }
+
+.text-input {
+  display: block; /* block */
+  width: 100%; /* w-full */
+  padding: 0.5rem; /* p-2 (1 unit in Tailwind's default config is 0.25rem, so 2 units is 0.5rem) */
+  font-size: 1.25rem; /* text-xl (1.25rem = 20px, default font-size for xl) */
+  font-weight: 600; /* font-semibold (600 is semibold) */
+  color: #4a5568; /* text-gray-700 (default Tailwind gray-700 color) */
+  background-color: #fff; /* bg-white */
+  border-width: 1px; /* border */
+  border-style: solid; /* border (default border style) */
+  border-color: #cbd5e0; /* border-gray-300 (default Tailwind gray-300 color) */
+  border-radius: 0.375rem; /* rounded-md (0.375rem = 6px, default border-radius for md) */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm (default shadow-sm) */
+  -webkit-appearance: none; /* appearance-none (for cross-browser reset) */
+  -moz-appearance: none; /* appearance-none (for cross-browser reset) */
+  appearance: none; /* appearance-none */
+  padding-right: 2rem; /* pr-8 (8 units = 2rem = 32px) */
+  cursor: pointer; /* cursor-pointer */
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter; /* transition (default transition property for Tailwind) */
+  transition-property: all; /* You can simplify this to 'all' if you're not concerned about specific properties, but Tailwind's 'transition' is quite broad */
+  transition-duration: 150ms; /* duration-150 */
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); /* ease-in-out (default ease-in-out timing function) */
+}
+
+.text-input:hover {
+  border-color: #a0aec0; /* hover:border-gray-400 (default Tailwind gray-400 color) */
+}
+
+.text-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px #0ea5e9, 0 0 0 2px #0ea5e9;
+  border-color: #0ea5e9;
+}
+
+.base-btn {
+  font-weight: 600; /* font-semibold */
+    font-size: 1rem; /* text-base */
+    padding-top: 0.5rem; /* py-2 */
+    padding-bottom: 0.5rem; /* py-2 */
+    padding-left: 0.75rem; /* px-3 */
+    padding-right: 0.75rem; /* px-3 */
+    border-radius: 9999px; /* rounded-full */
+    transition-property: all; /* transition */
+    transition-duration: 150ms; /* duration-150 */
+    transition-timing-function: ease-in-out; /* ease-in-out */
+    outline: none; /* focus:outline-none */
+    display: flex; /* flex */
+    align-items: center; /* items-center */
+    justify-content: center; /* justify-center */
+    white-space: nowrap; /* whitespace-nowrap */
+    border-width: 1px; /* border */
+    border-color: #BFDBFE; /* border-blue-200 */
+}
+
+.base-btn:focus {
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* blue-500 with 50% opacity */
+}
+
+.sidebarBtn {
+    display: flex; /* flex */
+    align-items: center; /* items-center */
+    cursor: pointer; /* cursor-pointer */
+    transition-property: all; /* transition-all */
+    transition-duration: 200ms; /* duration-200 */
+    transition-timing-function: ease-in-out; /* ease-in-out */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+    background-color: #EFF6FF; /* bg-blue-50 */
+    flex-direction: row; /* flex-row */
+    padding-top: 0.75rem; /* py-3 */
+    padding-bottom: 0.75rem; /* py-3 */
+    padding-left: 1rem; /* px-4 */
+    padding-right: 1rem; /* px-4 */
+    font-size: 1.125rem; /* text-lg */
+    justify-content: flex-start; /* justify-start */
+    border-radius: 0.5rem; /* rounded-lg */
+}
+
+.sidebarBtnNotSelected {
+    border-top-width: 4px; /* border-t-4 */
+    border-color: #EFF6FF; /* border-blue-50 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+    transition-property: all; /* transition-all */
+    transition-duration: 200ms; /* duration-200 */
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); /* ease-in-out */
+    transform: var(--tw-transform); /* transform - placeholder for other transforms */
+}
+
+.sidebarBtnNotSelected:hover {
+    transform: scale(1.05); /* hover:scale-105 */
+    background-color: #A3FFE0; /* hover:bg-[#a3ffe0] */
+    border-color: #60A5FA; /* hover:border-blue-400 */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* hover:shadow-xl */
+}
+
+.sidebarBtnSelected {
+    border-color: #a3ffe0;
+    border-top-width: 0.5rem
+}
+
+@media (min-width: 768px) {
+  .base-btn {
+    font-size: 1.125rem; /* md:text-lg */
+    padding-left: 1rem; /* md:px-4 */
+    padding-right: 1rem; /* md:px-4 */
+  }
+}
+
+@media (max-width: 768px) {
+  .text-input {
+    font-size: 1rem
+  }
+}

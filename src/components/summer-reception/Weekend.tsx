@@ -1,193 +1,259 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Weekend.css"
+import "./Weekend.css" // Keep this if it contains global styles you need
 import { WeekendType } from "../../types/types";
 
 interface WeekendProps {
-    selectedWeekend: WeekendType
-    isEditMode: boolean
-    onClose: () => void
-    onSave: (weekend: WeekendType) => void
+    selectedWeekend: WeekendType;
+    isEditMode: boolean;
+    onClose: () => void;
+    onSave: (weekend: WeekendType) => void;
 }
 
 const Weekend: React.FC<WeekendProps> = ({ selectedWeekend, isEditMode, onClose, onSave }) => {
     const [weekendData, setWeekendData] = useState<WeekendType>(selectedWeekend);
-    const popupRef = useRef(null);
+    const popupRef = useRef<HTMLDivElement>(null);
+    const [enableBtns, setEnableBtns] = useState<boolean>(false)
 
     useEffect(() => {
-        setWeekendData(selectedWeekend)
+        // When selectedWeekend prop changes, update local state
+        setWeekendData(selectedWeekend);
     }, [selectedWeekend]);
 
     useEffect(() => {
-        // escape button
-        const handleEscapeKey = (event: any) => {
-            if (event.keyCode === 27) onClose();
+        const { name, startDate, endDate, location } = weekendData
+        setEnableBtns(name && startDate && endDate && location ? true : false)
+    }, [weekendData])
+
+    useEffect(() => {
+        // Add event listener for the Escape key to close the modal
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') onClose();
         };
 
         document.addEventListener("keydown", handleEscapeKey);
 
+        // Cleanup function to remove event listener
         return () => {
             document.removeEventListener("keydown", handleEscapeKey);
         };
-    }, [onClose]);
+    }, [onClose]); // Dependency array includes onClose to ensure it's up-to-date
 
-    // Handle input changes
+    // Handle input changes for all form fields
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-
-        // Create a shallow copy of weekendData and update the necessary field
         setWeekendData((prevData) => ({
             ...prevData,
-            [name]: value,
+            [name]: name === "limit" ? parseInt(value) || 0 : value, // Convert limit to number, handle NaN
         }));
     };
 
-
     // Handle form submission (save changes)
-    const handleSave = () =>  onSave(weekendData)
+    const handleSave = () => {
+        // Basic validation before saving
+        if (!weekendData.name.trim() || !weekendData.startDate.trim() || !weekendData.endDate.trim() || !weekendData.location.trim()) {
+            alert("Please fill in all required fields (Name, Dates, Location)."); // Consider using a toast notification here
+            return;
+        }
+        onSave(weekendData); // Call parent's onSave handler
+    };
 
     // Handle cancel changes
     const handleCancel = () => {
-        setWeekendData(selectedWeekend)
+        setWeekendData(selectedWeekend); // Reset to original data
         onClose(); // Close the form
     };
 
-    // Format startDate - endDate without year
-    // const formatDateRange = (start, end) => {
-    //     const startDate = new Date(start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    //     const endDate = new Date(end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    //     return `${startDate} - ${endDate}`;
-    // };
-
     return (
-        <div className="overlay">
-            <div className={`relative bg-gradient rounded-xl shadow-md w-4/5 h-4/5 flex flex-col`} 
-                ref={popupRef} style={{ maxWidth: '800px', maxHeight: '600px' }}>
-                <div className="absolute top-0 flex w-full mx-auto justify-between items-center py-2 px-5 border-b">
-                    <span className="text-2xl font-bold text-white">{isEditMode ? "Edit weekend" : "Add new weekend"}</span>
-                    <button onClick={onClose} className="rounded-full bg-white py-1.5 px-3 text-black border border-[#0B3D59]">
-                        <i className="fa-solid fa-x text-[#0B3D59]"></i>
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50"> {/* Overlay */}
+            {/* The main popup container */}
+            <div
+                className="
+                    relative bg-white rounded-2xl shadow-2xl border border-gray-200
+                    w-full max-w-2xl max-h-[90vh] flex flex-col // Responsive width, max height, flex column layout
+                "
+                ref={popupRef}
+            >
+                {/* Header */}
+                <div className="bg-blue-600 text-white p-4 rounded-t-2xl flex justify-between items-center flex-shrink-0">
+                    <span className="text-2xl font-bold">{isEditMode ? "Edit Weekend" : "Add New Weekend"}</span>
+                    <button
+                        onClick={onClose}
+                        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors duration-200"
+                        title="Close"
+                    >
+                        <i className="fa-solid fa-x text-white"></i>
                     </button>
                 </div>
-                <div className="w-full p-6 text-white overflow-y-scroll mt-14 mb-20" style={{ scrollbarWidth: "thin" }}>
-                    <form className="space-y-4 mt-4 text-xl">
-                        <div className="form-row">
-                            <label>
-                                <i className="fa-solid fa-umbrella-beach"></i>
-                                <span>Name: </span>
+                
+                {/* Scrollable Content Area (Form) */}
+                <div className="w-full p-6 bg-white text-gray-800 overflow-y-auto flex-grow" style={{ scrollbarWidth: "thin" }}>
+                    <form className="space-y-6"> {/* Increased spacing */}
+                        {/* Event Name */}
+                        <div className="flex flex-col space-y-1">
+                            <label htmlFor="name" className="text-base font-semibold text-gray-700 flex items-center gap-2 mb-1">
+                                <i className="fa-solid fa-umbrella-beach text-blue-500"></i> Event Name:
                             </label>
                             <input
+                                id="name"
                                 type="text"
                                 name="name"
                                 value={weekendData.name}
                                 onChange={handleInputChange}
-                                placeholder="Event Name"
-                                className="sm:col-span-4"
+                                placeholder="e.g., Summer Weekend in Skopje"
+                                className="
+                                    w-full p-3 border border-gray-300 rounded-lg bg-white
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    text-gray-800 text-base shadow-sm
+                                "
                             />
                         </div>
+
                         {/* Date Range */}
-                        <div className="form-row">
-                            <label>
-                                <i className="fa fa-calendar-alt"></i>
-                                <span>Date: </span>
+                        <div className="flex flex-col space-y-1">
+                            <label className="text-base font-semibold text-gray-700 flex items-center gap-2 mb-1">
+                                <i className="fa-solid fa-calendar-alt text-blue-500"></i> Dates:
                             </label>
-                            <input
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> {/* Side-by-side on small screens */}
+                                <input
                                     type="date"
                                     name="startDate"
                                     value={weekendData.startDate}
                                     onChange={handleInputChange}
-                                    className="col-span-2"
+                                    className="
+                                        w-full p-3 border border-gray-300 rounded-lg bg-white
+                                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                        text-gray-800 text-base shadow-sm
+                                    "
                                 />
-                            <input
+                                <input
                                     type="date"
                                     name="endDate"
                                     value={weekendData.endDate}
                                     onChange={handleInputChange}
-                                    className="col-span-2"
+                                    className="
+                                        w-full p-3 border border-gray-300 rounded-lg bg-white
+                                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                        text-gray-800 text-base shadow-sm
+                                    "
                                 />
+                            </div>
                         </div>
+
                         {/* Location */}
-                        <div className="form-row">
-                            <label>
-                                <i className="fa fa-map-marker-alt"></i>
-                                <span>Location: </span>
+                        <div className="flex flex-col space-y-1">
+                            <label htmlFor="location" className="text-base font-semibold text-gray-700 flex items-center gap-2 mb-1">
+                                <i className="fa-solid fa-map-marker-alt text-blue-500"></i> Location:
                             </label>
                             <input
+                                id="location"
                                 type="text"
                                 name="location"
                                 value={weekendData.location}
                                 onChange={handleInputChange}
-                                placeholder="Location"
-                                className="col-span-4"
+                                placeholder="e.g., Ohrid Lake"
+                                className="
+                                    w-full p-3 border border-gray-300 rounded-lg bg-white
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    text-gray-800 text-base shadow-sm
+                                "
                             />
                         </div>
 
                         {/* Link */}
-                        <div className="form-row">
-                            <label>
-                                <i className="fa fa-link"></i>
-                                <span>Reg. link: </span>
+                        <div className="flex flex-col space-y-1">
+                            <label htmlFor="link" className="text-base font-semibold text-gray-700 flex items-center gap-2 mb-1">
+                                <i className="fa-solid fa-link text-blue-500"></i> Registration Link:
                             </label>
                             <input
+                                id="link"
                                 type="text"
                                 name="link"
                                 value={weekendData.link}
                                 onChange={handleInputChange}
-                                placeholder="Registration Link"
-                                className="underline col-span-4"
+                                placeholder="Optional: Enter registration link"
+                                className="
+                                    w-full p-3 border border-gray-300 rounded-lg bg-white
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    text-gray-800 text-base shadow-sm
+                                "
                             />
                         </div>
+
                         {/* Limit */}
-                        <div className="form-row">
-                            <label>
-                                <i className="fa fa-users"></i>
-                                <span>Limit: </span>
+                        <div className="flex flex-col space-y-1">
+                            <label htmlFor="limit" className="text-base font-semibold text-gray-700 flex items-center gap-2 mb-1">
+                                <i className="fa-solid fa-users text-blue-500"></i> Participants Limit:
                             </label>
                             <input
+                                id="limit"
                                 type="number"
                                 name="limit"
-                                value={weekendData.limit}
+                                value={weekendData.limit || ''} // Handle 0 or null for placeholder
                                 onChange={handleInputChange}
-                                placeholder="Maximum Participants"
-                                className="col-span-4"
+                                placeholder="Optional: Max. Participants"
+                                className="
+                                    w-full p-3 border border-gray-300 rounded-lg bg-white
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    text-gray-800 text-base shadow-sm
+                                "
                             />
                         </div>
+
                         {/* Description */}
-                        <div className="form-row">
-                            <label>
-                                <i className="fa fa-file-lines"></i>
-                                <span>Description: </span>
+                        <div className="flex flex-col space-y-1">
+                            <label htmlFor="description" className="text-base font-semibold text-gray-700 flex items-center gap-2 mb-1">
+                                <i className="fa-solid fa-file-lines text-blue-500"></i> Description:
                             </label>
                             <textarea
+                                id="description"
                                 name="description"
                                 value={weekendData.description}
                                 onChange={handleInputChange}
-                                placeholder="Description"
-                                rows={8}
-                                className="col-span-4 p-1 text-black"
+                                placeholder="Enter a detailed description of the event"
+                                rows={6} // Increased rows for more visible description
+                                className="
+                                    w-full p-3 border border-gray-300 rounded-lg bg-white
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    text-gray-800 text-base shadow-sm
+                                    resize-y // Allow vertical resizing
+                                "
+                                style={{ scrollbarWidth: 'thin'}}
                             />
                         </div>
                     </form>
                 </div>
+                
                 {/* Fixed Footer */}
-                <footer className="absolute bottom-0 left-0 w-full border-t-2 p-2">
-                    <div className="flex justify-end space-x-4 font-semibold">
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            className="btn flex items-center rounded-md border-2 border-red-500 text-red-500 p-1 bg-white hover:bg-red-500 hover:text-white hover:shadow-xl"
-                        >
-                            <i className="fa fa-ban mr-1" aria-hidden="true"></i>
-                            Cancel
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleSave}
-                            className="btn flex items-center rounded-md border-2 border-[#1B75BB] text-[#1B75BB] p-1 bg-white hover:bg-[#1B75BB] hover:text-white hover:shadow-xl"
-                        >
-                            <i className="fa fa-save mr-1" aria-hidden="true"></i>
-                            Save Changes
-                        </button>
-                    </div>
+                <footer className="bg-gray-100 p-4 border-t border-gray-200 flex justify-end space-x-4 flex-shrink-0 rounded-b-2xl">
+                    <button
+                        type="button"
+                        onClick={handleCancel}
+                        className="
+                            px-6 py-2 rounded-lg font-semibold
+                            bg-red-500 text-white hover:bg-red-600
+                            transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500
+                        "
+                    >
+                        <i className="fa fa-ban mr-2" aria-hidden="true"></i>
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleSave}
+                        className={`
+                            px-6 py-2 rounded-lg font-semibold
+                            ${enableBtns ?
+                                "bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                : "bg-gray-500 text-gray-400"
+                            }
+                            
+                            transition-all duration-200 transform 
+                        `}
+                        disabled={!enableBtns}
+                    >
+                        <i className="fa fa-save mr-2" aria-hidden="true"></i>
+                        Save Changes
+                    </button>
                 </footer>
             </div>
         </div>

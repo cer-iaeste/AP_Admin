@@ -1,12 +1,12 @@
 export interface CountryType {
-    id: number
+    id: string | number
     name: string
     href: string
     imageSrc: string
     imageAlt: string
     pdf: string
     banner?: string
-    socialLinks: SocialLinkType[]
+    socialLinks: CardFormType[]
     cities: CityType[]
     committees: string[]
     emergencyContacts: EmergencyContactsType[]
@@ -15,9 +15,10 @@ export interface CountryType {
     drinks: CuisineType[]
     information: InformationType[]
     summerReception: WeekendType[]
-    otherInformation: CuisineType[]
+    otherInformation: OtherType[]
     gallery: GalleryImageType[]
     transport: TransportType[]
+    region: string
 }
 
 export interface CityType {
@@ -36,7 +37,8 @@ export interface CuisineType {
 }
 
 export interface EmergencyContactsType {
-    [key: string] : string
+    title: string
+    number: string
 }
 
 export interface InformationType {
@@ -53,6 +55,7 @@ export interface WeekendType {
     link: string
     limit: number
     description: string
+    date?: string
 }
 
 export interface GalleryImageType {
@@ -75,10 +78,30 @@ export interface CardType {
     icon: string
     content?: any
     isSectionEmpty?: boolean
+    header?: string
+    desc?: string
+    sidebarTitle?: string
 }
 
-export interface SocialLinkType {
+export interface CardFormType {
     name: string
     icon?: string
     value: string
+}
+
+export interface SidebarSectionType {
+    name: string,
+    link: string,
+    icon?: string
+}
+
+export interface CardTempType {
+    name: string
+    icon: string
+}
+
+export interface UploadedFileType {
+    file: File
+    url: string
+    dbUrl: string
 }

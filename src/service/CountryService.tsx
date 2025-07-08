@@ -1,29 +1,25 @@
 import { CountryType } from "../types/types";
-import { doc, getDoc, getDocs, collection, getFirestore, updateDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection, getFirestore, updateDoc, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { getCountryDbName } from "../global/Global";
 
 const COUNTRY_CACHE_KEY = "countryData"
 const COUNTRIES_CACHE_KEY = "countriesData"
 
+const fetchCountriesData = async (): Promise<CountryType[]> => {
+    const querySnapshot = await getDocs(collection(db, "countries"))
+    const result: CountryType[] = []
+    querySnapshot.forEach((doc) => {
+        const countryData = doc.data() as CountryType
+        result.push(countryData)
+    })
+    localStorage.setItem(COUNTRIES_CACHE_KEY, JSON.stringify(result))
+    return result
+}
+
 export async function fetchDbData(): Promise<CountryType[]> {
     const storedData = localStorage.getItem(COUNTRIES_CACHE_KEY);
-
-    if (storedData) return JSON.parse(storedData)
-
-    const fetchCountriesData = async () : Promise<CountryType[]> => {
-        const querySnapshot = await getDocs(collection(db, "countries"))
-        const result: CountryType[] = []
-        querySnapshot.forEach((doc) => {
-            const countryData = doc.data() as CountryType
-            result.push(countryData)
-        })
-        localStorage.setItem(COUNTRIES_CACHE_KEY, JSON.stringify(result))
-        return result
-    }
-
-
-    return fetchCountriesData();
+    return storedData ? JSON.parse(storedData) : fetchCountriesData();
 }
 
 export async function fetchCountryData(country: string): Promise<CountryType | undefined> {
@@ -78,7 +74,33 @@ export async function fetchUnregisteredCountries() {
     return unregisteredCountries
 }
 
-
 export function clearCountryCache() {
     localStorage.removeItem(COUNTRY_CACHE_KEY)
+}
+
+export async function AddNewCountry(name: string, imageSrc: string, region: string) {
+    const newCountry: CountryType = {
+        name,
+        imageSrc,
+        region,
+        href: `/${name}`,
+        imageAlt: name.toLowerCase(),
+        id: 0,
+        pdf: "",
+        socialLinks: [],
+        cities: [],
+        committees: [],
+        emergencyContacts: [],
+        facts: [],
+        food: [],
+        drinks: [],
+        information: [],
+        summerReception: [],
+        otherInformation: [],
+        gallery: [],
+        transport: [],
+    }
+    const docRef = await addDoc(collection(db, "countries"), newCountry)
+    await fetchCountriesData()
+    await updateCountryField(name, docRef.id, 'id')
 }

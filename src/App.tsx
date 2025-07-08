@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import './App.css';
-import AdminPanel from './components/panel/AdminPanel';
+import AdminPanel from './components/admin-panel/AdminPanel';
 import Login from "./components/auth/Login";
 import AuthWrapper from "./service/AuthWrapper";
 import { AuthProvider } from "./service/AuthProvider";

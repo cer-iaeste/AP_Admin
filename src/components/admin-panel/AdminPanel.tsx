@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import AdminNavbar from "../navbar/Navbar";
 import Sidebar from "../sidebar/Sidebar";
 import UserSidebar from "../sidebar/UserSidebar";
 import Landing from "../landing/Landing";
@@ -12,18 +11,24 @@ import { loadingTimer } from "../../global/Global";
 import { fetchDbData } from "../../service/CountryService";
 import "../../App.css"
 import ProtectedRoute from "../../service/ProtectedRoute";
+import Countries from "../countries/Countries";
+import AddCountry from "../add-country/AddCountry";
+import { useNavigate, useLocation } from "react-router-dom";
+import useCountryFromUrl from "../../hooks/useCountryFromUrl";
 
 const AdminPanel = () => {
     const { width } = useWindowSize()
     const [role, setRole] = useState<"admin" | "user">("user")
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true)
     const [isLoading, setIsLoading] = useState(true)
     const [countries, setCountries] = useState<CountryType[]>([])
-
-    const toggleSidebar = (): void => setIsSidebarOpen(!isSidebarOpen)
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [selectedCountry, setSelectedCountry] = useState<string>()
+    const countryName = useCountryFromUrl()
 
     useEffect(() => {
-        setIsSidebarOpen(false);
+        setIsSidebarOpen(width > 348);
         setIsLoading(false)
     }, [width])
 
@@ -45,40 +50,49 @@ const AdminPanel = () => {
             const user = JSON.parse(loggedIn)
             setRole(user.role)
         }
-    }, []); 
+    }, []);
 
     return (
         !isLoading
-            ? <section className="flex flex-row">
+            ? <section className="flex flex-row bg-sky-100 min-h-screen">
                 {role === "user" ?
-                    <UserSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar}/>
-                    : <Sidebar isOpen={isSidebarOpen} countries={countries} toggleSidebar={toggleSidebar}/>
+                    <UserSidebar />
+                    : <Sidebar />
                 }
-                <div className={`w-full transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"}`}>
-                    <AdminNavbar toggleSidebar={toggleSidebar} role={role}/>
+                <div className={`w-full transition-all duration-300 relative pb-20 lg:pb-0 ${isSidebarOpen ? "lg:ml-60" : "ml-0"}`}>
                     <Routes>
                         <Route path="/" element={
                             <ProtectedRoute>
-                                <Landing countries={countries}/>
+                                <Landing />
                             </ProtectedRoute>
-                            
+
                         } />
-                        <Route path="/:country" element={
+                        <Route path="/:section" element={
                             <ProtectedRoute>
-                                <Country/>
+                                <Countries countries={countries} />
                             </ProtectedRoute>
                         } />
-                        <Route path="/:country/:card" element={
+                        <Route path="/countries/new" element={
                             <ProtectedRoute>
-                                <Card/>
+                                <AddCountry />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/countries/:country" element={
+                            <ProtectedRoute>
+                                <Country role={role} />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/countries/:country/:card" element={
+                            <ProtectedRoute>
+                                <Card />
                             </ProtectedRoute>
                         } />
                     </Routes>
                 </div>
-                {/* For mobile view*/}
-                {isSidebarOpen && width <= 1024 && (
+                {/* For mobile view
+                {isSidebarOpen && width <= 640 && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 z-10" onClick={toggleSidebar}></div>
-                )}
+                )} */}
             </section>
             : null
     );

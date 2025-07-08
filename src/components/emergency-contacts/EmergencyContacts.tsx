@@ -1,66 +1,79 @@
-import React, { useState, useEffect } from "react";
-import CardFooter from "../card/CardFooter";
-import { EmergencyContactsType } from "../../types/types";
+import React, { useState, useEffect, useCallback, useContext } from "react";
+import { EmergencyContactsType, CardFormType } from "../../types/types";
 import "../card/Card.css"
-import { CardProps } from "../../global/Global";
+import CardForm from "../card/Form";
+import { EMERGENCY_CONTACTS_CONSTANTS } from "../../global/Global";
+import CardContext from "../card/CardContext";
 
-interface EmergencyContactsProps extends CardProps {
-    emergencyContacts: EmergencyContactsType[]
+interface EmergencyContactsProps {
+    emergencyContacts: EmergencyContactsType[] // Only specific data prop remains
 }
 
-const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts, country, handleSave, handleDelete, handleCancel, handleBack, handleAddNewItem, handleInputChange }) => {
-    const [contactData, setContactData] = useState<EmergencyContactsType[]>([]);
-    const [isChanged, setIsChanged] = useState(false)
+const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts }) => {
+    const context = useContext(CardContext);
+    // All useState, useCallback, useEffect hooks must be called unconditionally before any early returns
+    const [mappedContacts, setMappedContacts] = useState<CardFormType[]>([])
+    const [contactData, setContactData] = useState<CardFormType[]>([]);
 
-    const mapContantData = (emergencyContacts: EmergencyContactsType[]): EmergencyContactsType[] => {
-        const initialContants: EmergencyContactsType[] = [
-            { title: 'Police', number: '' },
-            { title: 'Ambulance', number: '' },
-            { title: 'Fire Department', number: '' },
-            { title: 'Emergency Line', number: '' },
-        ]
-
-        if (!emergencyContacts.length) return initialContants
-
-        const contacts = structuredClone(emergencyContacts)
-
-        return initialContants.map(contact => ({
-            ...contact,
-            number: contacts.find((c: EmergencyContactsType) => c.title === contact.title)?.number ?? ''
-        }))
-    }
+    // Memoize the mapping function to avoid unnecessary re-renders
+    const mapContactData = useCallback(
+        (currentEmergencyContacts: EmergencyContactsType[]): CardFormType[] => {
+            return EMERGENCY_CONTACTS_CONSTANTS.map(initialItem => ({
+                ...initialItem,
+                value: currentEmergencyContacts.find(cem => cem.title === initialItem.name)?.number ?? ""
+            }));
+        },
+        []
+    );
 
     useEffect(() => {
-        setContactData(mapContantData(emergencyContacts))
-    }, [emergencyContacts]);
+        setContactData(mappedContacts)
+    }, [mappedContacts])
 
+    useEffect(() => {
+        setMappedContacts(mapContactData(emergencyContacts))
+        setIsChanged(false);
+    }, [emergencyContacts, mapContactData]);
+
+    useEffect(() => {
+        const hasChanges = contactData.some(contact => {
+            // Compare current local state `contact.value` with the original prop's `number`
+            const originalContact = emergencyContacts.find(ec => ec.title === contact.name);
+            return originalContact ? originalContact.number !== contact.value : contact.value !== '';
+        });
+        setIsChanged(hasChanges);
+    }, [contactData, emergencyContacts]);
+
+    // Defensive check after all hooks are called
+    if (!context) return null; // Or throw an error, or render a fallback UI
+    // Destructure required functions and countryName from context after the check
+    const { countryName, handleSave, handleInputChange, handleCancel, isChanged, setIsChanged, isLoading } = context;
+
+    // Handlers
     const onSave = () => {
-        const result = contactData.filter(contact => contact.number !== "")
-        handleSave(country, result, "emergencyContacts", "Emergency contacts", setIsChanged)
-    }
-    const onCancel = () => handleCancel(isChanged, setContactData, mapContantData(emergencyContacts), setIsChanged)
-    const onBack = () => handleBack(isChanged, setContactData, mapContantData(emergencyContacts), setIsChanged)
-    const onInputChange = (e: any, index: number, column: string) => handleInputChange(setContactData, contactData, index, e.target.value, setIsChanged, column)
+        const result: EmergencyContactsType[] = contactData
+            .map(contact => ({
+                title: contact.name, 
+                number: contact.value
+            }));
+        handleSave(countryName, result, "emergencyContacts", "Emergency contacts");
+    };
+
+    const onCancel = () => handleCancel(setContactData, mappedContacts)
+
+    // Handler for input changes in individual contact fields
+    const onInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) =>
+        handleInputChange(setContactData, contactData, emergencyContacts, index, e.target.value, 'value', 'number');
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-6 table-margins mx-2">
-            {contactData.map((contact, index) => (
-                <div key={index} className="card-container">
-                    <div className="card-header">
-                        {contact.title}
-                    </div>
-                    <input
-                        placeholder={`${contact.title} number`}
-                        value={contact.number}
-                        onChange={(e) => onInputChange(e, index, "number")}
-                        className="card-textarea"
-                    />
-                </div>
-            ))}
-
-            {/* Reusable Footer Component */}
-            <CardFooter isChanged={isChanged} onCancel={onCancel} onSave={onSave} onBack={onBack} />
-        </div>
+        <CardForm
+            items={contactData}
+            onInputChange={onInputChange}
+            isLoading={isLoading}
+            isChanged={isChanged}
+            onSave={onSave}
+            onCancel={onCancel}
+        />
     );
 };
 
