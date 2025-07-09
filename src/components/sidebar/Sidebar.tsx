@@ -64,7 +64,7 @@ const Sidebar = () => {
             <ul className={`
                 flex-1 w-full
                 ${isMobile
-                    ? 'grid grid-cols-3 h-10' // Mobile: horizontal, space-around
+                    ? 'grid grid-cols-4 h-10' // Mobile: horizontal, space-around
                     : 'flex flex-col pt-2 space-y-4 px-2' // Desktop: vertical, spaced
                 }
             `}>

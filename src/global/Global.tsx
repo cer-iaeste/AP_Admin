@@ -72,7 +72,8 @@ export const SOCIAL_LINKS_CONSTANTS: CardTempType[] = [
 
 export const SIDEBAR_SECTIONS: SidebarSectionType[] = [
     { name: "Admin Panel", icon: "fa-solid fa-home", link: "/" },
-    { name: "AP Countries", icon: "fa-solid fa-earth-europe", link: "/countries" },
+    { name: "Countries", icon: "fa-solid fa-earth-europe", link: "/countries" },
+    { name: "Users", icon: "fa-solid fa-users", link: "/users" },
 ]
 
 //functions

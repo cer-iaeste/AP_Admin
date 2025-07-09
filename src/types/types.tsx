@@ -105,3 +105,14 @@ export interface UploadedFileType {
     url: string
     dbUrl: string
 }
+
+export interface UserType {
+    uid: string
+    email: string
+    created: string
+    signedIn: string
+    country: string
+    role: "admin" | "user"
+    test?: boolean
+    disabled?: boolean
+}
