@@ -1,6 +1,6 @@
 import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { emptyLocalStorage } from "../global/Global";
 
 const AuthService = {
@@ -8,12 +8,22 @@ const AuthService = {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password)
             const idToken = await userCredential.user.getIdToken() // Firebase ID token
-            const userDoc = await getDoc(doc(db, "users", userCredential.user.uid))
+            const userRef = doc(db, "users", userCredential.user.uid)
+            const userDoc = await getDoc(userRef)
             if (userDoc.exists()) {
                 const data = userDoc.data()
-                localStorage.setItem("loggedIn", JSON.stringify(data))
-                localStorage.setItem("authToken", idToken)
-                return data;
+                if (!data.disabled) {
+                    const lastLoggedIn = Date.now()
+                    data["lastLoggedIn"] = lastLoggedIn
+                    await updateDoc(userRef, {
+                        "lastLoggedIn": lastLoggedIn
+                    })
+
+                    localStorage.setItem("loggedIn", JSON.stringify(data))
+                    localStorage.setItem("authToken", idToken)
+                    
+                    return data;
+                } else throw new Error("User is disabled!")
             } else throw new Error("User document not found!")
         } catch (error: any) {
             // Throw an error so `toast.promise` treats it as a failure.
@@ -45,7 +55,10 @@ const AuthService = {
 
             await setDoc(doc(db, "users", user.uid), {
                 country,
-                role: "user"
+                role: "user",
+                uid: user.uid,
+                email,
+                createdAt: Date.now()
             })
 
             return true

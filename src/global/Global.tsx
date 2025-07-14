@@ -72,7 +72,8 @@ export const SOCIAL_LINKS_CONSTANTS: CardTempType[] = [
 
 export const SIDEBAR_SECTIONS: SidebarSectionType[] = [
     { name: "Admin Panel", icon: "fa-solid fa-home", link: "/" },
-    { name: "AP Countries", icon: "fa-solid fa-earth-europe", link: "/countries" },
+    { name: "Countries", icon: "fa-solid fa-earth-europe", link: "/countries" },
+    { name: "Users", icon: "fa-solid fa-users", link: "/users" },
 ]
 
 //functions
@@ -269,3 +270,18 @@ export const createUploadFile = (file: File, countryName: string, folder: string
     url: URL.createObjectURL(file),
     dbUrl: `https://firebasestorage.googleapis.com/v0/b/iaeste-ap.appspot.com/o/${countryName}%2F${folder}%2F${file.name}?alt=media`
 })
+
+export const formatDate = (timestamp?: number | string): string => {
+    if (!timestamp) return ''
+
+    const date = new Date(+timestamp * 1000)
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-2);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return  `${day}.${month}.${year} - ${hours}:${minutes}:${seconds}`
+}

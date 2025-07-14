@@ -6,15 +6,16 @@ import useWindowSize from "../../hooks/useScreenSize"
 import { Routes, Route } from "react-router-dom";
 import Country from "../country/Country";
 import Card from "../card/Card";
-import { CountryType } from "../../types/types";
-import { loadingTimer } from "../../global/Global";
+import { CountryType, UserType } from "../../types/types";
+import { loadingTimer, formatDate } from "../../global/Global";
 import { fetchDbData } from "../../service/CountryService";
+import { fetchUsersData } from "../../service/UsersService";
 import "../../App.css"
 import ProtectedRoute from "../../service/ProtectedRoute";
 import Countries from "../countries/Countries";
 import AddCountry from "../add-country/AddCountry";
-import { useNavigate, useLocation } from "react-router-dom";
-import useCountryFromUrl from "../../hooks/useCountryFromUrl";
+import Users from "../users/Users";
+import AddUser from "../users/AddUser";
 
 const AdminPanel = () => {
     const { width } = useWindowSize()
@@ -22,10 +23,7 @@ const AdminPanel = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true)
     const [isLoading, setIsLoading] = useState(true)
     const [countries, setCountries] = useState<CountryType[]>([])
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [selectedCountry, setSelectedCountry] = useState<string>()
-    const countryName = useCountryFromUrl()
+    const [users, setUsers] = useState<UserType[]>([])
 
     useEffect(() => {
         setIsSidebarOpen(width > 348);
@@ -52,6 +50,24 @@ const AdminPanel = () => {
         }
     }, []);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            if (users.length === 0) {
+                setIsLoading(true)
+                const data = await fetchUsersData()
+                const filteredData = data.filter((user: UserType) => user.role === "user" && !user.test)
+                const mappedData = filteredData.map(user => ({
+                    ...user,
+                    createdAt: formatDate(user.createdAt),
+                    lastLoggedIn: formatDate(user.lastLoggedIn)
+                }))
+                setUsers(mappedData)
+                loadingTimer(setIsLoading)
+            }
+        }
+        fetchData()
+    }, [users])
+
     return (
         !isLoading
             ? <section className="flex flex-row bg-sky-100 min-h-screen">
@@ -67,7 +83,7 @@ const AdminPanel = () => {
                             </ProtectedRoute>
 
                         } />
-                        <Route path="/:section" element={
+                        <Route path="/countries" element={
                             <ProtectedRoute>
                                 <Countries countries={countries} />
                             </ProtectedRoute>
@@ -85,6 +101,16 @@ const AdminPanel = () => {
                         <Route path="/countries/:country/:card" element={
                             <ProtectedRoute>
                                 <Card />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/users" element={
+                            <ProtectedRoute>
+                                <Users users={users}/>
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/users/new" element={
+                            <ProtectedRoute>
+                                <AddUser countries={countries} users={users} />
                             </ProtectedRoute>
                         } />
                     </Routes>
