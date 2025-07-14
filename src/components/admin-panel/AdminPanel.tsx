@@ -7,7 +7,7 @@ import { Routes, Route } from "react-router-dom";
 import Country from "../country/Country";
 import Card from "../card/Card";
 import { CountryType, UserType } from "../../types/types";
-import { loadingTimer } from "../../global/Global";
+import { loadingTimer, formatDate } from "../../global/Global";
 import { fetchDbData } from "../../service/CountryService";
 import { fetchUsersData } from "../../service/UsersService";
 import "../../App.css"
@@ -15,6 +15,7 @@ import ProtectedRoute from "../../service/ProtectedRoute";
 import Countries from "../countries/Countries";
 import AddCountry from "../add-country/AddCountry";
 import Users from "../users/Users";
+import AddUser from "../users/AddUser";
 
 const AdminPanel = () => {
     const { width } = useWindowSize()
@@ -54,8 +55,13 @@ const AdminPanel = () => {
             if (users.length === 0) {
                 setIsLoading(true)
                 const data = await fetchUsersData()
-                console.log(data)
-                setUsers(data)
+                const filteredData = data.filter((user: UserType) => user.role === "user" && !user.test)
+                const mappedData = filteredData.map(user => ({
+                    ...user,
+                    createdAt: formatDate(user.createdAt),
+                    lastLoggedIn: formatDate(user.lastLoggedIn)
+                }))
+                setUsers(mappedData)
                 loadingTimer(setIsLoading)
             }
         }
@@ -100,6 +106,11 @@ const AdminPanel = () => {
                         <Route path="/users" element={
                             <ProtectedRoute>
                                 <Users users={users}/>
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/users/new" element={
+                            <ProtectedRoute>
+                                <AddUser countries={countries} users={users} />
                             </ProtectedRoute>
                         } />
                     </Routes>

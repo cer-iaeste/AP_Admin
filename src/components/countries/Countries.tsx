@@ -70,7 +70,7 @@ const Countries: React.FC<LandingProps> = ({ countries }) => {
                 <div className="bg-blue-50 p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200">
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                         {/* Title */}
-                        <div className="flex flex-row items-center gap-4 font-semibold text-2xl md:text-3xl lg:text-4xl text-gray-800">
+                        <div className="flex flex-row items-center gap-4 font-semibold text-2xl md:text-3xl lg:text-4xl text-[#1B75BB]">
                             <i className="fa-solid fa-earth-europe"></i>
                             <span className=" flex-shrink-0">
                                 AP Countries
