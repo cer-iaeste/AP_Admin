@@ -19,6 +19,7 @@ export interface CountryType {
     gallery: GalleryImageType[]
     transport: TransportType[]
     region: string
+    users: UserType[]
 }
 
 export interface CityType {
@@ -87,6 +88,8 @@ export interface CardFormType {
     name: string
     icon?: string
     value: string
+    isSelect?: boolean
+    options?: {value: string, display: string}[]
 }
 
 export interface SidebarSectionType {
@@ -115,4 +118,21 @@ export interface UserType {
     lastLoggedIn: string
     test?: boolean
     disabled?: boolean
+}
+
+export interface FileUploadProps {
+    type: "flag" | "banner" | "pdf"
+    file: string
+    fileToUpload: UploadedFileType | undefined
+    fileToDelete: string
+    column: keyof CountryType
+    title: string
+    defaultFile?: string
+}
+
+export interface TabProps {
+    setIsChanged: (data: boolean) => void
+    isChanged: boolean
+    isLoading: boolean
+    handleCancel: (resetData: () => void) => Promise<boolean>
 }

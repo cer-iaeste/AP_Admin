@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Sidebar from "../sidebar/Sidebar";
 import UserSidebar from "../sidebar/UserSidebar";
 import Landing from "../landing/Landing";
@@ -68,6 +68,7 @@ const AdminPanel = () => {
         fetchData()
     }, [users])
 
+
     return (
         !isLoading
             ? <section className="flex flex-row bg-sky-100 min-h-screen">
@@ -100,12 +101,12 @@ const AdminPanel = () => {
                         } />
                         <Route path="/countries/:country/:card" element={
                             <ProtectedRoute>
-                                <Card />
+                                <Card role={role}/>
                             </ProtectedRoute>
                         } />
                         <Route path="/users" element={
                             <ProtectedRoute>
-                                <Users users={users}/>
+                                <Users users={users} />
                             </ProtectedRoute>
                         } />
                         <Route path="/users/new" element={

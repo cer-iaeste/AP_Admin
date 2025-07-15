@@ -20,7 +20,8 @@ const CardForm: React.FC<CardFormProps> = ({ items, onInputChange, isChanged, is
                             <i className={`${item.icon} text-2xl text-blue-600`} />
                             <span className="hidden md:block ml-2">{item.name}</span>
                         </label>
-                        <input
+                        {!item.isSelect ? (
+                            <input
                             id={`link-${item.name.replace(/\s+/g, '-')}`}
                             type="text"
                             placeholder={`Enter ${item.name} value`}
@@ -28,6 +29,19 @@ const CardForm: React.FC<CardFormProps> = ({ items, onInputChange, isChanged, is
                             onChange={(e) => onInputChange(e, index)}
                             className="col-span-4 text-input w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
                         />
+                        ) : (
+                            <select id={`link-${item.name.replace(/\s+/g, '-')}`}
+                                value={item.value}
+                                onChange={(e) => onInputChange(e, index)}
+                                className="col-span-4 text-input w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+                            >
+                                {item.options && item.options.map((op, index) => 
+                                    <option key={index} value={op.value} disabled={!op.value}>
+                                        {op.display}
+                                    </option>
+                                )}
+                            </select>
+                        )}
                     </div>
                 )
             }

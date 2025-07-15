@@ -2,6 +2,8 @@ import { CountryType } from "../types/types";
 import { doc, getDoc, getDocs, collection, getFirestore, updateDoc, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { getCountryDbName } from "../global/Global";
+import { fetchCountryUsers } from "./UsersService";
+import { toast } from "react-toastify";
 
 const COUNTRY_CACHE_KEY = "countryData"
 const COUNTRIES_CACHE_KEY = "countriesData"
@@ -23,8 +25,16 @@ export async function fetchDbData(): Promise<CountryType[]> {
 }
 
 export async function fetchCountryData(country: string): Promise<CountryType | undefined> {
-    const countries = await fetchDbData()
-    return countries.find((data: CountryType) => data.name === country)
+    try {
+        const countries = await fetchDbData()
+        const foundCountry = countries.find((data: CountryType) => data.name === country)
+        if (!foundCountry) throw new Error("Country not found!")
+
+        foundCountry.users = await fetchCountryUsers(country)
+        return foundCountry
+    } catch (error) {
+        toast.error("Error fetching country data! Message: " + error)
+    }
 }
 
 export async function updateCountryField(country: string, content: any, column: keyof CountryType) {
@@ -99,6 +109,7 @@ export async function AddNewCountry(name: string, imageSrc: string, region: stri
         otherInformation: [],
         gallery: [],
         transport: [],
+        users: []
     }
     const docRef = await addDoc(collection(db, "countries"), newCountry)
     await fetchCountriesData()

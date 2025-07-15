@@ -86,7 +86,7 @@ const Country: React.FC<CountryProps> = ({ role }) => {
                             </div>
                         </div>
 
-                        {/* Country Cards List - UPDATED DESIGN */}
+                        {/* Country Cards List */}
                         <ul className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                             {cards.map((card, index) =>
                                 <li
