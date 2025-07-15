@@ -14,7 +14,7 @@ const Users: React.FC<UsersProps> = ({ users }) => {
     const [searchQuery, setSearchQuery] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(0)
-    const rowsPerPage = 8
+    const rowsPerPage = 10
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -97,7 +97,7 @@ const Users: React.FC<UsersProps> = ({ users }) => {
                     </div>
                 </div>
 
-                {/* Countries List */}
+                {/* Users Table */}
                 {filteredUsers.length > 0 ? (
                     <div>
                         <div className="w-full overflow-x-auto">

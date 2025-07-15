@@ -11,13 +11,24 @@ interface DBUser {
 }
 
 export const fetchUsersData = async (): Promise<UserType[]> => {
-    const querySnapshot = await getDocs(collection(db, "users"))
-    const result: UserType[] = []
-    querySnapshot.forEach((doc) => {
-        const data = doc.data() as UserType
-        result.push(data)
-    })
-    return result
+    try {
+        const querySnapshot = await getDocs(collection(db, "users"))
+        return querySnapshot.docs.map(doc => doc.data() as UserType);
+    } catch (error) {
+        toast.error(`Error fetching users! Message: ${error}`)
+        return []
+    }
+}
+
+export const fetchCountryUsers = async (countryName: string): Promise<UserType[]> => {
+    try {
+        const querySnapshot = await getDocs(collection(db, "users"))
+        return querySnapshot.docs.map(doc => doc.data() as UserType)
+            .filter(user => user.country === countryName && !user.test) ?? []
+    } catch (error) {
+        toast.error(`Error fetching users! Message: ${error}`)
+        return []
+    }
 }
 
 export const changeUserStatus = async (uid: string, status: boolean) => {
@@ -34,4 +45,3 @@ export const changeUserStatus = async (uid: string, status: boolean) => {
         return false
     }
 }
- 

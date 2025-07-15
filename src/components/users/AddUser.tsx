@@ -6,6 +6,7 @@ import { confirmModalWindow } from "../../global/Global";
 import { CountryType, UserType } from "../../types/types";
 import AuthService from "../../service/AuthService";
 import FormButtons from "../card/FormButtons";
+import { useSearchParams } from "react-router-dom";
 
 interface AddUserProps {
   countries: CountryType[]
@@ -13,6 +14,9 @@ interface AddUserProps {
 }
 
 const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
+  const [searchParams] = useSearchParams();
+  const preselectedCountry = searchParams.get("country") || "";
+
   const [isLoading, setIsLoading] = useState(true)
   const [isChanged, setIsChanged] = useState(false)
   const [change, setChange] = useState(false)
@@ -23,11 +27,10 @@ const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState(preselectedCountry);
 
   const [validCountries, setValidCountries] = useState<String[]>([])
   const [usedEmails, setUsedEmails] = useState<String[]>([])
-
 
   useEffect(() => {
     const resultEmails: string[] = []
@@ -127,7 +130,7 @@ const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header Section */}
         <div className="flex flex-col justify-center text-center md:text-left relative">
-          <Back confirmationNeeded={change} />
+          <Back confirmationNeeded={change} isAddUser={!!preselectedCountry} countryName={preselectedCountry}/>
 
           <span className="font-semibold text-3xl lg:text-4xl mt-20">Add a new user</span>
           <div className="font-bold items-center text-lg mt-2 flex justify-center md:justify-start">
@@ -226,9 +229,12 @@ const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
               value={selectedCountry}
               onChange={handlCountryChange}
               required
-              className="col-span-3 text-input w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              disabled={!!preselectedCountry}  // disable if prefilled
+              className="col-span-3 text-input w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
-              <option value="" disabled>Select a Country</option>
+              {!preselectedCountry && (
+                <option value="" disabled>Select a Country</option>
+              )}
               {validCountries.map((country, index) => (
                 <option key={index} value={country.toString()}>{country}</option>
               ))}

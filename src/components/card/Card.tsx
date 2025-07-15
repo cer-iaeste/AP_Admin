@@ -22,7 +22,11 @@ import { toast } from "react-toastify";
 import useWindowSize from "../../hooks/useScreenSize";
 import CardContext from "./CardContext";
 
-const Card = () => {
+interface CardProps {
+    role: "admin" | "user"
+}
+
+const Card: React.FC<CardProps> = ({ role }) => {
     // state handlers
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isChanged, setIsChanged] = useState<boolean>(false);
@@ -127,11 +131,13 @@ const Card = () => {
     );
 
     const handleCancel = useCallback(
-        async (setData: (data: any) => void, data: any): Promise<boolean> => {
+        async (setData: (data?: any) => void, data?: any): Promise<boolean> => {
             const handleReset = (): void => {
-                setData(structuredClone(data));
+                if (data) setData(structuredClone(data));
+                else setData()
                 setIsChanged(false);
             };
+
             if (!isChanged) {
                 handleReset();
                 return true;
@@ -221,7 +227,7 @@ const Card = () => {
                     setCardComponent(<SummerReception summerReception={selectedCard.content} />);
                     break;
                 default:
-                    setCardComponent(<Hero content={selectedCard.content} />);
+                    setCardComponent(<Hero content={selectedCard.content} role={role} />);
                     break;
             }
             setIsLoading(false);

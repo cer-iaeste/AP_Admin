@@ -7,7 +7,6 @@ import { storage } from "../firebase";
 import { ref, uploadBytes, deleteObject } from "firebase/storage";
 import { toast } from "react-toastify";
 import AuthService from "../service/AuthService";
-import { useLocation } from "react-router-dom";
 
 // interfaces
 export interface CardProps {
@@ -22,7 +21,7 @@ export interface CardProps {
 
 // constants
 export const componentsCards: CardType[] = [
-    { title: "Banner", icon: "fa fa-chalkboard", header: "Hero Banner Details", desc: "Manage the main banner image & country PDF settings" },
+    { title: "Banner", icon: "fa fa-chalkboard", header: "Hero Banner Details", desc: "Manage the country's details, banner, flag, pdf and users in the admin panel" },
     { title: "Social Links", icon: "fa fa-share-nodes", header: "Social Media & Contact Links", desc: "Manage links to social media and contact information" },
     { title: "Emergency Numbers", icon: "fa fa-phone", header: "Emergency Numbers", desc: "Manage essential emergency contact numbers for the country", sidebarTitle: "Emergency no." },
     { title: "General Information", icon: "fa fa-info-circle", header: "General Information", desc: "Manage general facts and descriptions for the country", sidebarTitle: "General info" },
@@ -118,7 +117,8 @@ export const getCardContent = (country: CountryType | null | undefined, title: s
                 flag: country?.imageSrc ?? "",
                 banner: country?.banner ?? "",
                 pdf: country?.pdf ?? "",
-                region: country?.region ?? ""
+                region: country?.region ?? "",
+                users: country?.users ?? []
             }
     }
 }

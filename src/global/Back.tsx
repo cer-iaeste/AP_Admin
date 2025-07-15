@@ -7,19 +7,23 @@ interface BackProps {
     confirmationNeeded?: boolean
     isMobile?: boolean
     countryName?: string
+    isAddUser?: boolean
 }
 
-const Back: React.FC<BackProps> = ({ confirmationNeeded, banner, isMobile, countryName }) => {
+const Back: React.FC<BackProps> = ({ confirmationNeeded, banner, isMobile, countryName, isAddUser }) => {
     const navigate = useNavigate();
     const location = useLocation()
 
     const handleBack = async () => {
         const goBack = () => {
-            const pathSegments = location.pathname.split("/").filter(Boolean)
             let newPath = "/"
-            if (pathSegments.length > 0) {
-                const slicedPath = pathSegments.slice(0, pathSegments.length - 1)
-                newPath = "/" + slicedPath.join("/")   
+            if (isAddUser && countryName) newPath = `/countries/${countryName}/Banner`
+            else {
+                const pathSegments = location.pathname.split("/").filter(Boolean)
+                if (pathSegments.length > 0) {
+                    const slicedPath = pathSegments.slice(0, pathSegments.length - 1)
+                    newPath = "/" + slicedPath.join("/")
+                }
             }
 
             window.scrollTo({ top: 0, left: 0 })
