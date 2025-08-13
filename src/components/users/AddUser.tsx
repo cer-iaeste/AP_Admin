@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import Back from "../../global/Back";
 import { useNavigate } from "react-router-dom";
-import { confirmModalWindow } from "../../global/Global";
+import { confirmModalWindow, useCountryFromPath } from "../../global/Global";
 import { CountryType, UserType } from "../../types/types";
 import AuthService from "../../service/AuthService";
 import FormButtons from "../card/FormButtons";
-import { useSearchParams } from "react-router-dom";
 
 interface AddUserProps {
   countries: CountryType[]
@@ -14,8 +13,8 @@ interface AddUserProps {
 }
 
 const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
-  const [searchParams] = useSearchParams();
-  const preselectedCountry = searchParams.get("country") || "";
+  const couuntryFromPath = useCountryFromPath()
+  const preselectedCountry = couuntryFromPath ?? "";
 
   const [isLoading, setIsLoading] = useState(true)
   const [isChanged, setIsChanged] = useState(false)

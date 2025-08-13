@@ -40,7 +40,7 @@ const UsersTab: React.FC<UsersTabProps> = ({ countryName, users, setUsers, role 
         );
     };
 
-    const handleAddNewUser = () => navigate(`/users/new?country=${encodeURIComponent(countryName)}`);
+    const handleAddNewUser = () => navigate(`/countries/${countryName}/Banner/new-user`);
 
     return (
         <section>
@@ -55,7 +55,7 @@ const UsersTab: React.FC<UsersTabProps> = ({ countryName, users, setUsers, role 
                                     <th className="py-3 px-4">Created</th>
                                     <th className="py-3 px-4">Last login</th>
                                     <th className="py-3 px-4">Status</th>
-                                    <th className={`py-3 px-4 ${role === "admin" ? "block" : "hidden"}`}>Actions</th>
+                                    <th className="py-3 px-4">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -71,7 +71,7 @@ const UsersTab: React.FC<UsersTabProps> = ({ countryName, users, setUsers, role 
                                         <td className="py-3 px-4 text-gray-700">{user.createdAt}</td>
                                         <td className="py-3 px-4 text-gray-700">{user.lastLoggedIn}</td>
                                         <td className="py-3 px-4 text-gray-700">{!user.disabled ? 'Active' : 'Disabled'}</td>
-                                        <td className={`py-3 px-4 ${role === "admin" ? "block" : "hidden"} text-gray-700`}>
+                                        <td className="py-3 px-4">
                                             <button onClick={() => toggleUserStatus(user)} className={user.disabled ? 'text-green-500' : 'text-red-500'}>
                                                 <i className="fa-solid fa-power-off" />
                                             </button>

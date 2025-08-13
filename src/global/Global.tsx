@@ -7,6 +7,8 @@ import { storage } from "../firebase";
 import { ref, uploadBytes, deleteObject } from "firebase/storage";
 import { toast } from "react-toastify";
 import AuthService from "../service/AuthService";
+import { useLocation } from "react-router-dom";
+import { useMemo } from "react";
 
 // interfaces
 export interface CardProps {
@@ -285,3 +287,13 @@ export const formatDate = (timestamp?: number | string): string => {
 
     return  `${day}.${month}.${year} - ${hours}:${minutes}:${seconds}`
 }
+
+export const useCountryFromPath = () => {
+  const location = useLocation();
+
+  return useMemo(() => {
+    const segments = location.pathname.split("/").filter(Boolean);
+    const country = segments[1] ?? "";
+    return country.replace(/%20/g, " ");
+  }, [location.pathname]);
+};

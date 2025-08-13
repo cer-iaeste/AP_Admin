@@ -99,6 +99,11 @@ const AdminPanel = () => {
                                 <Country role={role} />
                             </ProtectedRoute>
                         } />
+                        <Route path="/countries/:country/Banner/new-user" element={
+                            <ProtectedRoute>
+                                <AddUser countries={countries} users={users}/>
+                            </ProtectedRoute>
+                        } />
                         <Route path="/countries/:country/:card" element={
                             <ProtectedRoute>
                                 <Card role={role}/>
