@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useContext } from "react";
 import "../card/Card.css" // Keep this if it contains global styles you need
 import CardContext from "../card/CardContext"; // Adjust path as necessary
 import CardGrid from "../card/CardGrid";
+import { CardObject, MappedCardProps } from "../../types/types";
+import { mapCardContent } from "../../global/Global";
 
 interface FunFactsProps {
     facts: string[]
@@ -9,10 +11,10 @@ interface FunFactsProps {
 
 const FunFacts: React.FC<FunFactsProps> = ({ facts }) => {
     const context = useContext(CardContext)
-    const [factsData, setFactsData] = useState<string[]>([])
+    const [factsData, setFactsData] = useState<CardObject[]>([])
 
     useEffect(() => {
-        setFactsData(structuredClone(facts))
+        setFactsData(mapCardContent(facts))
         setIsChanged(false)
     }, [facts]);
 
@@ -30,7 +32,7 @@ const FunFacts: React.FC<FunFactsProps> = ({ facts }) => {
 
     const onSave = () => {
         // Filter out empty facts before saving
-        const factsToSave = factsData.filter(fact => fact.trim() !== '')
+        const factsToSave = factsData.filter(fact => typeof(fact.data) === "string" ? fact.data.trim() !== '' : "")
         handleSave(countryName, factsToSave, "facts", "Fun facts")
     };
 

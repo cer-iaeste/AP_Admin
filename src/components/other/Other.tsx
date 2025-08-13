@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
-import CardFooter from "../card/CardFooter";
 import "../card/Card.css"
-import { OtherType } from "../../types/types";
-import useWindowSize from "../../hooks/useScreenSize";
+import { CardObject, MappedCardProps, OtherType } from "../../types/types";
 import CardContext from "../card/CardContext";
 import CardGrid from "../card/CardGrid";
+import { mapCardContent } from "../../global/Global";
 
 interface OtherProps {
     other: OtherType[]
@@ -12,10 +11,10 @@ interface OtherProps {
 
 const Other: React.FC<OtherProps> = ({ other }) => {
     const context = useContext(CardContext);
-    const [otherData, setOtherData] = useState<OtherType[]>([])
+    const [otherData, setOtherData] = useState<CardObject[]>([])
 
     useEffect(() => {
-        setOtherData(other)
+        setOtherData(mapCardContent(other))
     }, [other])
 
     // Defensive check after all hooks are called

@@ -3,37 +3,38 @@ import { UserType } from "../../types/types"
 import { confirmModalWindow } from "../../global/Global"
 import { changeUserStatus } from "../../service/UsersService"
 import { useNavigate } from "react-router-dom"
+import useWindowSize from "../../hooks/useScreenSize"
+import Pagination from "../../global/Pagination"
 
 interface UsersProps {
     users: UserType[]
 }
 
 const Users: React.FC<UsersProps> = ({ users }) => {
+    const { width } = useWindowSize()
+    const navigate = useNavigate()
+
     const [filteredUsers, setFilteredUsers] = useState<UserType[]>([])
     const [paginatedUsers, setPaginatedUsers] = useState<UserType[]>([])
     const [searchQuery, setSearchQuery] = useState('')
-    const [currentPage, setCurrentPage] = useState(1)
-    const [totalPages, setTotalPages] = useState(0)
-    const rowsPerPage = 10
-    const navigate = useNavigate()
+    const [rowsPerPage, setRowsPerPage] = useState(8)
 
     useEffect(() => {
         setFilteredUsers(users)
     }, [users])
 
     useEffect(() => {
-        if (currentPage !== 1) setCurrentPage(1)
         const search = users.filter(user =>
             user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
             user.country.toLowerCase().includes(searchQuery.toLowerCase())
         )
         setFilteredUsers(search)
-    }, [searchQuery])
+    }, [searchQuery, users])
+
 
     useEffect(() => {
-        setTotalPages(Math.ceil(filteredUsers.length / rowsPerPage))
-        setPaginatedUsers(filteredUsers.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage))
-    }, [filteredUsers, currentPage])
+        setRowsPerPage(width > 640 ? 8 : 3)
+    }, [width, rowsPerPage])
 
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,10 +42,6 @@ const Users: React.FC<UsersProps> = ({ users }) => {
     };
 
     const handleAddNewUser = () => navigate('/users/new');
-
-    const handlePageChange = (page: number) => {
-        if (page >= 1 && page <= totalPages) setCurrentPage(page)
-    }
 
     const toggleUserStatus = async (user: UserType) => {
         const isDisabled = user.disabled;
@@ -65,7 +62,7 @@ const Users: React.FC<UsersProps> = ({ users }) => {
         <section className="bg-sky-100 min-h-screen text-[#1B75BB] py-8 px-4">
             <div className="max-w-6xl mx-auto space-y-8">
                 {/* Main Header Section (always visible) */}
-                <div className="bg-blue-50 p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200">
+                <div className="bg-blue-50 p-4 sm:p-6 rounded-xl shadow-lg ">
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                         {/* Title */}
                         <div className="flex flex-row items-center gap-4 font-semibold text-2xl md:text-3xl lg:text-4xl text-[#1B75BB]">
@@ -100,72 +97,68 @@ const Users: React.FC<UsersProps> = ({ users }) => {
                 {/* Users Table */}
                 {filteredUsers.length > 0 ? (
                     <div>
-                        <div className="w-full overflow-x-auto">
-                            <table className="min-w-full bg-white border border-[#1B75BB] rounded-xl shadow-md overflow-hidden">
-                                <thead className="bg-[#1B75BB] text-center text-white text-sm uppercase font-semibold">
-                                    <tr>
-                                        <th className="py-3 px-4">Email</th>
-                                        <th className="py-3 px-4">Country</th>
-                                        <th className="py-3 px-4">Created</th>
-                                        <th className="py-3 px-4">Last login</th>
-                                        <th className="py-3 px-4">Status</th>
-                                        <th className="py-3 px-4">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {paginatedUsers.map((user, index) => (
-                                        <tr
-                                            key={index}
-                                            data-name={user.country}
-                                            /* onClick={handleSelectCountry} */
-                                            className={`hover:bg-blue-50 cursor-pointer transition duration-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                                        >
-                                            <td className="py-3 px-4 text-gray-700">{user.email}</td>
-                                            <td className="py-3 px-4 text-gray-800 font-medium uppercase">{user.country}</td>
-                                            <td className="py-3 px-4 text-gray-700">{user.createdAt}</td>
-                                            <td className="py-3 px-4 text-gray-700">{user.lastLoggedIn}</td>
-                                            <td className="py-3 px-4 text-gray-700">{!user.disabled ? 'Active' : 'Disabled'}</td>
-                                            <td className="py-3 px-4 text-gray-700">
-                                                <button onClick={() => toggleUserStatus(user)} className={user.disabled ? 'text-green-500' : 'text-red-500'}>
-                                                    <i className="fa-solid fa-power-off" />
-                                                </button>
-                                            </td>
+                        <div className="w-full overflow-x-auto rounded-xl">
+                            {/* Desktop version */}
+                            <div className="hidden sm:block">
+                                <table className="min-w-full bg-white rounded-xl shadow-md">
+                                    <thead className="bg-[#1B75BB] text-center text-white text-sm uppercase font-semibold">
+                                        <tr>
+                                            <th className="py-3 px-4">Email</th>
+                                            <th className="py-3 px-4">Country</th>
+                                            <th className="py-3 px-4">Created</th>
+                                            <th className="py-3 px-4">Last login</th>
+                                            <th className="py-3 px-4">Status</th>
+                                            <th className="py-3 px-4">Actions</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="table-row-group">
+                                        {paginatedUsers.map((user, index) => (
+                                            <tr key={index} className={`transition duration-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50`}>
+                                                <td className="py-3 px-4 text-gray-700">{user.email}</td>
+                                                <td className="py-3 px-4 text-gray-800 font-medium uppercase">{user.country}</td>
+                                                <td className="py-3 px-4 text-gray-700">{user.createdAt}</td>
+                                                <td className="py-3 px-4 text-gray-700">{user.lastLoggedIn}</td>
+                                                <td className="py-3 px-4 text-gray-700">{!user.disabled ? 'Active' : 'Disabled'}</td>
+                                                <td className="py-3 px-4 text-gray-700">
+                                                    <button onClick={() => toggleUserStatus(user)} className={user.disabled ? 'text-green-500' : 'text-red-500'}>
+                                                        <i className="fa-solid fa-power-off" />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Mobile version */}
+                            <div className="sm:hidden space-y-4 mt-4">
+                                {paginatedUsers.map((user, index) => (
+                                    <div key={index} className="bg-white rounded-xl shadow-md p-4 border border-gray-200">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <h3 className="text-lg font-semibold text-blue-800">{user.email}</h3>
+                                            <button
+                                                onClick={() => toggleUserStatus(user)}
+                                                className={`text-xl ${user.disabled ? 'text-green-500' : 'text-red-500'}`}
+                                            >
+                                                <i className="fa-solid fa-power-off" />
+                                            </button>
+                                        </div>
+                                        <div className="text-gray-700 space-y-1 text-start">
+                                            <p><span className="font-medium">Country:</span> {user.country}</p>
+                                            <p><span className="font-medium">Created:</span> {user.createdAt}</p>
+                                            <p><span className="font-medium">Last login:</span> {user.lastLoggedIn}</p>
+                                            <p><span className="font-medium">Status:</span> {user.disabled ? 'Disabled' : 'Active'}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                         {/* Pagination Controls */}
-                        {totalPages > 1 && (
-                            <div className="flex justify-end items-center gap-2 mt-6">
-                                <button
-                                    className="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-blue-100"
-                                    disabled={currentPage === 1}
-                                    onClick={() => handlePageChange(currentPage - 1)}
-                                >
-                                    Prev
-                                </button>
-                                {[...Array(totalPages)].map((_, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => handlePageChange(i + 1)}
-                                        className={`px-3 py-1 rounded border ${currentPage === i + 1
-                                            ? "bg-[#1B75BB] text-white"
-                                            : "bg-white text-gray-700 hover:bg-blue-100"
-                                            }`}
-                                    >
-                                        {i + 1}
-                                    </button>
-                                ))}
-                                <button
-                                    className="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-blue-100"
-                                    disabled={currentPage === totalPages}
-                                    onClick={() => handlePageChange(currentPage + 1)}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        )}
+                        <Pagination 
+                            data={filteredUsers}
+                            setPaginatedData={setPaginatedUsers}
+                            rows={rowsPerPage}
+                        />
                     </div>
 
                 ) : (
@@ -178,9 +171,10 @@ const Users: React.FC<UsersProps> = ({ users }) => {
                             <span>No users found for your current filters!</span>
                         </div>
                     </div>
-                )}
-            </div>
-        </section>
+                )
+                }
+            </div >
+        </section >
     )
 }
 

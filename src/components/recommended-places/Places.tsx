@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import "../card/Card.css"
-import { CityType } from "../../types/types";
+import { CardObject, CityType, MappedCardProps } from "../../types/types";
 import CardContext from "../card/CardContext";
 import FormButtons from "../card/FormButtons";
 import CardGrid from "../card/CardGrid";
+import { mapCardContent } from "../../global/Global";
 
 interface PlacesProps {
     places: CityType[]
@@ -11,21 +12,21 @@ interface PlacesProps {
 
 const Places: React.FC<PlacesProps> = ({ places }) => {
     const context = useContext(CardContext);
-    const [placesData, setPlacesData] = useState<CityType[]>([])
+    const [placesData, setPlacesData] = useState<CardObject[]>([])
     const [isLoading, setIsLoading] = useState(false);
 
     // Effect to initialize placesData state when 'places' prop changes
     useEffect(() => {
-        setPlacesData(places)
+        setIsLoading(true)
+        setPlacesData(mapCardContent(places))
         setIsChanged(false); // Reset changed status on initial load or prop update
+        setIsLoading(false)
     }, [places])
 
     // Effect to check if changes have been made to enable the save button
     useEffect(() => {
-        const hasChanges = JSON.stringify(placesData) !== JSON.stringify(places);
+        const hasChanges = JSON.stringify(placesData.map(item => item.data)) !== JSON.stringify(places);
         setIsChanged(hasChanges);
-        // If you have a handleChange prop from the parent to update a shared state, call it here:
-        // if (handleChange) handleChange(hasChanges);
     }, [placesData, places]); // Depend on both states to detect changes
 
     if (!context) return null
@@ -36,13 +37,16 @@ const Places: React.FC<PlacesProps> = ({ places }) => {
     const onAdd = () => handleAddNewItem(setPlacesData, placesData, { name: "", description: "" })
 
     // Handler to save all changes
-    const onSave = () => handleSave(countryName, placesData, "cities", "Recommended places")
+    const onSave = () => handleSave(countryName, placesData, "cities", "Recommended places", true)
 
     // Handler to delete a specific place item by index
-    const onDelete = (index: number) => handleDelete(index, setPlacesData, placesData)
+    const onDelete = async (index: number) => {
+        const confirmation = await handleDelete(index, setPlacesData, placesData)
+        if (confirmation) onSave()
+    }
 
     // Handler to cancel all unsaved changes
-    const onCancel = () => handleCancel(setPlacesData, places)
+    const onCancel = () => handleCancel(setPlacesData, places, true)
 
     // Handler for input changes in individual place fields
     const onInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number, column?: string) => { // Use React.ChangeEvent<HTMLTextAreaElement> for textareas

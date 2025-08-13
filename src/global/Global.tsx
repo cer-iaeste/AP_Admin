@@ -1,4 +1,4 @@
-import { CardTempType, CardType, CountryType, SidebarSectionType } from "../types/types";
+import { CardObject, CardTempType, CardType, CityType, CountryType, CuisineType, OtherType, SidebarSectionType, TransportFeature, TransportType } from "../types/types";
 import { fetchCountryData } from "../service/CountryService";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
@@ -83,6 +83,12 @@ export const loadingTimer = (setIsLoading: (status: boolean) => void) => {
 
     return () => clearTimeout(timer)
 }
+
+export const mapCardContent = (content: CuisineType[] | OtherType[] | TransportFeature[] | string[] | CityType[]): CardObject[] => 
+    content.map((item, index) => ({
+        id: index,
+        data: item
+    }))
 
 export const getCardContent = (country: CountryType | null | undefined, title: string): any => {
     switch (title) {
@@ -283,5 +289,18 @@ export const formatDate = (timestamp?: number | string): string => {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
 
-    return  `${day}.${month}.${year} - ${hours}:${minutes}:${seconds}`
+    return `${day}.${month}.${year} - ${hours}:${minutes}:${seconds}`
+}
+
+export const handleSectionChange = (index: number, openIndex: number, setGridHeight: (data: string) => void, content: any[], setOpenIndex: (data: number) => void, setMappedData: (data: CardObject[]) => void) => {
+    const handleSetters = (i: number, list: any[]) => {
+        setMappedData(list.length ? mapCardContent(list) : [])
+        setOpenIndex(i)
+    }
+
+    setGridHeight("0px")
+    if (index === openIndex) handleSetters(-1, [])
+    else setTimeout(() => {
+        handleSetters(index, content)
+    }, 700)
 }

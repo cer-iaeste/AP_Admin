@@ -136,3 +136,13 @@ export interface TabProps {
     isLoading: boolean
     handleCancel: (resetData: () => void) => Promise<boolean>
 }
+
+export interface CardObject {
+    id: number
+    data: string | OtherType | CityType | TransportFeature | CuisineType
+}
+
+export interface MappedCardProps {
+    mappedData: CardObject[]
+    setMappedData: (data: CardObject[]) => void
+}

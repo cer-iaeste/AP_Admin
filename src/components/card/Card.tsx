@@ -15,9 +15,9 @@ import Gallery from "../gallery/Gallery";
 import SocialLinks from "../social-links/SocialLinks"
 import Hero from "../hero/Hero";
 import { updateCountryField } from "../../service/CountryService";
-import { CardType, CountryType, UploadedFileType } from "../../types/types";
+import { CardObject, CardType, CountryType, UploadedFileType } from "../../types/types";
 import { useParams } from "react-router-dom";
-import { getCard, getCountryData, confirmModalWindow, scrollToBottom, isList, getCountryDbName, createUploadFile } from "../../global/Global";
+import { getCard, getCountryData, confirmModalWindow, scrollToBottom, isList, getCountryDbName, createUploadFile, mapCardContent } from "../../global/Global";
 import { toast } from "react-toastify";
 import useWindowSize from "../../hooks/useScreenSize";
 import CardContext from "./CardContext";
@@ -60,14 +60,16 @@ const Card: React.FC<CardProps> = ({ role }) => {
 
     // Functions for handling events with cards - these will be provided via Context
     const handleSave = useCallback(
-        (country: string, data: any, column: keyof CountryType, title: string) => {
+        (country: string, data: any, column: keyof CountryType, title: string, isCardObject: boolean = false) => {
+            const newData = isCardObject ? data.map((item: any) => item.data) : data
             setIsLoading(true)
-            const updatePromise = updateCountryField(country, data, column)
+            const updatePromise = updateCountryField(country, newData, column)
             toast.promise(updatePromise, {
                 pending: "Saving changes...",
                 success: {
                     render() {
                         setIsChanged(false);
+                        getCountryData(country, setSelectedCountry, setIsLoading)
                         return `${title} updated successfully!`;
                     }
                 },
@@ -88,7 +90,6 @@ const Card: React.FC<CardProps> = ({ role }) => {
                 else newData[index].content = newData[index].content.filter((_: any, i: number) => i !== itemIndex);
                 setData(newData);
             }
-            setIsChanged(true);
             return true;
         }, []
     );
@@ -108,7 +109,8 @@ const Card: React.FC<CardProps> = ({ role }) => {
 
     const handleInputChange = useCallback(
         (setData: (data: any) => void, data: any, originalData: any, index: number, value: any, column?: string, originalColumn?: string, itemIndex?: number) => {
-            const newData = structuredClone(data)
+            const isCardObject: boolean = data[0].hasOwnProperty("id")
+            const newData = structuredClone(isCardObject ? data.map((item: any) => item.data) : data)
             let change = false
             if (column) {
                 if (itemIndex !== undefined) {
@@ -125,15 +127,15 @@ const Card: React.FC<CardProps> = ({ role }) => {
                 newData[index] = value
                 change = value !== originalData[index]
             }
-            setData(newData);
+            setData(isCardObject ? mapCardContent(newData) : newData);
             setIsChanged(change);
         }, []
     );
 
     const handleCancel = useCallback(
-        async (setData: (data?: any) => void, data?: any): Promise<boolean> => {
+        async (setData: (data?: any) => void, data?: any, isCardObject: boolean = false): Promise<boolean> => {
             const handleReset = (): void => {
-                if (data) setData(structuredClone(data));
+                if (data) setData(structuredClone(isCardObject ? mapCardContent(data) : data));
                 else setData()
                 setIsChanged(false);
             };

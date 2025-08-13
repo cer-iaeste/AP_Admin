@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
-import CardFooter from "../card/CardFooter";
 import "../card/Card.css"
-import { TransportType, TransportFeature } from "../../types/types";
-import { TRANSPORT_CONSTANTS } from "../../global/Global";
+import { TransportType, TransportFeature, CardObject, MappedCardProps } from "../../types/types";
+import { handleSectionChange, TRANSPORT_CONSTANTS } from "../../global/Global";
 import CardContext from "../card/CardContext"
 import CardGrid from "../card/CardGrid";
 
@@ -19,8 +18,9 @@ interface TransportMapType {
 
 const Transport: React.FC<TransportProps> = ({ transport }) => {
     const context = useContext(CardContext);
-    const [mappedData, setMappedData] = useState<TransportMapType[]>([])
+    const [mappedTransportData, setMappedTransportData] = useState<TransportMapType[]>([])
     const [transportData, setTransportData] = useState<TransportMapType[]>([])
+    const [mappedFeature, setMappedFeature] = useState<CardObject[]>([])
     const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
     const [transportSectionChange, setTransportSectionChange] = useState<boolean[]>([false, false, false, false])
     const [gridHeight, setGridHeight] = useState("0px");
@@ -54,21 +54,21 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
             },
         ]
 
-        return initialData.map(data => {
-            data.content = initialtransport.find(t => t.id === data.id)?.features ?? []
-            return data
-        })
+        return initialData.map(data => ({
+            ...data,
+            content: initialtransport.find(t => t.id === data.id)?.features ?? []
+        }))
     }, [])
 
     useEffect(() => {
-        setMappedData(mapTransportData(transport))
+        setMappedTransportData(mapTransportData(transport))
         setOpenIndex(-1);
         setGridHeight("0px");
     }, [transport, mapTransportData])
 
     useEffect(() => {
-        setTransportData(mappedData)
-    }, [mappedData])
+        setTransportData(mappedTransportData)
+    }, [mappedTransportData])
 
     // Effect to handle animation when openIndex changes
     useEffect(() => {
@@ -87,8 +87,6 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
     if (!context) return null
     // Destructure required functions and countryName from context after the check
     const { countryName, handleInputChange, handleSave, handleAddNewItem, handleDelete, handleCancel, isChanged, isLoading } = context;
-
-    const hasLinks = (feature: TransportFeature) => feature?.hasOwnProperty("link");
 
     const resetTransportChange = (promiseResult: boolean) => {
         if (promiseResult) setTransportSectionChange([false, false, false, false])
@@ -121,21 +119,15 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
         handleDelete(openIndex, setTransportData, transportData, itemIndex)
         addTransportSectionChange(openIndex)
     }
-    const onCancel = () => handleCancel(setTransportData, mappedData).then(result => resetTransportChange(result))
+    const onCancel = () => handleCancel(setTransportData, mappedTransportData).then(result => resetTransportChange(result))
 
     const onItemChange = (e: any, itemIndex: number, column?: string) => {
-        handleInputChange(setTransportData, transportData, mappedData, openIndex, e.target.value, column, column, itemIndex)
+        handleInputChange(setTransportData, transportData, mappedTransportData, openIndex, e.target.value, column, column, itemIndex)
         addTransportSectionChange(openIndex)
     }
 
-    const handleSectionClick = (index: number) => {
-        setGridHeight("0px")
-        if (index === openIndex) setOpenIndex(-1)
-        else setTimeout(() => {
-            setOpenIndex(index)
-        }, 700)
-    }
-
+    const handleSectionClick = (index: number) => 
+        handleSectionChange(index, openIndex, setGridHeight, transportData[openIndex].content, setOpenIndex, setMappedFeature)
 
     return (
         <div className="mt-5">
@@ -164,7 +156,7 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
 
             {openIndex !== -1 &&
                 <div ref={contentRef} className="lg:bg-gradient-to-br from-white to-green-50 rounded-2xl lg:shadow-xl lg:border lg:border-green-100 my-4 transition-all duration-700 ease-in-out overflow-hidden" style={{ maxHeight: gridHeight }}>
-                    <CardGrid title={transportData[openIndex].title} data={transportData[openIndex].content} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onItemChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
+                    <CardGrid title={transportData[openIndex].title} data={mappedFeature} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onItemChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
                 </div>
             }
         </div>

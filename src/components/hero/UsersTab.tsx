@@ -47,39 +47,64 @@ const UsersTab: React.FC<UsersTabProps> = ({ countryName, users, setUsers, role 
             {countryUsers.length > 0 ? (
                 <div>
                     <div className="w-full overflow-x-auto">
-                        <table className="min-w-full bg-white border border-[#1B75BB] rounded-xl shadow-md overflow-hidden">
-                            <thead className="bg-[#1B75BB] text-center text-white text-sm uppercase font-semibold">
-                                <tr>
-                                    <th className="py-3 px-4">Email</th>
-                                    <th className="py-3 px-4">Country</th>
-                                    <th className="py-3 px-4">Created</th>
-                                    <th className="py-3 px-4">Last login</th>
-                                    <th className="py-3 px-4">Status</th>
-                                    <th className={`py-3 px-4 ${role === "admin" ? "block" : "hidden"}`}>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {countryUsers.map((user, index) => (
-                                    <tr
-                                        key={index}
-                                        data-name={user.country}
-                                        /* onClick={handleSelectCountry} */
-                                        className={`hover:bg-blue-50 cursor-pointer transition duration-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                                    >
-                                        <td className="py-3 px-4 text-gray-700">{user.email}</td>
-                                        <td className="py-3 px-4 text-gray-800 font-medium uppercase">{user.country}</td>
-                                        <td className="py-3 px-4 text-gray-700">{user.createdAt}</td>
-                                        <td className="py-3 px-4 text-gray-700">{user.lastLoggedIn}</td>
-                                        <td className="py-3 px-4 text-gray-700">{!user.disabled ? 'Active' : 'Disabled'}</td>
-                                        <td className={`py-3 px-4 ${role === "admin" ? "block" : "hidden"} text-gray-700`}>
-                                            <button onClick={() => toggleUserStatus(user)} className={user.disabled ? 'text-green-500' : 'text-red-500'}>
-                                                <i className="fa-solid fa-power-off" />
-                                            </button>
-                                        </td>
+                        {/* Desktop version */}
+                        <div className="hidden sm:block">
+                            <table className="min-w-full bg-white border border-[#1B75BB] rounded-xl shadow-md overflow-hidden">
+                                <thead className="bg-[#1B75BB] text-center text-white text-sm uppercase font-semibold">
+                                    <tr>
+                                        <th className="py-3 px-4">Email</th>
+                                        <th className="py-3 px-4">Country</th>
+                                        <th className="py-3 px-4">Created</th>
+                                        <th className="py-3 px-4">Last login</th>
+                                        <th className="py-3 px-4">Status</th>
+                                        <th className={`py-3 px-4 ${role === "admin" ? "block" : "hidden"}`}>Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {countryUsers.map((user, index) => (
+                                        <tr
+                                            key={index}
+                                            data-name={user.country}
+                                            /* onClick={handleSelectCountry} */
+                                            className={`hover:bg-blue-50 cursor-pointer transition duration-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
+                                        >
+                                            <td className="py-3 px-4 text-gray-700">{user.email}</td>
+                                            <td className="py-3 px-4 text-gray-800 font-medium uppercase">{user.country}</td>
+                                            <td className="py-3 px-4 text-gray-700">{user.createdAt}</td>
+                                            <td className="py-3 px-4 text-gray-700">{user.lastLoggedIn}</td>
+                                            <td className="py-3 px-4 text-gray-700">{!user.disabled ? 'Active' : 'Disabled'}</td>
+                                            <td className={`py-3 px-4 ${role === "admin" ? "block" : "hidden"} text-gray-700`}>
+                                                <button onClick={() => toggleUserStatus(user)} className={user.disabled ? 'text-green-500' : 'text-red-500'}>
+                                                    <i className="fa-solid fa-power-off" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {/* Mobile version */}
+                        <div className="sm:hidden space-y-4 mt-4">
+                            {countryUsers.map((user, index) => (
+                                <div key={index} className="bg-white rounded-xl shadow-md p-4 border border-gray-200">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h3 className="text-lg font-semibold text-blue-800">{user.email}</h3>
+                                        <button
+                                            onClick={() => toggleUserStatus(user)}
+                                            className={`text-xl ${user.disabled ? 'text-green-500' : 'text-red-500'}`}
+                                        >
+                                            <i className="fa-solid fa-power-off" />
+                                        </button>
+                                    </div>
+                                    <div className="text-gray-700 space-y-1 text-start">
+                                        <p><span className="font-medium">Country:</span> {user.country}</p>
+                                        <p><span className="font-medium">Created:</span> {user.createdAt}</p>
+                                        <p><span className="font-medium">Last login:</span> {user.lastLoggedIn}</p>
+                                        <p><span className="font-medium">Status:</span> {user.disabled ? 'Disabled' : 'Active'}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             ) : (

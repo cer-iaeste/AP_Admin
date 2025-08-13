@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useContext, useRef } from "react";
 import "../card/Card.css"
-import { CuisineType, OtherType } from "../../types/types";
+import { CardObject, CuisineType, MappedCardProps, OtherType } from "../../types/types";
 import CardContext from "../card/CardContext"
 import CardGrid from "../card/CardGrid";
+import { handleSectionChange } from "../../global/Global";
 
 interface CuisineProps {
     cuisine: CuisineType
@@ -16,9 +17,10 @@ interface CuisineMapType {
 
 const Cuisine: React.FC<CuisineProps> = ({ cuisine }) => {
     const context = useContext(CardContext);
-    const [mappedData, setMappedData] = useState<CuisineMapType[]>([])
+    const [mappedCuisineData, setMappedCuisineData] = useState<CuisineMapType[]>([])
     const [cuisineData, setCuisineData] = useState<CuisineMapType[]>([])
-    const [openIndex, setOpenIndex] = useState(-1); // State to manage which transport item is open
+    const [mappedData, setMappedData] = useState<CardObject[]>([])
+    const [openIndex, setOpenIndex] = useState(-1);
     const [cuisineSectionChange, setCuisineSectionChange] = useState<boolean[]>([false, false])
     const [gridHeight, setGridHeight] = useState("0px");
     const contentRef = useRef<HTMLDivElement>(null);
@@ -40,14 +42,14 @@ const Cuisine: React.FC<CuisineProps> = ({ cuisine }) => {
     }, [cuisine])
 
     useEffect(() => {
-        setMappedData(mapCuisineData())
+        setMappedCuisineData(mapCuisineData())
         setOpenIndex(-1);
         setGridHeight("0px");
     }, [cuisine, mapCuisineData])
 
     useEffect(() => {
-        setCuisineData(mappedData)
-    }, [mappedData])
+        setCuisineData(mappedCuisineData)
+    }, [mappedCuisineData])
 
     // Effect to handle animation when openIndex changes
     useEffect(() => {
@@ -97,20 +99,15 @@ const Cuisine: React.FC<CuisineProps> = ({ cuisine }) => {
         handleDelete(openIndex, setCuisineData, cuisineData, itemIndex)
         addCuisineSectionChange(openIndex)
     }
-    const onCancel = () => handleCancel(setCuisineData, mappedData).then(result => resetCuisineChange(result))
+    const onCancel = () => handleCancel(setCuisineData, mappedCuisineData).then(result => resetCuisineChange(result))
 
     const onItemChange = (e: any, itemIndex: number, column?: string) => {
-        handleInputChange(setCuisineData, cuisineData, mappedData, openIndex, e.target.value, column, column, itemIndex)
+        handleInputChange(setCuisineData, cuisineData, mappedCuisineData, openIndex, e.target.value, column, column, itemIndex)
         addCuisineSectionChange(openIndex)
     }
 
-    const handleSectionClick = (index: number) => {
-        setGridHeight("0px")
-        if (index === openIndex) setOpenIndex(-1)
-        else setTimeout(() => {
-            setOpenIndex(index)
-        }, 500)
-    }
+    const handleSectionClick = (index: number) =>
+        handleSectionChange(index, openIndex, setGridHeight, cuisineData[openIndex].content, setOpenIndex, setMappedData)
 
 
     return (
@@ -162,7 +159,7 @@ const Cuisine: React.FC<CuisineProps> = ({ cuisine }) => {
 
             {openIndex !== -1 &&
                 <div ref={contentRef} className="md:bg-gradient-to-br from-white to-green-50 rounded-2xl md:shadow-xl border border-green-100 my-4 transition-all duration-700 ease-in-out overflow-hidden" style={{ maxHeight: gridHeight }}>
-                    <CardGrid title={cuisineData[openIndex].title} data={cuisineData[openIndex].content} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onItemChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
+                    <CardGrid title={cuisineData[openIndex].title} data={mappedData} isChanged={isChanged} isLoading={isLoading} onDelete={onDelete} onInputChange={onItemChange} onSave={onSave} onAdd={onAdd} onCancel={onCancel} />
                 </div>
             }
         </div>
