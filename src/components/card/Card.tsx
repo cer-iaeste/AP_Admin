@@ -17,7 +17,7 @@ import Hero from "../hero/Hero";
 import { updateCountryField } from "../../service/CountryService";
 import { CardType, CountryType, UploadedFileType } from "../../types/types";
 import { useParams } from "react-router-dom";
-import { getCard, getCountryData, confirmModalWindow, scrollToBottom, isList, getCountryDbName, createUploadFile } from "../../global/Global";
+import { getCard, getCountryData, confirmModalWindow, scrollToBottom, getCountryDbName, createUploadFile } from "../../global/Global";
 import { toast } from "react-toastify";
 import useWindowSize from "../../hooks/useScreenSize";
 import CardContext from "./CardContext";
@@ -145,11 +145,11 @@ const Card: React.FC<CardProps> = ({ role }) => {
             const confirmation = await confirmModalWindow("All unsaved changes will be lost");
             if (confirmation) handleReset();
             return confirmation;
-        }, []
+        }, [isChanged]
     )
 
 
-    const handleUpload = (event: React.ChangeEvent<HTMLInputElement>, folderName: string, data: any, setData: (data: any) => void, setDataToUpload: (data: any) => void, setDataToDelete?: (data: any) => void) => {
+    const handleUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>, folderName: string, data: any, setData: (data: any) => void, setDataToUpload: (data: any) => void, setDataToDelete?: (data: any) => void) => {
         const name = getCountryDbName(selectedCountry?.name ?? "")
         const file = event.target.files?.[0]
         if (file) {
@@ -165,7 +165,7 @@ const Card: React.FC<CardProps> = ({ role }) => {
             event.target.value = ''
             setIsChanged(true)
         } else toast.error("Error while uploading file!")
-    }
+    }, [selectedCountry?.name])
 
     // Memoize the context value to prevent unnecessary re-renders of children
     const contextValue = React.useMemo(() => ({
@@ -233,7 +233,7 @@ const Card: React.FC<CardProps> = ({ role }) => {
             setIsLoading(false);
         }, 1100);
         return () => clearTimeout(timer);
-    }, [selectedCard, selectedCountry]); // Removed `handleCancel` from dependencies since it's removed
+    }, [selectedCard, selectedCountry, role]); // Removed `handleCancel` from dependencies since it's removed
 
 
     return (

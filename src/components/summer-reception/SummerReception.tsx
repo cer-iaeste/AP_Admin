@@ -24,6 +24,7 @@ const newWeekendTemplate: WeekendType = {
 
 const SummerReception: React.FC<SummerReceptionProps> = ({ summerReception }) => {
     const context = useContext(CardContext);
+    const setIsChanged = context?.setIsChanged;
     // All useState, useCallback, useEffect hooks must be called unconditionally before any early returns
     const [mappedData, setMappedData] = useState<WeekendType[]>([])
     const [summerReceptionData, setSummerReceptionData] = useState<WeekendType[]>([]);
@@ -54,8 +55,8 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ summerReception }) =>
     useEffect(() => {
         setMappedData(mapWeekends(summerReception))
         // setSummerReceptionData(structuredClone(summerReception)); // Deep clone to avoid direct mutation
-        setIsChanged(false); // Reset changed status on initial load or prop update
-    }, [summerReception]);
+        setIsChanged?.(false); // Reset changed status on initial load or prop update
+    }, [summerReception, mapWeekends, setIsChanged]);
 
     useEffect(() => {
         setSummerReceptionData(mappedData)
@@ -63,13 +64,13 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ summerReception }) =>
 
     // Effect to check if changes have been made to enable the save button
     useEffect(() => {
-        setIsChanged(JSON.stringify(summerReceptionData) !== JSON.stringify(mappedData));
-    }, [summerReceptionData, summerReception]); // Depend on both states to detect changes
+        setIsChanged?.(JSON.stringify(summerReceptionData) !== JSON.stringify(mappedData));
+    }, [summerReceptionData, summerReception, mappedData, setIsChanged]); // Depend on both states to detect changes
 
     // Defensive check after all hooks are called
     if (!context) return null
     // Destructure required functions and countryName from context after the check
-    const { countryName, handleSave, handleDelete, handleCancel, setIsChanged, isChanged, isLoading } = context;
+    const { countryName, handleSave, handleDelete, handleCancel, isChanged, isLoading } = context;
 
     // Handler to close the popup modal
     const closePopup = () => setSelectedWeekend(null)
@@ -85,7 +86,7 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ summerReception }) =>
         setSummerReceptionData(prev =>
             isEditMode ? prev.map(w => (w.name === weekend.name ? weekend : w)) : [...prev, mapWeekend(weekend)]
         )
-        setIsChanged(true) // Mark as changed
+        setIsChanged?.(true) // Mark as changed
         closePopup()
         toast.success(`Weekend "${weekend.name}" added. Click "Save" to apply changes.`);
     };
