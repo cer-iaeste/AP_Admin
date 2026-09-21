@@ -13,8 +13,8 @@ interface AddUserProps {
 }
 
 const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
-  const couuntryFromPath = useCountryFromPath()
-  const preselectedCountry = couuntryFromPath ?? "";
+  const countryFromPath = useCountryFromPath()
+  const preselectedCountry = countryFromPath && countryFromPath !== 'new' ? countryFromPath : ''
 
   const [isLoading, setIsLoading] = useState(true)
   const [isChanged, setIsChanged] = useState(false)
@@ -54,6 +54,7 @@ const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
 
   useEffect(() => {
     setIsChanged(email && password && confirmPassword && selectedCountry ? true : false)
+    console.log(preselectedCountry)
   }, [email, password, confirmPassword, selectedCountry]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, setData: (data: string) => void): void => {
