@@ -11,7 +11,6 @@ interface SummerReceptionProps {
     summerReception: WeekendType[]
 }
 
-// Define a consistent structure for a new weekend item
 const newWeekendTemplate: WeekendType = {
     name: "",
     startDate: "",
@@ -49,7 +48,7 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ summerReception }) =>
 
     const mapWeekends = useCallback((summerReception: WeekendType[]) =>
         summerReception.map(weekend => mapWeekend(weekend))
-    , [])
+        , [])
 
     // Initialize summerReceptionData state when 'summerReception' prop changes
     useEffect(() => {
@@ -90,13 +89,13 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ summerReception }) =>
         closePopup()
         toast.success(`Weekend "${weekend.name}" added. Click "Save" to apply changes.`);
     };
-    
+
     const onSave = async () => {
         const dataToSave = summerReceptionData.filter(weekend => weekend.name.trim() !== '');
         handleSave(countryName, dataToSave, "summerReception", "Summer Reception Events");
     };
 
-    const onCancel = async () => 
+    const onCancel = async () =>
         await handleCancel(setSummerReceptionData, mappedData) ? toast.info("Changes discarded.") : toast.info("Cancellation aborted.");
 
     // Handler for deleting a weekend event
@@ -108,91 +107,91 @@ const SummerReception: React.FC<SummerReceptionProps> = ({ summerReception }) =>
     return (
         <section className="my-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {summerReceptionData.map((weekend, index) => (
-                        <div
-                            key={index}
-                            className="
+                {summerReceptionData.map((weekend, index) => (
+                    <div
+                        key={index}
+                        className="
                                 bg-sky-50 p-6 rounded-2xl shadow-xl border border-blue-100
                                 flex flex-col h-72 // Dynamic height but ensures a minimum
                                 transition-all duration-300 transform hover:scale-103 hover:shadow-2xl
                             "
-                        >
-                            {/* Card Header with Title and Buttons */}
-                            <div className="
+                    >
+                        {/* Card Header with Title and Buttons */}
+                        <div className="
                                 flex justify-between items-center pb-2 mb-4 border-b-2 border-blue-200
                                 text-base md:text-xl font-bold text-gray-800
                             ">
-                                <span className="truncate pr-2">{weekend.name || `Weekend #${index + 1}`}</span>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => handlePopupModel(weekend, true)}
-                                        className="
+                            <span className="truncate pr-2">{weekend.name || `Weekend #${index + 1}`}</span>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => handlePopupModel(weekend, true)}
+                                    className="
                                             w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center
                                             hover:bg-blue-600 hover:text-white transition-colors duration-200
                                             focus:outline-none focus:ring-2 focus:ring-blue-500
                                         "
-                                        title="Edit event"
-                                    >
-                                        <i className="fa fa-pencil-alt text-base" aria-hidden="true"></i>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => onDelete(index)}
-                                        className="
+                                    title="Edit event"
+                                >
+                                    <i className="fa fa-pencil-alt text-base" aria-hidden="true"></i>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => onDelete(index)}
+                                    className="
                                             w-8 h-8 rounded-full bg-blue-100 text-red-600 flex items-center justify-center
                                             hover:bg-red-600 hover:text-white transition-colors duration-200
                                             focus:outline-none focus:ring-2 focus:ring-red-500
                                         "
-                                        title="Remove event"
-                                    >
-                                        <i className="fa fa-trash text-base" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            {/* Card Body - Event Details */}
-                            <div className="flex flex-col flex-1 space-y-3 text-gray-700 text-base md:text-xl font-semibold">
-                                <div className="flex items-center gap-2">
-                                    <i className="fa-solid fa-calendar-alt text-blue-500 mr-3"></i>
-                                    <span>{weekend.date}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <i className="fa-solid fa-location-dot text-blue-500 mr-3"></i>
-                                    <span>{weekend.location || 'N/A'}</span>
-                                </div>
-                                {weekend.link && (
-                                    <div className="flex items-center gap-2">
-                                        <i className="fa-solid fa-link text-blue-500 mr-1"></i>
-                                        <a href={weekend.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate">
-                                            Registration Link
-                                        </a>
-                                    </div>
-                                )}
-                                {weekend.limit > 0 && (
-                                    <div className="flex items-center gap-2">
-                                        <i className="fa-solid fa-users text-blue-500 mr-2"></i>
-                                        <span>{weekend.limit} participants</span>
-                                    </div>
-                                )}
+                                    title="Remove event"
+                                >
+                                    <i className="fa fa-trash text-base" aria-hidden="true"></i>
+                                </button>
                             </div>
                         </div>
-                    ))}
 
-                    <AddBtn onAdd={() => handlePopupModel(newWeekendTemplate, false)} />
-                </div>
+                        {/* Card Body - Event Details */}
+                        <div className="flex flex-col flex-1 space-y-3 text-gray-700 text-base md:text-xl font-semibold">
+                            <div className="flex items-center gap-2">
+                                <i className="fa-solid fa-calendar-alt text-blue-500 mr-3"></i>
+                                <span>{weekend.date}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <i className="fa-solid fa-location-dot text-blue-500 mr-3"></i>
+                                <span>{weekend.location || 'N/A'}</span>
+                            </div>
+                            {weekend.link && (
+                                <div className="flex items-center gap-2">
+                                    <i className="fa-solid fa-link text-blue-500 mr-1"></i>
+                                    <a href={weekend.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate">
+                                        Registration Link
+                                    </a>
+                                </div>
+                            )}
+                            {weekend.limit > 0 && (
+                                <div className="flex items-center gap-2">
+                                    <i className="fa-solid fa-users text-blue-500 mr-2"></i>
+                                    <span>{weekend.limit} participants</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ))}
 
-                <FormButtons isChanged={isChanged} isLoading={isLoading} onCancel={onCancel} onSave={onSave} />
+                <AddBtn onAdd={() => handlePopupModel(newWeekendTemplate, false)} />
+            </div>
 
-                {/* Popup Modal for Add/Edit Weekend */}
-                {selectedWeekend !== null && (
-                    <Weekend
-                        selectedWeekend={selectedWeekend}
-                        isEditMode={isEditMode}
-                        onClose={closePopup}
-                        onSave={handleSaveWeekend}
-                    />
-                )}
+            <FormButtons isChanged={isChanged} isLoading={isLoading} onCancel={onCancel} onSave={onSave} />
+
+            {/* Popup Modal for Add/Edit Weekend */}
+            {selectedWeekend !== null && (
+                <Weekend
+                    selectedWeekend={selectedWeekend}
+                    isEditMode={isEditMode}
+                    onClose={closePopup}
+                    onSave={handleSaveWeekend}
+                />
+            )}
         </section>
     );
 };

@@ -98,6 +98,7 @@ export async function AddNewCountry(name: string, imageSrc: string, region: stri
         id: 0,
         pdf: "",
         socialLinks: [],
+        socials: [],
         cities: [],
         committees: [],
         emergencyContacts: [],

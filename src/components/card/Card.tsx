@@ -203,7 +203,7 @@ const Card: React.FC<CardProps> = ({ role }) => {
                     setCardComponent(<GeneralInfo information={selectedCard.content} />);
                     break;
                 case "Social Links":
-                    setCardComponent(<SocialLinks socialLinks={selectedCard.content} />);
+                    setCardComponent(<SocialLinks socials={selectedCard.content} />);
                     break;
                 case "Fun Facts":
                     setCardComponent(<FunFacts facts={selectedCard.content} />);

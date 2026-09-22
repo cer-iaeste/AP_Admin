@@ -6,10 +6,17 @@ import { confirmModalWindow, useCountryFromPath } from "../../global/Global";
 import { CountryType, UserType } from "../../types/types";
 import AuthService from "../../service/AuthService";
 import FormButtons from "../card/FormButtons";
+import { FirebaseError } from "firebase/app";
 
 interface AddUserProps {
   countries: CountryType[]
   users: UserType[]
+}
+
+const getSignupErrorMessage = (error: unknown): string => {
+  if (error instanceof FirebaseError) return `${error.code}: ${error.message}`
+  if (error instanceof Error) return error.message
+  return "Unknown error"
 }
 
 const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
@@ -53,8 +60,7 @@ const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
   }, [countries, users])
 
   useEffect(() => {
-    setIsChanged(email && password && confirmPassword && selectedCountry ? true : false)
-    console.log(preselectedCountry)
+    setIsChanged(!!(email && password && confirmPassword && selectedCountry))
   }, [email, password, confirmPassword, selectedCountry]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, setData: (data: string) => void): void => {
@@ -90,9 +96,15 @@ const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
 
 
   const onSave = async () => {
-    setIsLoading(true)
-    if (usedEmails.includes(email)) {
+    const normalizedEmail = email.trim().toLowerCase()
+
+    if (usedEmails.some(usedEmail => usedEmail.toString().toLowerCase() === normalizedEmail)) {
       toast.error("Email already in use!")
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long!")
       return;
     }
 
@@ -101,25 +113,14 @@ const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
       return;
     }
 
-    try {
-      const signupPromise = AuthService.signup(email, password, selectedCountry);
-      toast.promise(signupPromise, {
-        pending: "Registering...",
-        success: {
-          render() {
-            navigate("/users");
-            return "Registration successful!";
-          }
-        },
-        error: {
-          render() {
-            return "Error while registering!";
-          }
-        }
-      });
+    setIsLoading(true)
 
+    try {
+      await AuthService.signup(normalizedEmail, password, selectedCountry)
+      toast.success("Registration successful!")
+      navigate("/users")
     } catch (error) {
-      toast.error("Failed to add user.");
+      toast.error(`Failed to add user: ${getSignupErrorMessage(error)}`)
     } finally {
       setIsLoading(false)
     }

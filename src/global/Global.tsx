@@ -107,7 +107,11 @@ export const getCardContent = (country: CountryType | null | undefined, title: s
         case "Gallery":
             return country?.gallery ?? []
         case "Social Links":
-            return country?.socialLinks ?? []
+            if (country?.socials?.length) return country.socials
+            if (country?.socialLinks?.length) {
+                return [{ committee: country.name, links: country.socialLinks }]
+            }
+            return []
         case "Traditional Cuisine":
             return {
                 food: country?.food ?? [],

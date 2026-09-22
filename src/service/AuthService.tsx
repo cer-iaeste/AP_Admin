@@ -64,7 +64,7 @@ const AuthService = {
             return true
         } catch (error) {
             console.error("Error during signup: ", error)
-            return false
+            throw error
         }
     }
 };

@@ -7,6 +7,7 @@ export interface CountryType {
     pdf: string
     banner?: string
     socialLinks: CardFormType[]
+    socials: SocialsType[]
     cities: CityType[]
     committees: string[]
     emergencyContacts: EmergencyContactsType[]
@@ -72,6 +73,11 @@ export interface TransportFeature {
 export interface TransportType {
     id: number
     features: TransportFeature[]
+}
+
+export interface SocialsType {
+    committee: string
+    links: CardFormType[]
 }
 
 export interface CardType {
