@@ -11,6 +11,7 @@ interface EmergencyContactsProps {
 
 const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts }) => {
     const context = useContext(CardContext);
+    const setIsChanged = context?.setIsChanged;
     // All useState, useCallback, useEffect hooks must be called unconditionally before any early returns
     const [mappedContacts, setMappedContacts] = useState<CardFormType[]>([])
     const [contactData, setContactData] = useState<CardFormType[]>([]);
@@ -32,8 +33,8 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
 
     useEffect(() => {
         setMappedContacts(mapContactData(emergencyContacts))
-        setIsChanged(false);
-    }, [emergencyContacts, mapContactData]);
+        setIsChanged?.(false);
+    }, [emergencyContacts, mapContactData, setIsChanged]);
 
     useEffect(() => {
         const hasChanges = contactData.some(contact => {
@@ -41,13 +42,13 @@ const EmergencyContacts: React.FC<EmergencyContactsProps> = ({ emergencyContacts
             const originalContact = emergencyContacts.find(ec => ec.title === contact.name);
             return originalContact ? originalContact.number !== contact.value : contact.value !== '';
         });
-        setIsChanged(hasChanges);
-    }, [contactData, emergencyContacts]);
+        setIsChanged?.(hasChanges);
+    }, [contactData, emergencyContacts, setIsChanged]);
 
     // Defensive check after all hooks are called
     if (!context) return null; // Or throw an error, or render a fallback UI
     // Destructure required functions and countryName from context after the check
-    const { countryName, handleSave, handleInputChange, handleCancel, isChanged, setIsChanged, isLoading } = context;
+    const { countryName, handleSave, handleInputChange, handleCancel, isChanged, isLoading } = context;
 
     // Handlers
     const onSave = () => {

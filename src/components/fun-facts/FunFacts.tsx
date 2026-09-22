@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../card/Card.css" // Keep this if it contains global styles you need
 import CardContext from "../card/CardContext"; // Adjust path as necessary
 import CardGrid from "../card/CardGrid";
@@ -9,22 +9,23 @@ interface FunFactsProps {
 
 const FunFacts: React.FC<FunFactsProps> = ({ facts }) => {
     const context = useContext(CardContext)
+    const setIsChanged = context?.setIsChanged
     const [factsData, setFactsData] = useState<string[]>([])
 
     useEffect(() => {
         setFactsData(structuredClone(facts))
-        setIsChanged(false)
-    }, [facts]);
+        setIsChanged?.(false)
+    }, [facts, setIsChanged]);
 
     useEffect(() => {
         const hasChanges = JSON.stringify(factsData) !== JSON.stringify(facts)
-        setIsChanged(hasChanges)
-    }, [factsData, facts])
+        setIsChanged?.(hasChanges)
+    }, [factsData, facts, setIsChanged])
 
     // Defensive check after all hooks are called
     if (!context) return null
     // Destructure required functions and countryName from context after the check
-    const { countryName, handleSave, handleDelete, handleAddNewItem, handleInputChange, handleCancel, isChanged, setIsChanged, isLoading } = context
+    const { countryName, handleSave, handleDelete, handleAddNewItem, handleInputChange, handleCancel, isChanged, isLoading } = context
 
     const onAdd = () => handleAddNewItem(setFactsData, factsData, "")
 

@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import CardFooter from "../card/CardFooter";
 import "../card/Card.css"
 import { OtherType } from "../../types/types";
-import useWindowSize from "../../hooks/useScreenSize";
 import CardContext from "../card/CardContext";
 import CardGrid from "../card/CardGrid";
 

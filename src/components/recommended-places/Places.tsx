@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import "../card/Card.css"
 import { CityType } from "../../types/types";
 import CardContext from "../card/CardContext";
-import FormButtons from "../card/FormButtons";
 import CardGrid from "../card/CardGrid";
 
 interface PlacesProps {
@@ -11,26 +10,26 @@ interface PlacesProps {
 
 const Places: React.FC<PlacesProps> = ({ places }) => {
     const context = useContext(CardContext);
+    const setIsChanged = context?.setIsChanged;
     const [placesData, setPlacesData] = useState<CityType[]>([])
-    const [isLoading, setIsLoading] = useState(false);
 
     // Effect to initialize placesData state when 'places' prop changes
     useEffect(() => {
         setPlacesData(places)
-        setIsChanged(false); // Reset changed status on initial load or prop update
-    }, [places])
+        setIsChanged?.(false); // Reset changed status on initial load or prop update
+    }, [places, setIsChanged])
 
     // Effect to check if changes have been made to enable the save button
     useEffect(() => {
         const hasChanges = JSON.stringify(placesData) !== JSON.stringify(places);
-        setIsChanged(hasChanges);
+        setIsChanged?.(hasChanges);
         // If you have a handleChange prop from the parent to update a shared state, call it here:
         // if (handleChange) handleChange(hasChanges);
-    }, [placesData, places]); // Depend on both states to detect changes
+    }, [placesData, places, setIsChanged]); // Depend on both states to detect changes
 
     if (!context) return null
     // Destructure required functions and countryName from context after the check
-    const { countryName, handleSave, handleInputChange, handleCancel, handleAddNewItem, handleDelete, isChanged, setIsChanged } = context;
+    const { countryName, handleSave, handleInputChange, handleCancel, handleAddNewItem, handleDelete, isChanged, isLoading } = context;
 
     // Handler to add a new empty place item
     const onAdd = () => handleAddNewItem(setPlacesData, placesData, { name: "", description: "" })

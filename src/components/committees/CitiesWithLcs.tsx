@@ -11,19 +11,20 @@ interface CitiesProps {
 const CitiesWithLcs: React.FC<CitiesProps> = ({ cities }) => {
     // Consume context to get shared functions and countryName
     const context = useContext(CardContext);
+    const setIsChanged = context?.setIsChanged;
     const [committeesData, setCommitteesData] = useState<string[]>([]);
     const [newCityName, setNewCityName] = useState(""); // State for the new city input field
 
     // Initialize committeesData when the 'cities' prop changes
     useEffect(() => {
         setCommitteesData(structuredClone(cities));
-        setIsChanged(false); // Reset changed status on initial load or prop update
-    }, [cities]);
+        setIsChanged?.(false); // Reset changed status on initial load or prop update
+    }, [cities, setIsChanged]);
 
     // Effect to check if changes have been made to enable the save button
     useEffect(() => {
-        setIsChanged(JSON.stringify(committeesData) !== JSON.stringify(cities));
-    }, [committeesData, cities]);
+        setIsChanged?.(JSON.stringify(committeesData) !== JSON.stringify(cities));
+    }, [committeesData, cities, setIsChanged]);
 
         // Defensive check: ensure context is available
     if (!context) {
@@ -31,7 +32,7 @@ const CitiesWithLcs: React.FC<CitiesProps> = ({ cities }) => {
         return null; // Or throw an error, or render a fallback UI
     }
     // Destructure required functions and countryName from context
-    const { countryName, handleSave, handleCancel, handleAddNewItem, handleDelete, isChanged, setIsChanged, isLoading } = context;
+    const { countryName, handleSave, handleCancel, handleAddNewItem, handleDelete, isChanged, isLoading } = context;
 
     // Handler to add a new city from the input field
     const onAddNewCity = () => {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
-import CardFooter from "../card/CardFooter";
 import "../card/Card.css"
 import { TransportType, TransportFeature } from "../../types/types";
 import { TRANSPORT_CONSTANTS } from "../../global/Global";
@@ -87,8 +86,6 @@ const Transport: React.FC<TransportProps> = ({ transport }) => {
     if (!context) return null
     // Destructure required functions and countryName from context after the check
     const { countryName, handleInputChange, handleSave, handleAddNewItem, handleDelete, handleCancel, isChanged, isLoading } = context;
-
-    const hasLinks = (feature: TransportFeature) => feature?.hasOwnProperty("link");
 
     const resetTransportChange = (promiseResult: boolean) => {
         if (promiseResult) setTransportSectionChange([false, false, false, false])

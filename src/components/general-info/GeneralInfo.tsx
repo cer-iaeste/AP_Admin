@@ -11,6 +11,7 @@ interface GeneralInfoProps {
 
 const GeneralInfo: React.FC<GeneralInfoProps> = ({ information }) => {
     const context = useContext(CardContext)
+    const setIsChanged = context?.setIsChanged
     const [mappedInfoData, setMappedInfoData] = useState<CardFormType[]>([])
     const [infoData, setInfoData] = useState<CardFormType[]>([])
 
@@ -40,13 +41,13 @@ const GeneralInfo: React.FC<GeneralInfoProps> = ({ information }) => {
 
     useEffect(() => {
         setMappedInfoData(mapInfo(information));
-        setIsChanged(false); // Reset changed status on initial load or prop update
-    }, [information, mapInfo]);
+        setIsChanged?.(false); // Reset changed status on initial load or prop update
+    }, [information, mapInfo, setIsChanged]);
 
 
     if (!context) return null
     // Destructure required functions and countryName from context after the check
-    const { countryName, handleSave, handleInputChange, handleCancel, isChanged, setIsChanged, isLoading } = context;
+    const { countryName, handleSave, handleInputChange, handleCancel, isChanged, isLoading } = context;
 
     // Handlers
     const onSave = () => {
