@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import cerLogo from "../../images/cer-logo.png";
-import cerLogoSmall from "../../images/logo-small.jpg";
 import "../../App.css" // Keep this if it contains global styles you need
 import { useNavigate, useParams } from "react-router-dom";
 import { SIDEBAR_SECTIONS } from "../../global/Global"; // Assuming SIDEBAR_SECTIONS structure

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../sidebar/Sidebar";
 import UserSidebar from "../sidebar/UserSidebar";
 import Landing from "../landing/Landing";

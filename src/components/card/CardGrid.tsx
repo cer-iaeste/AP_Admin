@@ -31,7 +31,7 @@ const CardGrid: React.FC<CardGridProps> = ({ title, data, isChanged, isLoading, 
         if (isDataLoaded) {
             setisBasic(["Fun fact", "Airports"].includes(title))
         }
-    },[isDataLoaded, data])
+    }, [isDataLoaded, title])
 
     return (
         isDataLoaded ? (

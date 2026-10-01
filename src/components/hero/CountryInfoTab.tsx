@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { CardFormType, TabProps } from "../../types/types";
 import CardForm from "../card/Form";
 
@@ -11,7 +11,7 @@ interface CountryInfoProps extends TabProps {
 const CountryInfoTab: React.FC<CountryInfoProps> = ({ countryName, region, setIsChanged, isChanged, isLoading, handleCancel, handleCountryInfoSave }) => {
     const [countryInfoItems, setCountryInfoItems] = useState<CardFormType[]>([])
 
-    const setInitialCountryInfo = () => {
+    const setInitialCountryInfo = useCallback(() => {
         setCountryInfoItems([
             {
                 name: "Country name",
@@ -31,11 +31,11 @@ const CountryInfoTab: React.FC<CountryInfoProps> = ({ countryName, region, setIs
                 ]
             }
         ])
-    }
+    }, [countryName, region])
 
     useEffect(() => {
         if (countryName && region) setInitialCountryInfo()
-    }, [countryName, region])
+    }, [countryName, region, setInitialCountryInfo])
 
 
     const onCountryInfoInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index: number) => {

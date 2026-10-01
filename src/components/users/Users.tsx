@@ -22,13 +22,13 @@ const Users: React.FC<UsersProps> = ({ users }) => {
     }, [users])
 
     useEffect(() => {
-        if (currentPage !== 1) setCurrentPage(1)
+        setCurrentPage(1)
         const search = users.filter(user =>
             user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
             user.country.toLowerCase().includes(searchQuery.toLowerCase())
         )
         setFilteredUsers(search)
-    }, [searchQuery])
+    }, [searchQuery, users])
 
     useEffect(() => {
         setTotalPages(Math.ceil(filteredUsers.length / rowsPerPage))

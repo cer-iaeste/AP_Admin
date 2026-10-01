@@ -16,54 +16,44 @@ const UserSidebar = () => {
     const [selectedSection, setSelectedSection] = useState<number>(-1); // -1 for Admin Panel, otherwise index of card
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Effect to get country data and set selected section based on URL
+    // Load the country selected in the URL.
     useEffect(() => {
-        const pathSegments = location.pathname.split("/").filter(Boolean); // e.g., ['countries', 'USA', 'Places']
-        // Fetch country data if not already loaded or if country in URL changes
-        const countryFromPath = pathSegments[1] || "";
-        if (!selectedCountry || selectedCountry.name !== countryFromPath) {
+        const pathSegments = location.pathname.split("/").filter(Boolean);
+        const countryFromPath = decodeURIComponent(pathSegments[1] ?? "");
+
+        if (countryFromPath && selectedCountry?.name !== countryFromPath) {
             getCountryData(countryFromPath, setSelectedCountry);
         }
-
-        // Determine which card/section is selected from the URL
-        const cardTitleFromPath = pathSegments[2] || ""; // 'Places', 'Cuisine', etc.
-        if (cardTitleFromPath) {
-            const foundIndex = cards.findIndex(c => c.title === cardTitleFromPath.replaceAll("%20", " "));
-            if (foundIndex !== selectedSection) setSelectedSection(foundIndex)
-        }
-    }, [selectedCountry]); // Added selectedCountry and cards to dependencies for reactivity
+    }, [location.pathname, selectedCountry?.name]);
 
     // Effect to map country data to cards once selectedCountry is available
     useEffect(() => {
         if (selectedCountry) setCards(mapCountryCards(selectedCountry));
     }, [selectedCountry])
 
-    // Effect to inform parent component about the selected card
+    // Navigate when the selected sidebar item changes.
     useEffect(() => {
-        console.log(selectedSection)
-        const link = handleSelectCard(selectedCountry?.name ?? "", selectedSection !== -1 ? cards[selectedSection]?.title : undefined);
-        console.log(link)
+        if (!selectedCountry) return;
+
+        const link = handleSelectCard(
+            selectedCountry.name,
+            selectedSection !== -1 ? cards[selectedSection]?.title : undefined
+        );
         navigate(link)
         window.scrollTo({ top: 0, left: 0 })
-    }, [selectedSection, cards, handleSelectCard]); // Add handleSelectCard to deps
+    }, [cards, navigate, selectedCountry, selectedSection]);
 
+    // Keep the highlighted sidebar item synchronized with browser navigation.
     useEffect(() => {
         const pathSegments = location.pathname.split("/").filter(Boolean)
-        console.log(pathSegments)
-        // no card chosen
-        if (pathSegments.length < 3 && selectedSection !== -1) setSelectedSection(-1)
-        // card chosen
-        else {
-            const cardTitleFromPath = pathSegments[2] || ""
-            console.log(cardTitleFromPath.replaceAll("%20", " "))
-            if (cardTitleFromPath) {
-                console.log(cards)
-                const foundIndex = cards.findIndex(c => c.title === cardTitleFromPath.replaceAll("%20", " "))
-                if (foundIndex !== selectedSection) setSelectedSection(foundIndex)
-            }
-        }
+        const cardTitleFromPath = decodeURIComponent(pathSegments[2] ?? "")
+        const nextSection = cardTitleFromPath
+            ? cards.findIndex(card => card.title === cardTitleFromPath)
+            : -1
+
+        setSelectedSection(current => current === nextSection ? current : nextSection)
         setIsMobileMenuOpen(false)
-    }, [location])
+    }, [cards, location.pathname])
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(prev => !prev)
 

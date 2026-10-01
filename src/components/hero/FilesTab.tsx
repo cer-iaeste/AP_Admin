@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FileUploadProps, TabProps, UploadedFileType } from "../../types/types";
 import ImagePopup from "../../global/ImagePopup";
 import FormButtons from "../card/FormButtons";
@@ -27,7 +27,7 @@ const FilesTab: React.FC<FilesProps> = ({ flag, banner, pdf, handleUpload, handl
 
     const closeModal = () => setViewImage(null);
 
-    const setInitialFiles = () => {
+    const setInitialFiles = useCallback(() => {
         setFlagImage(flag)
         setBannerImage(banner ?? "")
         setPdfFile(pdf ?? "")
@@ -37,11 +37,11 @@ const FilesTab: React.FC<FilesProps> = ({ flag, banner, pdf, handleUpload, handl
         setFlagToDelete("")
         setBannerToDelete("")
         setPdfToDelete("")
-    }
+    }, [banner, flag, pdf])
 
     useEffect(() => {
         if (flag) setInitialFiles()
-    }, [banner, pdf, flag])
+    }, [banner, pdf, flag, setInitialFiles])
 
     const onUploadFile = (e: React.ChangeEvent<HTMLInputElement>, type: "flag" | "banner" | "pdf") => {
         if (type === "flag") handleUpload(e, "flag", flagImage, setFlagImage, setFlagToUpload, setFlagToDelete);

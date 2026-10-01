@@ -7,18 +7,14 @@ interface FooterProps {
 }
 
 const CardFooter: React.FC<FooterProps> = ({ isChanged, onCancel, onSave }) => {
-    const [isDisabled, setIsDisabled] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        setIsDisabled(!isChanged);
-        // After saving, reset the loading state
-        if (!isChanged && isLoading) setIsLoading(false); // Only reset if already loading and changes are saved
-    }, [isChanged, isLoading]);
+        if (!isChanged) setIsLoading(false);
+    }, [isChanged]);
 
     const handleSave = async () => {
         setIsLoading(true); // Start loading
-        setIsDisabled(true); // Disable buttons immediately to prevent multiple clicks
         // The actual `onSave` function should handle re-enabling `isChanged` to false upon success/failure,
         // which will then trigger the `useEffect` above to reset `isDisabled` and `isLoading`.
         onSave();

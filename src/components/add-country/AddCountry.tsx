@@ -8,12 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { AddNewCountry } from "../../service/CountryService" // Assuming this service exists
 import Back from "../../global/Back";
 
-interface UploadedFile {
-    file: File
-    url: string // URL.createObjectURL for local preview
-    dbUrl: string // URL to Firebase Storage
-}
-
 const AddCountry: React.FC = () => {
     const [isChanged, setIsChanged] = useState(false)
     const [change, setChange] = useState(false) // Used to trigger useEffect for form changes

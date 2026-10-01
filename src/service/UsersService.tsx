@@ -1,14 +1,7 @@
 import { UserType } from "../types/types";
-import { doc, getDoc, getDocs, collection, getFirestore, updateDoc, addDoc } from "firebase/firestore";
+import { doc, getDocs, collection, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { toast } from 'react-toastify';
-
-interface DBUser {
-    uid: string
-    email: string
-    created: string
-    signedIn: string
-}
 
 export const fetchUsersData = async (): Promise<UserType[]> => {
     try {

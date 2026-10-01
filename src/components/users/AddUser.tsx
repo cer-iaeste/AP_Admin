@@ -35,8 +35,8 @@ const AddUser: React.FC<AddUserProps> = ({ countries, users }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(preselectedCountry);
 
-  const [validCountries, setValidCountries] = useState<String[]>([])
-  const [usedEmails, setUsedEmails] = useState<String[]>([])
+  const [validCountries, setValidCountries] = useState<string[]>([])
+  const [usedEmails, setUsedEmails] = useState<string[]>([])
 
   useEffect(() => {
     const resultEmails: string[] = []
